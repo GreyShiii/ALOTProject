@@ -6,25 +6,20 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('attendances', function (Blueprint $table) {
-            $table->id('attendance_id');
-            $table->foreignId('employee_id')->constrained('employees', 'employee_id')->cascadeOnDelete();
+            $table->id();
+            $table->foreignId('employee_id')->constrained()->restrictOnDelete();
             $table->date('date');
             $table->dateTime('time_in')->nullable();
             $table->dateTime('time_out')->nullable();
-            $table->unique(['employee_id', 'date']);
             $table->timestamps();
+
+            $table->unique(['employee_id', 'date']);
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('attendances');

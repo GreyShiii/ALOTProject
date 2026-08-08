@@ -6,30 +6,25 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        Schema::create('overtime_requests', function (Blueprint $table) {
-            $table->id('overtime_request_id');
-            $table->foreignId('employee_id')->constrained('employees', 'employee_id')->restrictOnDelete();
-            $table->date('date');
-            $table->decimal('hours', 5, 2);
+        Schema::create('leave_requests', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('employee_id')->constrained()->restrictOnDelete();
+            $table->enum('leave_type', ['Sick', 'Vacation', 'Emergency', 'Bereavement']);
+            $table->date('start_date');
+            $table->date('end_date');
             $table->string('reason', 500)->nullable();
             $table->enum('status', ['Pending', 'Approved', 'Rejected'])->default('Pending');
-            $table->foreignId('approved_by')->nullable()->constrained('users', 'user_id')->nullOnDelete();
+            $table->foreignId('approved_by')->nullable()->constrained('users')->nullOnDelete();
             $table->dateTime('approval_date')->nullable();
             $table->string('rejection_reason', 500)->nullable();
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists('overtime_requests');
+        Schema::dropIfExists('leave_requests');
     }
 };
