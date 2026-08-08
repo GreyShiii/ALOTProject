@@ -9,18 +9,46 @@
 </head>
 <body class="bg-gray-50">
     <div class="flex h-screen overflow-hidden">
+
+        {{-- Mobile --}}
+        <div id="sidebar-overlay" class="fixed inset-0 bg-black/40 z-30 hidden lg:hidden"></div>
+
         {{-- Sidebar --}}
         @include('partials.sidebar')
 
-        {{--  --}}
-        <div class="flex-1 flex flex-col overflow-hidden">
+        {{-- Main content --}}
+        <div class="flex-1 flex flex-col overflow-hidden min-w-0">
+
             {{-- Topbar --}}
             @include('partials.topbar')
-            <main class="flex-1 overflow-y-auto p-8">
+
+            {{-- Page Content --}}
+            <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
                 @yield('content')
             </main>
 
         </div>
     </div>
+
+    <script>
+        const sidebar = document.getElementById("sidebar");
+        const overlay = document.getElementById("sidebar-overlay");
+        const openBtn = document.getElementById("sidebar-open");
+        const closeBtn = document.getElementById("sidebar-close");
+
+        function openSidebar() {
+            sidebar.classList.remove("-translate-x-full");
+            overlay.classList.remove("hidden");
+        }
+
+        function closeSidebar() {
+            sidebar.classList.add("-translate-x-full");
+            overlay.classList.add("hidden");
+        }
+
+        openBtn?.addEventListener("click", openSidebar);
+        closeBtn?.addEventListener("click", closeSidebar);
+        overlay?.addEventListener("click", closeSidebar);
+    </script>
 </body>
 </html>
