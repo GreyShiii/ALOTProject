@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\DepartmentController;
+use App\Http\Controllers\Admin\EmployeeController;
 use App\Http\Controllers\Auth\LoginController;
 use Illuminate\Support\Facades\Route;
 
@@ -34,5 +35,7 @@ Route::middleware('auth')->group(function () {
     Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('departments', DepartmentController::class)
             ->only(['index', 'store', 'update', 'destroy']);
+        Route::resource('employees', EmployeeController::class)
+            ->only(['index', 'store', 'show', 'update', 'destroy']);
     });
 });

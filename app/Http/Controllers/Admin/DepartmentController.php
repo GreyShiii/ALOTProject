@@ -38,7 +38,7 @@ class DepartmentController extends Controller
 
     public function destroy(Department $department)
     {
-        if ($department->employees()->count() > 0) {
+        if ($department->employees()->exists()) {
             return response()->json([
                 'message' => 'This department has employees and cannot be deleted.',
             ], 409);
