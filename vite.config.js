@@ -10,6 +10,7 @@ export default defineConfig({
                 'resources/js/app.js',
                 'resources/js/admin/departments/departments.js',
                 'resources/js/admin/employees/employees.js',
+                'resources/js/admin/users/users.js',
             ],
             refresh: true,
         }),
