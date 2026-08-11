@@ -1,7 +1,3 @@
-// =====================================================
-// ELEMENTS
-// =====================================================
-
 const addEmployeeButton = document.getElementById("add-employee-btn")
 const addEmployeeModal = document.getElementById("add-employee-modal")
 const addEmployeeForm = document.getElementById("add-employee-form")
@@ -88,10 +84,16 @@ addEmployeeForm.addEventListener("submit", async (event) => {
 })
 
 // =====================================================
-// EDIT / DELETE BUTTONS (EVENT DELEGATION)
+// VIEW / EDIT / DELETE BUTTONS (EVENT DELEGATION)
 // =====================================================
 
 employeeTableBody.addEventListener("click", async (event) => {
+  // View
+  if (event.target.classList.contains("view-employee-btn")) {
+    showViewEmployee(event.target)
+    return
+  }
+
   // Edit
   if (event.target.classList.contains("edit-employee-btn")) {
     const id = event.target.getAttribute("data-id")
@@ -205,44 +207,43 @@ const viewEmployeeManager = document.getElementById("view-employee-manager")
 const viewEmployeeHireDate = document.getElementById("view-employee-hire-date")
 const viewEmployeeStatus = document.getElementById("view-employee-status")
 
-document.querySelectorAll(".view-employee-btn").forEach((button) => {
-  button.addEventListener("click", () => {
-    const firstName = button.dataset.firstName
-    const lastName = button.dataset.lastName
-    const employeeId = button.dataset.id
-    const email = button.dataset.email
-    const role = button.dataset.role
-    const status = button.dataset.status
-    const position = button.dataset.position
-    const department = button.dataset.department
-    const manager = button.dataset.manager
-    const hireDate = button.dataset.hireDate
+// Fill and open the view modal from a clicked View button
+function showViewEmployee(button) {
+  const firstName = button.dataset.firstName
+  const lastName = button.dataset.lastName
+  const employeeId = button.dataset.id
+  const email = button.dataset.email
+  const role = button.dataset.role
+  const status = button.dataset.status
+  const position = button.dataset.position
+  const department = button.dataset.department
+  const manager = button.dataset.manager
+  const hireDate = button.dataset.hireDate
 
-    // Name
-    viewEmployeeName.textContent = `${firstName} ${lastName}`
+  // Name
+  viewEmployeeName.textContent = `${firstName} ${lastName}`
 
-    // Account ID
-    viewEmployeeAccount.textContent = `Employee record EMP-${String(employeeId).padStart(4, "0")}`
+  // Account ID
+  viewEmployeeAccount.textContent = `Employee record EMP-${String(employeeId).padStart(4, "0")}`
 
-    // Email
-    viewEmployeeEmail.textContent = email
+  // Email
+  viewEmployeeEmail.textContent = email
 
-    // Role (clean, capitalized)
-    viewEmployeeRole.textContent = role.charAt(0).toUpperCase() + role.slice(1)
+  // Role (clean, capitalized)
+  viewEmployeeRole.textContent = role.charAt(0).toUpperCase() + role.slice(1)
 
-    // Position / Department / Manager / Hire Date
-    viewEmployeePosition.textContent = position || "—"
-    viewEmployeeDepartment.textContent = department || "—"
-    viewEmployeeManager.textContent = manager || "None"
-    viewEmployeeHireDate.textContent = hireDate || "N/A"
+  // Position / Department / Manager / Hire Date
+  viewEmployeePosition.textContent = position || "—"
+  viewEmployeeDepartment.textContent = department || "—"
+  viewEmployeeManager.textContent = manager || "None"
+  viewEmployeeHireDate.textContent = hireDate || "N/A"
 
-    // Status (clean, capitalized)
-    viewEmployeeStatus.textContent = status.charAt(0).toUpperCase() + status.slice(1)
+  // Status (clean, capitalized)
+  viewEmployeeStatus.textContent = status.charAt(0).toUpperCase() + status.slice(1)
 
-    // Show modal
-    viewEmployeeModal.classList.remove("hidden")
-  })
-})
+  // Show modal
+  viewEmployeeModal.classList.remove("hidden")
+}
 
 // Close view modal
 closeViewEmployee.addEventListener("click", () => {
@@ -331,23 +332,19 @@ function populateEditForm(employee) {
   form.elements["department_id"].value = employee.department_id
   form.elements["manager_id"].value = employee.manager_id ?? ""
   form.elements["position"].value = employee.position
-  form.elements["hire_date"].value = employee.hire_date
-    ? employee.hire_date.substring(0, 10)
-    : ""
+  form.elements["hire_date"].value = employee.hire_date ? employee.hire_date.substring(0, 10) : ""
 }
 
 // =====================================================
-// ADD EMPLOYEE TO TABLE
+// BUILD ACTION BUTTONS (View / Edit / Delete)
 // =====================================================
 
-function addEmployeeToTable(employee) {
+function buildActionButtons(employee) {
   const user = employee.user
   const department = employee.department
   const manager = employee.manager
 
-  const managerName = manager
-    ? `${manager.user.first_name} ${manager.user.last_name}`
-    : "None"
+  const managerName = manager ? `${manager.user.first_name} ${manager.user.last_name}` : "None"
 
   const hireDate = employee.hire_date
     ? new Date(employee.hire_date).toLocaleDateString("en-US", {
@@ -356,6 +353,87 @@ function addEmployeeToTable(employee) {
         year: "numeric",
       })
     : "N/A"
+
+  return `
+    <div class="flex items-center justify-center gap-2">
+      <button
+        type="button"
+        class="view-employee-btn rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-300/60"
+        data-id="${employee.id}"
+        data-first-name="${user.first_name}"
+        data-last-name="${user.last_name}"
+        data-email="${user.email}"
+        data-role="${user.role}"
+        data-status="${user.status}"
+        data-position="${employee.position}"
+        data-department="${department.name}"
+        data-manager="${managerName}"
+        data-hire-date="${hireDate}"
+      >View</button>
+
+      <button
+        type="button"
+        class="edit-employee-btn rounded-md border border-slate-200 bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-slate-300/60"
+        data-id="${employee.id}"
+      >Edit</button>
+
+      <button
+        type="button"
+        class="delete-employee-btn rounded-md bg-red-600 px-3 py-1.5 text-xs font-medium text-white shadow-sm transition hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500/40"
+        data-id="${employee.id}"
+        data-first-name="${user.first_name}"
+        data-last-name="${user.last_name}"
+      >Delete</button>
+    </div>
+  `
+}
+
+// =====================================================
+// BUILD ROW CELLS (shared by add + update)
+// =====================================================
+
+function buildEmployeeCells(employee) {
+  const user = employee.user
+  const department = employee.department
+  const manager = employee.manager
+
+  const managerName = manager ? `${manager.user.first_name} ${manager.user.last_name}` : "None"
+
+  const hireDate = employee.hire_date
+    ? new Date(employee.hire_date).toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      })
+    : "N/A"
+
+  const statusBadge =
+    user.status === "active"
+      ? `<span class="inline-flex items-center rounded-full border border-green-200 bg-green-50 px-2.5 py-1 text-xs font-semibold text-green-700">Active</span>`
+      : `<span class="inline-flex items-center rounded-full border border-gray-200 bg-gray-100 px-2.5 py-1 text-xs font-semibold text-gray-600">Inactive</span>`
+
+  return `
+    <td class="whitespace-nowrap px-3 py-4 text-center font-mono text-xs text-gray-500">EMP-${String(employee.id).padStart(2, "0")}</td>
+    <td class="px-3 py-4 text-center text-sm font-semibold text-gray-900">${user.first_name} ${user.last_name}</td>
+    <td class="px-3 py-4 text-center text-sm text-gray-500 break-all">${user.email}</td>
+    <td class="max-w-[160px] px-3 py-4 text-center text-sm text-gray-700">${employee.position}</td>
+    <td class="px-3 py-4 text-center text-sm text-gray-700">${department.name}</td>
+    <td class="px-3 py-4 text-center text-sm text-gray-700">${manager ? managerName : `<span class="text-gray-400">None</span>`}</td>
+    <td class="whitespace-nowrap px-3 py-4 text-center text-sm text-gray-700">${hireDate}</td>
+    <td class="whitespace-nowrap px-3 py-4 text-center">${statusBadge}</td>
+    <td class="whitespace-nowrap px-3 py-4 text-center">${buildActionButtons(employee)}</td>
+  `
+}
+
+// =====================================================
+// ADD EMPLOYEE TO TABLE
+// =====================================================
+
+function addEmployeeToTable(employee) {
+  const department = employee.department
+  const manager = employee.manager
+
+  const managerName = manager ? `${manager.user.first_name} ${manager.user.last_name}` : "None"
 
   employeeTableBody.insertAdjacentHTML(
     "beforeend",
@@ -366,42 +444,7 @@ function addEmployeeToTable(employee) {
       data-department="${department.name}"
       data-manager="${managerName === "None" ? "" : managerName}"
     >
-      <td class="whitespace-nowrap px-3 py-4 text-center font-mono text-xs text-gray-500">EMP-${String(employee.id).padStart(2, "0")}</td>
-      <td class="px-3 py-4 text-center text-sm font-semibold text-gray-900">${user.first_name} ${user.last_name}</td>
-      <td class="px-3 py-4 text-center text-sm text-gray-500 break-all">${user.email}</td>
-      <td class="max-w-[160px] px-3 py-4 text-center text-sm text-gray-700">${employee.position}</td>
-      <td class="px-3 py-4 text-center text-sm text-gray-700">${department.name}</td>
-      <td class="px-3 py-4 text-center text-sm text-gray-700">${
-        manager ? managerName : `<span class="text-gray-400">None</span>`
-      }</td>
-
-      <td class="whitespace-nowrap px-3 py-4 text-center text-sm text-gray-700">${hireDate}</td>
-
-      <td class="whitespace-nowrap px-3 py-4 text-center">
-        ${
-          user.status === "active"
-            ? `<span class="inline-flex items-center rounded-full border border-green-200 bg-green-50 px-2.5 py-1 text-xs font-semibold text-green-700">Active</span>`
-            : `<span class="inline-flex items-center rounded-full border border-gray-200 bg-gray-100 px-2.5 py-1 text-xs font-semibold text-gray-600">Inactive</span>`
-        }
-      </td>
-
-      <td class="whitespace-nowrap px-3 py-4 text-center">
-        <div class="flex items-center justify-center gap-2">
-          <button
-            type="button"
-            class="edit-employee-btn rounded-md border border-slate-200 bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-slate-300/60"
-            data-id="${employee.id}"
-          >Edit</button>
-
-          <button
-            type="button"
-            class="delete-employee-btn rounded-md bg-red-600 px-3 py-1.5 text-xs font-medium text-white shadow-sm transition hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500/40"
-            data-id="${employee.id}"
-            data-first-name="${user.first_name}"
-            data-last-name="${user.last_name}"
-          >Delete</button>
-        </div>
-      </td>
+      ${buildEmployeeCells(employee)}
     </tr>
   `,
   )
@@ -413,67 +456,15 @@ function addEmployeeToTable(employee) {
 
 function updateEmployeeRow(employee) {
   const row = document.getElementById(`employee-row-${employee.id}`)
-  const user = employee.user
   const department = employee.department
   const manager = employee.manager
 
-  const managerName = manager
-    ? `${manager.user.first_name} ${manager.user.last_name}`
-    : "None"
-
-  const hireDate = employee.hire_date
-    ? new Date(employee.hire_date).toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-      })
-    : "N/A"
-
   // Update filter data
   row.dataset.department = department.name
-  row.dataset.manager = manager
-    ? `${manager.user.first_name} ${manager.user.last_name}`
-    : ""
+  row.dataset.manager = manager ? `${manager.user.first_name} ${manager.user.last_name}` : ""
 
   // Update row HTML
-  row.innerHTML = `
-    <td class="whitespace-nowrap px-3 py-4 text-center font-mono text-xs text-gray-500">EMP-${String(employee.id).padStart(2, "0")}</td>
-    <td class="px-3 py-4 text-center text-sm font-semibold text-gray-900">${user.first_name} ${user.last_name}</td>
-    <td class="px-3 py-4 text-center text-sm text-gray-500 break-all">${user.email}</td>
-    <td class="max-w-[160px] px-3 py-4 text-center text-sm text-gray-700">${employee.position}</td>
-    <td class="px-3 py-4 text-center text-sm text-gray-700">${department.name}</td>
-    <td class="px-3 py-4 text-center text-sm text-gray-700">${
-      manager ? managerName : `<span class="text-gray-400">None</span>`
-    }</td>
-
-    <td class="whitespace-nowrap px-3 py-4 text-center text-sm text-gray-700">${hireDate}</td>
-
-    <td class="whitespace-nowrap px-3 py-4 text-center">
-      ${
-        user.status === "active"
-          ? `<span class="inline-flex items-center rounded-full border border-green-200 bg-green-50 px-2.5 py-1 text-xs font-semibold text-green-700">Active</span>`
-          : `<span class="inline-flex items-center rounded-full border border-gray-200 bg-gray-100 px-2.5 py-1 text-xs font-semibold text-gray-600">Inactive</span>`
-      }
-    </td>
-
-    <td class="whitespace-nowrap px-3 py-4 text-center">
-      <div class="flex items-center justify-center gap-2">
-        <button
-          type="button"
-          class="edit-employee-btn rounded-md border border-slate-200 bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-slate-300/60"
-          data-id="${employee.id}"
-        >Edit</button>
-
-        <button
-          type="button"
-          class="delete-employee-btn rounded-md bg-red-600 px-3 py-1.5 text-xs font-medium text-white shadow-sm transition hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500/40"
-          data-id="${employee.id}"
-          data-first-name="${user.first_name}"
-          data-last-name="${user.last_name}"
-        >Delete</button>
-      </div>
-    </td>
-  `
+  row.innerHTML = buildEmployeeCells(employee)
 }
 
 // =====================================================
@@ -485,9 +476,7 @@ function filterEmployees() {
   const departmentValue = departmentFilter.value.toLowerCase().trim()
   const managerValue = managerFilter.value.toLowerCase().trim()
 
-  const rows = employeeTableBody.querySelectorAll(
-    "tr:not(#no-employees):not(#no-filter-results)",
-  )
+  const rows = employeeTableBody.querySelectorAll("tr:not(#no-employees):not(#no-filter-results)")
 
   let visibleRows = 0
 
@@ -498,8 +487,7 @@ function filterEmployees() {
 
     // Department
     const rowDepartment = (row.dataset.department || "").toLowerCase().trim()
-    const matchesDepartment =
-      departmentValue === "" || rowDepartment === departmentValue
+    const matchesDepartment = departmentValue === "" || rowDepartment === departmentValue
 
     // Manager
     const rowManager = (row.dataset.manager || "").toLowerCase().trim()

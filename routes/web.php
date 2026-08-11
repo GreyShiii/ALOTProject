@@ -27,12 +27,14 @@ Route::middleware('auth')->group(function () {
     // Employee dashboard
     Route::get('/employee/dashboard', [EmployeeDashboardController::class, 'index'])
         ->name('employee.dashboard');
-    // Employee attendance
+    // Employee attendance route
     Route::prefix('employee/attendance')->name('employee.attendance.')->group(function () {
+        Route::get('/', [AttendanceController::class, 'index'])
+            ->name('index');
         Route::post('/time-in', [AttendanceController::class, 'timeIn'])
-            ->name('time-in');
+            ->name('timeIn');
         Route::post('/time-out', [AttendanceController::class, 'timeOut'])
-            ->name('time-out');
+            ->name('timeOut');
     });
     // Manager dashboard
     Route::get('/manager/dashboard', function () {
