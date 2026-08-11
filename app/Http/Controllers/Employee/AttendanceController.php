@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers\Employee;
 
 use App\Http\Controllers\Controller;
@@ -22,10 +21,10 @@ class AttendanceController extends Controller
         $attendance = Attendance::firstOrCreate(
             [
                 'employee_id' => $employee->id,
-                'date' => today(),
+                'date' => today('Asia/Manila'),
             ],
             [
-                'time_in' => now(),
+                'time_in' => now('Asia/Manila'),
             ]
         );
 
@@ -55,10 +54,11 @@ class AttendanceController extends Controller
         }
 
         $attendance = Attendance::where('employee_id', $employee->id)
-            ->whereDate('date', today())
+            ->whereDate('date', today('Asia/Manila'))
             ->whereNotNull('time_in')
             ->whereNull('time_out')
             ->first();
+
 
         if (!$attendance) {
             return response()->json([
@@ -68,7 +68,7 @@ class AttendanceController extends Controller
         }
 
         $attendance->update([
-            'time_out' => now(),
+            'time_out' => now('Asia/Manila'),
         ]);
 
         $attendance->refresh();

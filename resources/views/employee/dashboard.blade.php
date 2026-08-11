@@ -70,7 +70,7 @@
       <p id="attendance-total-hours" class="mt-2 text-lg font-semibold text-gray-900">
         @if ($todayAttendance?->time_in && $todayAttendance?->time_out)
           @php
-            $totalMinutes = $todayAttendance->time_in->diffInMinutes($todayAttendance->time_out);
+            $totalMinutes = (int) abs($todayAttendance->time_in->diffInMinutes($todayAttendance->time_out));
             $hours = intdiv($totalMinutes, 60);
             $minutes = $totalMinutes % 60;
           @endphp
