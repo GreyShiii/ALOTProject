@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Employee\DashboardController as EmployeeDashboardController;
 use App\Http\Controllers\Employee\AttendanceController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Employee\LeaveController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -35,6 +36,13 @@ Route::middleware('auth')->group(function () {
             ->name('timeIn');
         Route::post('/time-out', [AttendanceController::class, 'timeOut'])
             ->name('timeOut');
+    });
+    // Employee Leave
+    Route::prefix('employee/leave')->name('employee.leave.')->group(function () {
+        Route::get('/', [LeaveController::class, 'index'])
+            ->name('index');
+    Route::post('/', [LeaveController::class, 'store'])
+        ->name('store');
     });
     // Manager dashboard
     Route::get('/manager/dashboard', function () {
