@@ -42,6 +42,39 @@ class LeaveController extends Controller
         ));
     }
 
+    public function data()
+    {
+        $employee = Auth::user()->employee;
+
+        $leaves = LeaveRequest::where('employee_id', $employee->id)
+            ->latest('created_at')
+            ->get();
+
+        $pendingCount = LeaveRequest::where('employee_id', $employee->id)
+            ->where('status', 'Pending')
+            ->count();
+
+        $approvedCount = LeaveRequest::where('employee_id', $employee->id)
+            ->where('status', 'Approved')
+            ->count();
+
+        $rejectedCount = LeaveRequest::where('employee_id', $employee->id)
+            ->where('status', 'Rejected')
+            ->count();
+
+        $totalCount = LeaveRequest::where('employee_id', $employee->id)
+            ->count();
+
+        return response()->json([
+            'success' => true,
+            'leaves' => $leaves,
+            'pendingCount' => $pendingCount,
+            'approvedCount' => $approvedCount,
+            'rejectedCount' => $rejectedCount,
+            'totalCount' => $totalCount,
+        ]);
+    }
+
     public function store(Request $request)
     {
         $employee = Auth::user()->employee;
@@ -53,7 +86,7 @@ class LeaveController extends Controller
             'reason' => 'nullable|string|max:500',
         ]);
 
-        LeaveRequest::create([
+        $leave = LeaveRequest::create([
             'employee_id' => $employee->id,
             'leave_type' => $validated['leave_type'],
             'start_date' => $validated['start_date'],
@@ -62,8 +95,10 @@ class LeaveController extends Controller
             'status' => 'Pending',
         ]);
 
-        return redirect()
-            ->route('employee.leave.index')
-            ->with('success', 'Leave request submitted successfully.');
+        return response()->json([
+            'success' => true,
+            'message' => 'Leave request submitted successfully.',
+            'data' => $leave,
+        ]);
     }
 }

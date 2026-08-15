@@ -8,11 +8,12 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('overtime_requests', function (Blueprint $table) {
+        Schema::create('leave_requests', function (Blueprint $table) {
             $table->id();
             $table->foreignId('employee_id')->constrained()->restrictOnDelete();
-            $table->date('date');
-            $table->decimal('hours', 5, 2);
+            $table->enum('leave_type', ['Sick', 'Vacation', 'Emergency', 'Bereavement']);
+            $table->date('start_date');
+            $table->date('end_date');
             $table->string('reason', 500)->nullable();
             $table->enum('status', ['Pending', 'Approved', 'Rejected'])->default('Pending');
             $table->foreignId('approved_by')->nullable()->constrained('users')->nullOnDelete();
@@ -24,6 +25,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('overtime_requests');
+        Schema::dropIfExists('leave_requests');
     }
 };
