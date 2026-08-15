@@ -13,10 +13,6 @@
     </div>
 
     <div class="flex items-center gap-3 sm:gap-5">
-        <button class="relative text-gray-500 hover:text-gray-700">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a1.95 1.95 0 0 1-3.4 0"/></svg>
-            <span class="absolute top-0 right-0 w-2 h-2 bg-amber-500 rounded-full ring-2 ring-white"></span>
-        </button>
 
         @auth
             @php
