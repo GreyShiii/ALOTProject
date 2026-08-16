@@ -4,8 +4,9 @@ use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\DepartmentController;
 use App\Http\Controllers\Admin\EmployeeController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\AttendanceController as AdminAttendanceController;
 use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\Employee\AttendanceController;
+use App\Http\Controllers\Employee\AttendanceController as EmployeeAttedanceController;
 use App\Http\Controllers\Employee\DashboardController as EmployeeDashboardController;
 use App\Http\Controllers\Employee\LeaveController;
 use App\Http\Controllers\Employee\OvertimeController;
@@ -35,9 +36,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/employee/dashboard/data', [EmployeeDashboardController::class, 'data'])->name('employee.dashboard.data');
 
     Route::prefix('employee/attendance')->name('employee.attendance.')->group(function () {
-        Route::get('/', [AttendanceController::class, 'index'])->name('index');
-        Route::post('/time-in', [AttendanceController::class, 'timeIn'])->name('timeIn');
-        Route::post('/time-out', [AttendanceController::class, 'timeOut'])->name('timeOut');
+        Route::get('/', [EmployeeAttedanceController::class, 'index'])->name('index');
+        Route::post('/time-in', [EmployeeAttedanceController::class, 'timeIn'])->name('timeIn');
+        Route::post('/time-out', [EmployeeAttedanceController::class, 'timeOut'])->name('timeOut');
     });
 
     Route::prefix('employee/leave')->name('employee.leave.')->group(function () {
@@ -69,6 +70,9 @@ Route::middleware('auth')->group(function () {
         Route::resource('users', UserController::class)->only([
             'index', 'store', 'show', 'update', 'destroy'
         ]);
+
+        Route::get('/attendance', [AdminAttendanceController::class, 'index'])
+            ->name('attendance.index');
     });
 
 });

@@ -471,7 +471,7 @@
 
                     {{-- Attendance --}}
                     <li>
-                        {{-- <a href="{{ route('admin.attendance.index') }}" --}}
+                        <a href="{{ route('admin.attendance.index') }}"
                             class="relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition
                             {{ request()->routeIs('admin.attendance.*')
                                 ? 'bg-slate-800/70 font-semibold text-white'
@@ -497,7 +497,7 @@
 
                     {{-- Leave Requests --}}
                     <li>
-                        {{-- <a href="{{ route('admin.leave.index') }}" --}}
+                        <a href=""
                             class="relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition
                             {{ request()->routeIs('admin.leave.*')
                                 ? 'bg-slate-800/70 font-semibold text-white'
@@ -523,7 +523,7 @@
 
                     {{-- Overtime Requests --}}
                     <li>
-                        {{-- <a href="{{ route('admin.overtime.index') }}" --}}
+                        <a href=""
                             class="relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition
                             {{ request()->routeIs('admin.overtime.*')
                                 ? 'bg-slate-800/70 font-semibold text-white'
@@ -549,62 +549,42 @@
 
                     {{-- Profile --}}
                     <li>
-                        {{-- <a href="{{ route('admin.profile') }}" --}}
+                        <a href=""
                             class="relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition
                             {{ request()->routeIs('admin.profile')
                                 ? 'bg-slate-800/70 font-semibold text-white'
                                 : 'text-slate-300 hover:bg-slate-800/50 hover:text-white' }}">
-
                             <svg class="h-5 w-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.8"
                                 viewBox="0 0 24 24">
                                 <circle cx="12" cy="8" r="4" />
-
                                 <path stroke-linecap="round" stroke-linejoin="round"
                                     d="M4 20c0-3.3 3.6-6 8-6s8 2.7 8 6" />
                             </svg>
-
                             Profile
-
                             @if (request()->routeIs('admin.profile'))
                                 <span
                                     class="absolute right-2 top-1/2 h-5 w-1 -translate-y-1/2 rounded-full bg-teal-400"></span>
                             @endif
-
                         </a>
                     </li>
-
                 </ul>
             @endif
-
         @endauth
-
     </nav>
 
-
-    {{-- =====================================================
-        SIGN OUT
-    ====================================================== --}}
     <div class="border-t border-slate-700/60 px-4 py-4">
-
         <form method="POST" action="{{ route('logout') }}">
-
             @csrf
-
             <button type="submit"
                 class="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-slate-300 transition hover:bg-slate-800/50 hover:text-white">
-
                 <svg class="h-5 w-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.8"
                     viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round"
                         d="M15 12H3m0 0 4-4m-4 4 4 4M11 4h6a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-6" />
                 </svg>
-
                 Sign out
-
             </button>
-
         </form>
-
     </div>
 
 </aside>

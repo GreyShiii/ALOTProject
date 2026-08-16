@@ -421,6 +421,6 @@
         </div>
     @endforeach
 
-    @vite('resources/js/admin/users/users.js')
+    @vite('resources/js/admin/users.js')
 
 @endsection

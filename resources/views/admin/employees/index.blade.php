@@ -523,6 +523,6 @@
     </div>
 
     {{-- Scripts --}}
-    @vite('resources/js/admin/employees/employees.js')
+    @vite('resources/js/admin/employees.js')
 
 @endsection
