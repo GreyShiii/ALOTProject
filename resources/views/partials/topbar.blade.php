@@ -13,7 +13,6 @@
     </div>
 
     <div class="flex items-center gap-3 sm:gap-5">
-
         @auth
             @php
                 $user = auth()->user();

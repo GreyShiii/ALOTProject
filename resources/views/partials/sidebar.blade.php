@@ -471,7 +471,7 @@
 
                     {{-- Attendance --}}
                     <li>
-                        <a href="{{ route('admin.attendance.index') }}"
+                        {{-- <a href="{{ route('admin.attendance.index') }}" --}}
                             class="relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition
                             {{ request()->routeIs('admin.attendance.*')
                                 ? 'bg-slate-800/70 font-semibold text-white'
@@ -497,7 +497,7 @@
 
                     {{-- Leave Requests --}}
                     <li>
-                        <a href="{{ route('admin.leave.index') }}"
+                        {{-- <a href="{{ route('admin.leave.index') }}" --}}
                             class="relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition
                             {{ request()->routeIs('admin.leave.*')
                                 ? 'bg-slate-800/70 font-semibold text-white'
@@ -523,7 +523,7 @@
 
                     {{-- Overtime Requests --}}
                     <li>
-                        <a href="{{ route('admin.overtime.index') }}"
+                        {{-- <a href="{{ route('admin.overtime.index') }}" --}}
                             class="relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition
                             {{ request()->routeIs('admin.overtime.*')
                                 ? 'bg-slate-800/70 font-semibold text-white'
@@ -549,7 +549,7 @@
 
                     {{-- Profile --}}
                     <li>
-                        <a href="{{ route('admin.profile') }}"
+                        {{-- <a href="{{ route('admin.profile') }}" --}}
                             class="relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition
                             {{ request()->routeIs('admin.profile')
                                 ? 'bg-slate-800/70 font-semibold text-white'
