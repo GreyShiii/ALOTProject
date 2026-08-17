@@ -234,7 +234,7 @@
                         <a
                             href="{{ route('employee.profile.index') }}"
                             class="relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition
-                            {{ request()->routeIs('employee.profile')
+                            {{ request()->routeIs('employee.profile.*')
                                 ? 'bg-slate-800/70 font-semibold text-white'
                                 : 'text-slate-300 hover:bg-slate-800/50 hover:text-white' }}"
                         >
@@ -261,7 +261,7 @@
 
                             Profile
 
-                            @if (request()->routeIs('employee.profile'))
+                            @if (request()->routeIs('employee.profile.*'))
                                 <span
                                     class="absolute right-2 top-1/2 h-5 w-1 -translate-y-1/2 rounded-full bg-teal-400"
                                 ></span>
