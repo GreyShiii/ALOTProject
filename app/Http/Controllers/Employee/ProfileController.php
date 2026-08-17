@@ -10,14 +10,13 @@ use Illuminate\Support\Facades\Hash;
 
 class ProfileController extends Controller
 {
-
     public function index()
     {
         $user = Auth::user();
 
         $employee = Employee::with([
             'department',
-            'manager'
+            'manager',
         ])
             ->where('user_id', $user->id)
             ->first();
@@ -38,13 +37,11 @@ class ProfileController extends Controller
                 'string',
                 'max:255',
             ],
-
             'last_name' => [
                 'required',
                 'string',
                 'max:255',
             ],
-
             'email' => [
                 'required',
                 'email',
@@ -59,8 +56,17 @@ class ProfileController extends Controller
             'email' => $validated['email'],
         ]);
 
-        return to_route('employee.profile.index')
-            ->with('success', 'Profile updated successfully!');
+        $user->load([
+            'employee.department',
+            'employee.manager',
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Profile updated successfully!',
+            'user' => $user,
+            'employee' => $user->employee,
+        ]);
     }
 
     public function updatePassword(Request $request)
@@ -71,7 +77,6 @@ class ProfileController extends Controller
             'current_password' => [
                 'required',
             ],
-
             'new_password' => [
                 'required',
                 'string',
@@ -84,11 +89,14 @@ class ProfileController extends Controller
             $validated['current_password'],
             $user->password
         )) {
-            return back()
-                ->withErrors([
-                    'current_password' => 'The current password is incorrect.',
-                ])
-                ->withInput();
+            return response()->json([
+                'message' => 'The current password is incorrect.',
+                'errors' => [
+                    'current_password' => [
+                        'The current password is incorrect.',
+                    ],
+                ],
+            ], 422);
         }
 
         $user->update([
@@ -97,7 +105,9 @@ class ProfileController extends Controller
             ),
         ]);
 
-        return to_route('employee.profile.index')
-            ->with('password_success', 'Password updated successfully!');
+        return response()->json([
+            'success' => true,
+            'message' => 'Password updated successfully!',
+        ]);
     }
 }

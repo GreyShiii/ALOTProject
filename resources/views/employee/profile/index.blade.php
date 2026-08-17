@@ -1,10 +1,21 @@
 @extends('layouts.app')
 
 @section('title', 'Profile')
-@section('breadcrumb-parent', 'Employee')
+
+@section(
+'breadcrumb-parent',
+auth()->user()->isManager() ? 'Manager' : 'Employee'
+)
+
 @section('breadcrumb-current', 'Profile')
 
 @section('content')
+
+@php
+    $profileRoutePrefix = auth()->user()->isManager()
+        ? 'manager.profile'
+        : 'employee.profile';
+@endphp
 
 <div class="space-y-6">
 
@@ -13,6 +24,7 @@
     ===================================================== --}}
 
     <div>
+
         <h1 class="text-2xl font-semibold text-gray-900">
             Profile
         </h1>
@@ -20,6 +32,7 @@
         <p class="mt-1 text-sm text-gray-500">
             Your personal, employment and account information.
         </p>
+
     </div>
 
 
@@ -33,31 +46,45 @@
 
             {{-- Avatar --}}
             <div
+                data-profile-avatar
                 class="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-blue-700 to-cyan-600 text-xl font-semibold text-white"
             >
                 {{ strtoupper(substr($user->first_name, 0, 1)) }}{{ strtoupper(substr($user->last_name, 0, 1)) }}
             </div>
 
-            {{-- Name --}}
+
+            {{-- Name / Role --}}
             <div>
 
-                <h2 class="text-xl font-semibold text-gray-900">
+                <h2
+                    data-profile-name
+                    class="text-xl font-semibold text-gray-900"
+                >
                     {{ $user->first_name }} {{ $user->last_name }}
                 </h2>
+
 
                 <p class="text-sm text-gray-500">
 
                     @if ($employee && $employee->position)
+
                         {{ $employee->position }}
+
                     @else
-                        Employee
+
+                        {{ auth()->user()->isManager() ? 'Manager' : 'Employee' }}
+
                     @endif
 
+
                     @if ($employee && $employee->department)
+
                         · {{ $employee->department->name }}
+
                     @endif
 
                 </p>
+
 
                 {{-- Role --}}
                 <div class="mt-2">
@@ -76,101 +103,18 @@
 
     </div>
 
-@if (session('success'))
 
-    <div
-        class="profile-success-toast fixed top-4 right-4 z-50 flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 px-4 py-2.5 shadow-sm"
-    >
-        <span class="flex h-5 w-5 items-center justify-center rounded-full bg-green-500">
-            <svg
-                class="h-3 w-3 text-white"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2.5"
-                viewBox="0 0 24 24"
-            >
-                <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M5 13l4 4L19 7"
-                />
-            </svg>
-        </span>
-
-        <span class="text-sm font-medium text-green-700">
-            {{ session('success') }}
-        </span>
-    </div>
-
-@endif
-
-@if (session('password_success'))
-
-    <div
-        class="profile-success-toast fixed top-4 right-4 z-50 flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 px-4 py-2.5 shadow-sm"
-    >
-        <span class="flex h-5 w-5 items-center justify-center rounded-full bg-green-500">
-            <svg
-                class="h-3 w-3 text-white"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2.5"
-                viewBox="0 0 24 24"
-            >
-                <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M5 13l4 4L19 7"
-                />
-            </svg>
-        </span>
-
-        <span class="text-sm font-medium text-green-700">
-            {{ session('password_success') }}
-        </span>
-    </div>
-
-@endif
-
-@if ($errors->any())
-    <div
-        class="profile-error-toast fixed top-4 right-4 z-50 flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-2.5 shadow-sm"
-    >
-        <span class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-red-500">
-            <svg
-                class="h-3 w-3 text-white"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2.5"
-                viewBox="0 0 24 24"
-            >
-                <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M6 6l12 12M18 6L6 18"
-                />
-            </svg>
-        </span>
-
-        <div class="text-sm text-red-700">
-            <p class="font-semibold">
-                Please check the following:
-            </p>
-
-            <ul class="mt-2 space-y-1">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    </div>
-@endif
+    {{-- =====================================================
+        PROFILE INFORMATION
+    ===================================================== --}}
 
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
 
-        <div class="rounded-xl border border-gray-200 bg-white shadow-sm">
+        {{-- =================================================
+            PERSONAL INFORMATION
+        ================================================== --}}
 
-            {{-- Header --}}
+        <div class="rounded-xl border border-gray-200 bg-white shadow-sm">
 
             <div class="border-b border-gray-200 px-5 py-4">
 
@@ -185,25 +129,22 @@
             </div>
 
 
-            {{-- Form --}}
-
             <form
                 method="POST"
-                action="{{ route('employee.profile.update') }}"
+                action="{{ route($profileRoutePrefix . '.update') }}"
+                data-profile-form="personal"
             >
 
                 @csrf
                 @method('PUT')
 
+
                 <div class="space-y-5 p-5">
 
-
                     {{-- First Name + Last Name --}}
-
                     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
 
                         {{-- First Name --}}
-
                         <div>
 
                             <label
@@ -226,7 +167,6 @@
 
 
                         {{-- Last Name --}}
-
                         <div>
 
                             <label
@@ -251,7 +191,6 @@
 
 
                     {{-- Email --}}
-
                     <div>
 
                         <label
@@ -267,14 +206,14 @@
                             name="email"
                             value="{{ old('email', $user->email) }}"
                             required
+                            data-profile-email
                             class="mt-2 w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-700 outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                         >
 
                     </div>
 
 
-                    {{-- Save Button --}}
-
+                    {{-- Save --}}
                     <div>
 
                         <button
@@ -295,11 +234,9 @@
 
         {{-- =================================================
             EMPLOYMENT INFORMATION
-        ================================================= --}}
+        ================================================== --}}
 
         <div class="rounded-xl border border-gray-200 bg-white shadow-sm">
-
-            {{-- Header --}}
 
             <div class="border-b border-gray-200 px-5 py-4">
 
@@ -314,13 +251,9 @@
             </div>
 
 
-            {{-- Information --}}
-
             <div class="px-5">
 
-
                 {{-- Employee ID --}}
-
                 <div class="flex items-center justify-between border-b border-gray-200 py-4">
 
                     <span class="text-sm text-gray-500">
@@ -328,14 +261,13 @@
                     </span>
 
                     <span class="text-sm font-medium text-gray-900">
-                        {{ $employee->employee_id ?? '—' }}
+                        {{ $employee?->id ? 'EMP-' . str_pad($employee->id, 2, '0', STR_PAD_LEFT) : '—' }}
                     </span>
 
                 </div>
 
 
                 {{-- Position --}}
-
                 <div class="flex items-center justify-between border-b border-gray-200 py-4">
 
                     <span class="text-sm text-gray-500">
@@ -350,7 +282,6 @@
 
 
                 {{-- Department --}}
-
                 <div class="flex items-center justify-between border-b border-gray-200 py-4">
 
                     <span class="text-sm text-gray-500">
@@ -365,7 +296,6 @@
 
 
                 {{-- Hire Date --}}
-
                 <div class="flex items-center justify-between border-b border-gray-200 py-4">
 
                     <span class="text-sm text-gray-500">
@@ -390,7 +320,6 @@
 
 
                 {{-- Role --}}
-
                 <div class="flex items-center justify-between border-b border-gray-200 py-4">
 
                     <span class="text-sm text-gray-500">
@@ -407,7 +336,6 @@
 
 
                 {{-- Reporting Manager --}}
-
                 <div class="flex items-center justify-between py-4">
 
                     <span class="text-sm text-gray-500">
@@ -418,8 +346,8 @@
 
                         @if ($employee && $employee->manager)
 
-                            {{ $employee->manager->first_name }}
-                            {{ $employee->manager->last_name }}
+                            {{ $employee->manager->user->first_name }}
+                            {{ $employee->manager->user->last_name }}
 
                         @else
 
@@ -444,8 +372,6 @@
 
     <div class="rounded-xl border border-gray-200 bg-white shadow-sm">
 
-        {{-- Header --}}
-
         <div class="border-b border-gray-200 px-5 py-4">
 
             <h2 class="text-lg font-semibold text-gray-900">
@@ -459,21 +385,19 @@
         </div>
 
 
-        {{-- Password Form --}}
-
         <form
             method="POST"
-            action="{{ route('employee.profile.password.update') }}"
+            action="{{ route($profileRoutePrefix . '.password.update') }}"
+            data-profile-form="password"
         >
 
             @csrf
             @method('PUT')
 
+
             <div class="space-y-5 p-5">
 
-
                 {{-- Current Password --}}
-
                 <div>
 
                     <label
@@ -507,7 +431,6 @@
 
 
                 {{-- New Password --}}
-
                 <div>
 
                     <label
@@ -546,7 +469,6 @@
 
 
                 {{-- Confirm Password --}}
-
                 <div>
 
                     <label
@@ -580,8 +502,7 @@
                 </div>
 
 
-                {{-- Button --}}
-
+                {{-- Update Password --}}
                 <div>
 
                     <button
@@ -602,7 +523,6 @@
 </div>
 
 @endsection
-
 
 @section('scripts')
 

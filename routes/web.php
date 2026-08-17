@@ -18,7 +18,6 @@ use App\Http\Controllers\Employee\ProfileController;
 use App\Http\Controllers\Manager\LeaveController as ManagerLeaveController;
 use App\Http\Controllers\Manager\OvertimeController as ManagerOvertimeController;
 use App\Http\Controllers\Manager\TeamController;
-use App\Http\Controllers\Manager\ProfileController as ManagerProfileController;
 use App\Http\Controllers\Manager\DashboardController as ManagerDashboardController;
 
 use Illuminate\Support\Facades\Route;
@@ -202,35 +201,66 @@ Route::middleware('auth')->group(function () {
 
         });
 
+
+    /*
+    |--------------------------------------------------------------------------
+    | Manager Overtime Requests
+    |--------------------------------------------------------------------------
+    */
+
     Route::prefix('manager/overtime')
-    ->name('manager.overtime.')
-    ->group(function () {
+        ->name('manager.overtime.')
+        ->group(function () {
 
-        Route::get('/', [ManagerOvertimeController::class, 'index'])
-            ->name('index');
+            Route::get('/', [ManagerOvertimeController::class, 'index'])
+                ->name('index');
 
-        Route::get('/data', [ManagerOvertimeController::class, 'data'])
-            ->name('data');
+            Route::get('/data', [ManagerOvertimeController::class, 'data'])
+                ->name('data');
 
-        Route::post('/{overtimeRequest}/approve', [ManagerOvertimeController::class, 'approve'])
-            ->name('approve');
+            Route::post('/{overtimeRequest}/approve', [ManagerOvertimeController::class, 'approve'])
+                ->name('approve');
 
-        Route::post('/{overtimeRequest}/reject', [ManagerOvertimeController::class, 'reject'])
-            ->name('reject');
+            Route::post('/{overtimeRequest}/reject', [ManagerOvertimeController::class, 'reject'])
+                ->name('reject');
 
-    });
+        });
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Manager Team
+    |--------------------------------------------------------------------------
+    */
 
     Route::get('/manager/team', [TeamController::class, 'index'])
-    ->name('manager.team.index');
+        ->name('manager.team.index');
 
-    Route::get('/manager/profile', [ManagerProfileController::class, 'index'])
-        ->name('manager.profile');
 
-    Route::put('/manager/profile', [ManagerProfileController::class, 'update'])
-        ->name('manager.profile.update');
+    /*
+    |--------------------------------------------------------------------------
+    | Manager Profile
+    |--------------------------------------------------------------------------
+    |
+    | Uses the same ProfileController as Employee Profile.
+    | The Blade decides which route prefix to use.
+    |
+    */
 
-    Route::put('/manager/profile/password', [ManagerProfileController::class, 'updatePassword'])
-        ->name('manager.profile.password.update');
+    Route::prefix('manager/profile')
+        ->name('manager.profile.')
+        ->group(function () {
+
+            Route::get('/', [ProfileController::class, 'index'])
+                ->name('index');
+
+            Route::put('/', [ProfileController::class, 'update'])
+                ->name('update');
+
+            Route::put('/password', [ProfileController::class, 'updatePassword'])
+                ->name('password.update');
+
+        });
 
 
     /*

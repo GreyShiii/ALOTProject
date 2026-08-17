@@ -445,7 +445,7 @@
                     {{-- Profile --}}
                     <li>
                         <a
-                            href="{{ route('manager.profile') }}"
+                            href="{{ route('manager.profile.index') }}"
                             class="relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition
                             {{ request()->routeIs('manager.profile')
                                 ? 'bg-slate-800/70 font-semibold text-white'
