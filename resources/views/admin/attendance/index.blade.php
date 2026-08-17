@@ -373,5 +373,6 @@
         </div>
 
     </div>
+    @vite('resources/js/admin/attendance.js')
 
 @endsection

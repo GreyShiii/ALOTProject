@@ -98,5 +98,6 @@
 
 </div>
 
+@vite('resources/js/employee/attendance.js')
 
 @endsection

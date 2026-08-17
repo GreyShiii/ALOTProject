@@ -419,4 +419,6 @@
     </div>
 </div>
 
+@vite('resources/js/employee/overtime.js')
+
 @endsection

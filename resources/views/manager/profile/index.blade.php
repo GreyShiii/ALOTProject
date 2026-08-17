@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title', 'Profile')
-@section('breadcrumb-parent', 'Employee')
+@section('breadcrumb-parent', 'Manager')
 @section('breadcrumb-current', 'Profile')
 
 @section('content')
@@ -31,14 +31,12 @@
 
         <div class="flex items-center gap-4">
 
-            {{-- Avatar --}}
             <div
                 class="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-blue-700 to-cyan-600 text-xl font-semibold text-white"
             >
                 {{ strtoupper(substr($user->first_name, 0, 1)) }}{{ strtoupper(substr($user->last_name, 0, 1)) }}
             </div>
 
-            {{-- Name --}}
             <div>
 
                 <h2 class="text-xl font-semibold text-gray-900">
@@ -50,7 +48,7 @@
                     @if ($employee && $employee->position)
                         {{ $employee->position }}
                     @else
-                        Employee
+                        Manager
                     @endif
 
                     @if ($employee && $employee->department)
@@ -59,7 +57,6 @@
 
                 </p>
 
-                {{-- Role --}}
                 <div class="mt-2">
 
                     <span
@@ -76,101 +73,142 @@
 
     </div>
 
-@if (session('success'))
 
-    <div
-        class="profile-success-toast fixed top-4 right-4 z-50 flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 px-4 py-2.5 shadow-sm"
-    >
-        <span class="flex h-5 w-5 items-center justify-center rounded-full bg-green-500">
-            <svg
-                class="h-3 w-3 text-white"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2.5"
-                viewBox="0 0 24 24"
-            >
-                <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M5 13l4 4L19 7"
-                />
-            </svg>
-        </span>
+    {{-- =====================================================
+        SUCCESS MESSAGE
+    ===================================================== --}}
 
-        <span class="text-sm font-medium text-green-700">
-            {{ session('success') }}
-        </span>
-    </div>
+    @if (session('success'))
 
-@endif
+        <div
+            class="profile-success-toast fixed right-4 top-4 z-50 flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 px-4 py-2.5 shadow-sm"
+        >
 
-@if (session('password_success'))
+            <span class="flex h-5 w-5 items-center justify-center rounded-full bg-green-500">
 
-    <div
-        class="profile-success-toast fixed top-4 right-4 z-50 flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 px-4 py-2.5 shadow-sm"
-    >
-        <span class="flex h-5 w-5 items-center justify-center rounded-full bg-green-500">
-            <svg
-                class="h-3 w-3 text-white"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2.5"
-                viewBox="0 0 24 24"
-            >
-                <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M5 13l4 4L19 7"
-                />
-            </svg>
-        </span>
+                <svg
+                    class="h-3 w-3 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2.5"
+                    viewBox="0 0 24 24"
+                >
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M5 13l4 4L19 7"
+                    />
+                </svg>
 
-        <span class="text-sm font-medium text-green-700">
-            {{ session('password_success') }}
-        </span>
-    </div>
+            </span>
 
-@endif
+            <span class="text-sm font-medium text-green-700">
+                {{ session('success') }}
+            </span>
 
-@if ($errors->any())
-    <div
-        class="profile-error-toast fixed top-4 right-4 z-50 flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-2.5 shadow-sm"
-    >
-        <span class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-red-500">
-            <svg
-                class="h-3 w-3 text-white"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2.5"
-                viewBox="0 0 24 24"
-            >
-                <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M6 6l12 12M18 6L6 18"
-                />
-            </svg>
-        </span>
-
-        <div class="text-sm text-red-700">
-            <p class="font-semibold">
-                Please check the following:
-            </p>
-
-            <ul class="mt-2 space-y-1">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
         </div>
-    </div>
-@endif
+
+    @endif
+
+
+    {{-- =====================================================
+        PASSWORD SUCCESS
+    ===================================================== --}}
+
+    @if (session('password_success'))
+
+        <div
+            class="profile-success-toast fixed right-4 top-4 z-50 flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 px-4 py-2.5 shadow-sm"
+        >
+
+            <span class="flex h-5 w-5 items-center justify-center rounded-full bg-green-500">
+
+                <svg
+                    class="h-3 w-3 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2.5"
+                    viewBox="0 0 24 24"
+                >
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M5 13l4 4L19 7"
+                    />
+                </svg>
+
+            </span>
+
+            <span class="text-sm font-medium text-green-700">
+                {{ session('password_success') }}
+            </span>
+
+        </div>
+
+    @endif
+
+
+    {{-- =====================================================
+        ERROR MESSAGE
+    ===================================================== --}}
+
+    @if ($errors->any())
+
+        <div
+            class="profile-error-toast fixed right-4 top-4 z-50 flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-2.5 shadow-sm"
+        >
+
+            <span class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-red-500">
+
+                <svg
+                    class="h-3 w-3 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2.5"
+                    viewBox="0 0 24 24"
+                >
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M6 6l12 12M18 6L6 18"
+                    />
+                </svg>
+
+            </span>
+
+            <div class="text-sm text-red-700">
+
+                <p class="font-semibold">
+                    Please check the following:
+                </p>
+
+                <ul class="mt-2 space-y-1">
+
+                    @foreach ($errors->all() as $error)
+
+                        <li>
+                            {{ $error }}
+                        </li>
+
+                    @endforeach
+
+                </ul>
+
+            </div>
+
+        </div>
+
+    @endif
+
+
+    {{-- =====================================================
+        PERSONAL + EMPLOYMENT INFORMATION
+    ===================================================== --}}
 
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
 
+        {{-- PERSONAL INFORMATION --}}
         <div class="rounded-xl border border-gray-200 bg-white shadow-sm">
-
-            {{-- Header --}}
 
             <div class="border-b border-gray-200 px-5 py-4">
 
@@ -185,11 +223,9 @@
             </div>
 
 
-            {{-- Form --}}
-
             <form
                 method="POST"
-                action="{{ route('employee.profile.update') }}"
+                action="{{ route('manager.profile.update') }}"
             >
 
                 @csrf
@@ -197,12 +233,7 @@
 
                 <div class="space-y-5 p-5">
 
-
-                    {{-- First Name + Last Name --}}
-
                     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-
-                        {{-- First Name --}}
 
                         <div>
 
@@ -224,8 +255,6 @@
 
                         </div>
 
-
-                        {{-- Last Name --}}
 
                         <div>
 
@@ -250,8 +279,6 @@
                     </div>
 
 
-                    {{-- Email --}}
-
                     <div>
 
                         <label
@@ -273,8 +300,6 @@
                     </div>
 
 
-                    {{-- Save Button --}}
-
                     <div>
 
                         <button
@@ -293,13 +318,8 @@
         </div>
 
 
-        {{-- =================================================
-            EMPLOYMENT INFORMATION
-        ================================================= --}}
-
+        {{-- EMPLOYMENT INFORMATION --}}
         <div class="rounded-xl border border-gray-200 bg-white shadow-sm">
-
-            {{-- Header --}}
 
             <div class="border-b border-gray-200 px-5 py-4">
 
@@ -314,13 +334,9 @@
             </div>
 
 
-            {{-- Information --}}
-
             <div class="px-5">
 
-
                 {{-- Employee ID --}}
-
                 <div class="flex items-center justify-between border-b border-gray-200 py-4">
 
                     <span class="text-sm text-gray-500">
@@ -328,14 +344,13 @@
                     </span>
 
                     <span class="text-sm font-medium text-gray-900">
-                        {{ $employee->employee_id ?? '—' }}
+                        {{ $employee?->id ?? '—' }}
                     </span>
 
                 </div>
 
 
                 {{-- Position --}}
-
                 <div class="flex items-center justify-between border-b border-gray-200 py-4">
 
                     <span class="text-sm text-gray-500">
@@ -343,14 +358,13 @@
                     </span>
 
                     <span class="text-right text-sm font-medium text-gray-900">
-                        {{ $employee->position ?? '—' }}
+                        {{ $employee?->position ?? '—' }}
                     </span>
 
                 </div>
 
 
                 {{-- Department --}}
-
                 <div class="flex items-center justify-between border-b border-gray-200 py-4">
 
                     <span class="text-sm text-gray-500">
@@ -358,14 +372,13 @@
                     </span>
 
                     <span class="text-right text-sm font-medium text-gray-900">
-                        {{ $employee->department->name ?? '—' }}
+                        {{ $employee?->department?->name ?? '—' }}
                     </span>
 
                 </div>
 
 
                 {{-- Hire Date --}}
-
                 <div class="flex items-center justify-between border-b border-gray-200 py-4">
 
                     <span class="text-sm text-gray-500">
@@ -374,7 +387,7 @@
 
                     <span class="text-sm font-medium text-gray-900">
 
-                        @if ($employee && $employee->hire_date)
+                        @if ($employee?->hire_date)
 
                             {{ $employee->hire_date->format('F j, Y') }}
 
@@ -390,7 +403,6 @@
 
 
                 {{-- Role --}}
-
                 <div class="flex items-center justify-between border-b border-gray-200 py-4">
 
                     <span class="text-sm text-gray-500">
@@ -407,7 +419,6 @@
 
 
                 {{-- Reporting Manager --}}
-
                 <div class="flex items-center justify-between py-4">
 
                     <span class="text-sm text-gray-500">
@@ -416,10 +427,10 @@
 
                     <span class="text-right text-sm font-medium text-gray-900">
 
-                        @if ($employee && $employee->manager)
+                        @if ($employee?->manager)
 
-                            {{ $employee->manager->first_name }}
-                            {{ $employee->manager->last_name }}
+                            {{ $employee->manager->user?->first_name }}
+                            {{ $employee->manager->user?->last_name }}
 
                         @else
 
@@ -444,8 +455,6 @@
 
     <div class="rounded-xl border border-gray-200 bg-white shadow-sm">
 
-        {{-- Header --}}
-
         <div class="border-b border-gray-200 px-5 py-4">
 
             <h2 class="text-lg font-semibold text-gray-900">
@@ -459,20 +468,15 @@
         </div>
 
 
-        {{-- Password Form --}}
-
         <form
             method="POST"
-            action="{{ route('employee.profile.password.update') }}"
+            action="{{ route('manager.profile.password.update') }}"
         >
 
             @csrf
             @method('PUT')
 
             <div class="space-y-5 p-5">
-
-
-                {{-- Current Password --}}
 
                 <div>
 
@@ -505,8 +509,6 @@
 
                 </div>
 
-
-                {{-- New Password --}}
 
                 <div>
 
@@ -545,8 +547,6 @@
                 </div>
 
 
-                {{-- Confirm Password --}}
-
                 <div>
 
                     <label
@@ -580,8 +580,6 @@
                 </div>
 
 
-                {{-- Button --}}
-
                 <div>
 
                     <button
@@ -606,6 +604,6 @@
 
 @section('scripts')
 
-@vite('resources/js/employee/profile.js')
+@vite('resources/js/manager/profile.js')
 
 @endsection

@@ -507,4 +507,6 @@
     </div>
 </div>
 
+@vite('resources/js/employee/leave.js')
+
 @endsection

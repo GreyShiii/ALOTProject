@@ -910,4 +910,6 @@
 
     @endforeach
 
+    @vite('resources/js/admin/users.js')
+
 @endsection
