@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\EmployeeController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\AttendanceController as AdminAttendanceController;
 use App\Http\Controllers\Admin\LeaveController as AdminLeaveController;
+use App\Http\Controllers\Admin\OvertimeController as AdminOvertimeController;
 
 use App\Http\Controllers\Auth\LoginController;
 
@@ -355,6 +356,12 @@ Route::middleware('auth')->group(function () {
 
             Route::get('/leave/data', [AdminLeaveController::class, 'data'])
                 ->name('leave.data');
+
+            Route::get('/overtime', [AdminOvertimeController::class, 'index'])
+                ->name('overtime.index');
+
+            Route::get('/overtime/data', [AdminOvertimeController::class, 'data'])
+                ->name('overtime.data');
 
         });
 

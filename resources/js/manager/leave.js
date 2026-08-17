@@ -1,124 +1,85 @@
 const searchInput =
-    document.getElementById(
-        "manager-leave-search",
-    )
+    document.getElementById("manager-leave-search")
 
 const statusFilter =
-    document.getElementById(
-        "manager-leave-status",
-    )
+    document.getElementById("manager-leave-status")
 
 const dateFilter =
-    document.getElementById(
-        "manager-leave-date",
-    )
-
+    document.getElementById("manager-leave-date")
 
 const tableBody =
-    document.getElementById(
-        "manager-leave-table-body",
-    )
+    document.getElementById("manager-leave-table-body")
 
 const cardList =
-    document.getElementById(
-        "manager-leave-card-list",
-    )
+    document.getElementById("manager-leave-card-list")
 
 const emptyMessage =
-    document.getElementById(
-        "manager-leave-empty",
-    )
+    document.getElementById("manager-leave-empty")
 
 
 const modal =
-    document.getElementById(
-        "manager-leave-modal",
-    )
+    document.getElementById("manager-leave-modal")
 
 const closeModalButton =
-    document.getElementById(
-        "close-manager-leave-modal",
-    )
+    document.getElementById("close-manager-leave-modal")
 
 const closeFooterButton =
-    document.getElementById(
-        "close-manager-leave-footer",
-    )
+    document.getElementById("close-manager-leave-footer")
 
 
 const approveButton =
-    document.getElementById(
-        "approve-leave-btn",
-    )
+    document.getElementById("approve-leave-btn")
 
 const rejectButton =
-    document.getElementById(
-        "reject-leave-btn",
-    )
+    document.getElementById("reject-leave-btn")
+
+const confirmRejectButton =
+    document.getElementById("confirm-reject-leave-btn")
+
+const cancelRejectButton =
+    document.getElementById("cancel-reject-leave-btn")
+
 
 const rejectSection =
-    document.getElementById(
-        "reject-section",
-    )
+    document.getElementById("reject-section")
 
 const rejectionReason =
-    document.getElementById(
-        "rejection-reason",
-    )
+    document.getElementById("rejection-reason")
 
 const errorMessage =
-    document.getElementById(
-        "manager-leave-error",
-    )
+    document.getElementById("manager-leave-error")
 
 
 const reviewEmployee =
-    document.getElementById(
-        "review-employee",
-    )
+    document.getElementById("review-employee")
 
 const reviewDepartment =
-    document.getElementById(
-        "review-department",
-    )
+    document.getElementById("review-department")
 
 const reviewPosition =
-    document.getElementById(
-        "review-position",
-    )
+    document.getElementById("review-position")
 
 const reviewLeaveType =
-    document.getElementById(
-        "review-leave-type",
-    )
+    document.getElementById("review-leave-type")
 
 const reviewStartDate =
-    document.getElementById(
-        "review-start-date",
-    )
+    document.getElementById("review-start-date")
 
 const reviewEndDate =
-    document.getElementById(
-        "review-end-date",
-    )
+    document.getElementById("review-end-date")
 
 const reviewSubmitted =
-    document.getElementById(
-        "review-submitted",
-    )
+    document.getElementById("review-submitted")
 
 const reviewStatus =
-    document.getElementById(
-        "review-status",
-    )
+    document.getElementById("review-status")
 
 const reviewReason =
-    document.getElementById(
-        "review-reason",
-    )
+    document.getElementById("review-reason")
 
 
 let leaveRequests = []
+
 let selectedLeave = null
 
 
@@ -191,15 +152,14 @@ function normalizeStatus(status) {
 function displayStatus(status) {
 
     const normalized =
-        normalizeStatus(
-            status,
-        )
+        normalizeStatus(status)
 
 
     if (
         normalized ===
         "pending"
     ) {
+
         return "Pending"
     }
 
@@ -208,6 +168,7 @@ function displayStatus(status) {
         normalized ===
         "approved"
     ) {
+
         return "Approved"
     }
 
@@ -216,6 +177,7 @@ function displayStatus(status) {
         normalized ===
         "rejected"
     ) {
+
         return "Rejected"
     }
 
@@ -231,9 +193,7 @@ function displayStatus(status) {
 function statusBadge(status) {
 
     const normalized =
-        normalizeStatus(
-            status,
-        )
+        normalizeStatus(status)
 
 
     if (
@@ -324,6 +284,7 @@ function getFilteredRequests() {
             const employee =
                 leave.employee
 
+
             const user =
                 employee?.user
 
@@ -387,8 +348,10 @@ function createTableRow(
     const employee =
         leave.employee
 
+
     const user =
         employee?.user
+
 
     const employeeName =
         user
@@ -400,6 +363,7 @@ function createTableRow(
         formatDate(
             leave.start_date,
         )
+
 
     const endDate =
         formatDate(
@@ -425,7 +389,6 @@ function createTableRow(
 
     row.innerHTML = `
         <td class="px-4 py-4">
-
             <div>
                 <p class="text-sm font-semibold text-gray-900">
                     ${employeeName}
@@ -435,7 +398,6 @@ function createTableRow(
                     ${user?.email || "—"}
                 </p>
             </div>
-
         </td>
 
         <td class="px-4 py-4 text-sm font-medium text-gray-900">
@@ -483,8 +445,10 @@ function createMobileCard(
     const employee =
         leave.employee
 
+
     const user =
         employee?.user
+
 
     const employeeName =
         user
@@ -604,6 +568,49 @@ function renderLeaveRequests() {
 
 
 // =====================================================
+// RESET REJECTION MODE
+// =====================================================
+
+function resetRejectionMode() {
+
+    rejectSection.classList.add(
+        "hidden",
+    )
+
+
+    approveButton.classList.remove(
+        "hidden",
+    )
+
+
+    rejectButton.classList.remove(
+        "hidden",
+    )
+
+
+    confirmRejectButton.classList.add(
+        "hidden",
+    )
+
+
+    cancelRejectButton.classList.add(
+        "hidden",
+    )
+
+
+    rejectionReason.value = ""
+
+
+    errorMessage.textContent = ""
+
+
+    errorMessage.classList.add(
+        "hidden",
+    )
+}
+
+
+// =====================================================
 // OPEN MODAL
 // =====================================================
 
@@ -618,8 +625,10 @@ function openReviewModal(
     const employee =
         leave.employee
 
+
     const user =
         employee?.user
+
 
     const department =
         employee?.department
@@ -675,41 +684,21 @@ function openReviewModal(
         "No reason provided."
 
 
-    rejectionReason.value =
-        ""
-
-    errorMessage.textContent =
-        ""
-
-    errorMessage.classList.add(
-        "hidden",
-    )
+    resetRejectionMode()
 
 
-    rejectSection.classList.add(
-        "hidden",
-    )
-
-
-    if (
+    const isPending =
         normalizeStatus(
             leave.status,
         ) === "pending"
-    ) {
 
-        approveButton.classList.remove(
-            "hidden",
-        )
 
-        rejectButton.classList.remove(
-            "hidden",
-        )
-
-    } else {
+    if (!isPending) {
 
         approveButton.classList.add(
             "hidden",
         )
+
 
         rejectButton.classList.add(
             "hidden",
@@ -720,6 +709,7 @@ function openReviewModal(
     modal.classList.remove(
         "hidden",
     )
+
 
     modal.classList.add(
         "flex",
@@ -737,23 +727,17 @@ function closeReviewModal() {
         "hidden",
     )
 
+
     modal.classList.remove(
         "flex",
     )
 
-    selectedLeave = null
 
-    rejectionReason.value = ""
+    selectedLeave =
+        null
 
-    errorMessage.textContent = ""
 
-    errorMessage.classList.add(
-        "hidden",
-    )
-
-    rejectSection.classList.add(
-        "hidden",
-    )
+    resetRejectionMode()
 }
 
 
@@ -761,6 +745,7 @@ closeModalButton.addEventListener(
     "click",
     closeReviewModal,
 )
+
 
 closeFooterButton.addEventListener(
     "click",
@@ -802,6 +787,7 @@ document.addEventListener(
 
 
         if (leave) {
+
             openReviewModal(
                 leave,
             )
@@ -830,6 +816,7 @@ approveButton.addEventListener(
                     `/manager/leave/${selectedLeave.id}/approve`,
                     {
                         method: "POST",
+
                         headers: {
                             Accept:
                                 "application/json",
@@ -857,9 +844,11 @@ approveButton.addEventListener(
                     data.message ||
                     "Unable to approve request."
 
+
                 errorMessage.classList.remove(
                     "hidden",
                 )
+
 
                 return
             }
@@ -869,11 +858,15 @@ approveButton.addEventListener(
                 leaveRequests.findIndex(
                     (item) =>
                         Number(item.id) ===
-                        Number(selectedLeave.id),
+                        Number(
+                            selectedLeave.id,
+                        ),
                 )
 
 
-            if (index !== -1) {
+            if (
+                index !== -1
+            ) {
 
                 leaveRequests[index] =
                     data.leaveRequest
@@ -907,17 +900,70 @@ rejectButton.addEventListener(
             "hidden",
         )
 
-        rejectionReason.focus()
 
+        approveButton.classList.add(
+            "hidden",
+        )
+
+
+        rejectButton.classList.add(
+            "hidden",
+        )
+
+
+        confirmRejectButton.classList.remove(
+            "hidden",
+        )
+
+
+        cancelRejectButton.classList.remove(
+            "hidden",
+        )
+
+
+        errorMessage.textContent =
+            ""
+
+
+        errorMessage.classList.add(
+            "hidden",
+        )
+
+
+        rejectionReason.focus()
     },
 )
 
 
 // =====================================================
-// REJECT
+// CANCEL REJECT
 // =====================================================
 
-rejectSection.addEventListener(
+cancelRejectButton.addEventListener(
+    "click",
+    () => {
+
+        resetRejectionMode()
+    },
+)
+
+
+// =====================================================
+// CONFIRM REJECT
+// =====================================================
+
+confirmRejectButton.addEventListener(
+    "click",
+    submitRejection,
+)
+
+
+// =====================================================
+// REJECTION KEYBOARD SHORTCUT
+// Ctrl + Enter
+// =====================================================
+
+rejectionReason.addEventListener(
     "keydown",
     (event) => {
 
@@ -925,11 +971,18 @@ rejectSection.addEventListener(
             event.key === "Enter" &&
             event.ctrlKey
         ) {
+
+            event.preventDefault()
+
             submitRejection()
         }
     },
 )
 
+
+// =====================================================
+// SUBMIT REJECTION
+// =====================================================
 
 async function submitRejection() {
 
@@ -942,17 +995,32 @@ async function submitRejection() {
         rejectionReason.value.trim()
 
 
-    if (reason === "") {
+    if (
+        reason === ""
+    ) {
 
         errorMessage.textContent =
             "Please provide a rejection reason."
+
 
         errorMessage.classList.remove(
             "hidden",
         )
 
+
+        rejectionReason.focus()
+
+
         return
     }
+
+
+    // Prevent double clicks
+    confirmRejectButton.disabled =
+        true
+
+    confirmRejectButton.textContent =
+        "Rejecting..."
 
 
     try {
@@ -962,6 +1030,7 @@ async function submitRejection() {
                 `/manager/leave/${selectedLeave.id}/reject`,
                 {
                     method: "POST",
+
                     headers: {
                         Accept:
                             "application/json",
@@ -993,12 +1062,19 @@ async function submitRejection() {
 
         if (!response.ok) {
 
-            if (data.errors) {
+            if (
+                data.errors
+            ) {
 
-                errorMessage.textContent =
+                const firstError =
                     Object.values(
                         data.errors,
-                    )[0][0]
+                    )[0]
+
+
+                errorMessage.textContent =
+                    firstError?.[0] ||
+                    "Unable to reject request."
 
             } else {
 
@@ -1011,6 +1087,7 @@ async function submitRejection() {
             errorMessage.classList.remove(
                 "hidden",
             )
+
 
             return
         }
@@ -1026,7 +1103,9 @@ async function submitRejection() {
             )
 
 
-        if (index !== -1) {
+        if (
+            index !== -1
+        ) {
 
             leaveRequests[index] =
                 data.leaveRequest
@@ -1043,6 +1122,23 @@ async function submitRejection() {
             "REJECT LEAVE ERROR:",
             error,
         )
+
+
+        errorMessage.textContent =
+            "Something went wrong while rejecting the request."
+
+
+        errorMessage.classList.remove(
+            "hidden",
+        )
+
+    } finally {
+
+        confirmRejectButton.disabled =
+            false
+
+        confirmRejectButton.textContent =
+            "Reject Request"
     }
 }
 
@@ -1056,10 +1152,12 @@ searchInput.addEventListener(
     renderLeaveRequests,
 )
 
+
 statusFilter.addEventListener(
     "change",
     renderLeaveRequests,
 )
+
 
 dateFilter.addEventListener(
     "change",

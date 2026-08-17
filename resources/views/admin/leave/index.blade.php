@@ -32,17 +32,13 @@
         {{-- HEADER --}}
         <div class="border-b border-gray-200 px-5 py-4">
 
-            <div>
+            <h2 class="text-lg font-semibold text-gray-900">
+                All Leave Requests
+            </h2>
 
-                <h2 class="text-lg font-semibold text-gray-900">
-                    All Leave Requests
-                </h2>
-
-                <p class="mt-1 text-sm text-gray-500">
-                    View employee leave requests and their current status.
-                </p>
-
-            </div>
+            <p class="mt-1 text-sm text-gray-500">
+                View employee leave requests and their current status.
+            </p>
 
         </div>
 
@@ -196,7 +192,22 @@
 
         <div class="hidden overflow-x-auto md:block">
 
-            <table class="min-w-full divide-y divide-gray-200">
+            <table class="w-full table-fixed divide-y divide-gray-200">
+
+                {{-- LOCK COLUMN WIDTHS --}}
+                <colgroup>
+
+                    <col class="w-[18%]">
+                    <col class="w-[12%]">
+                    <col class="w-[12%]">
+                    <col class="w-[18%]">
+                    <col class="w-[8%]">
+                    <col class="w-[12%]">
+                    <col class="w-[10%]">
+                    <col class="w-[10%]">
+
+                </colgroup>
+
 
                 <thead class="bg-gray-50">
 
@@ -242,9 +253,7 @@
                 <tbody
                     id="leave-table-body"
                     class="divide-y divide-gray-200 bg-white"
-                >
-
-                </tbody>
+                ></tbody>
 
             </table>
 
@@ -258,9 +267,7 @@
         <div
             id="leave-card-list"
             class="divide-y divide-gray-200 md:hidden"
-        >
-
-        </div>
+        ></div>
 
 
         {{-- =================================================
@@ -326,11 +333,13 @@
                         stroke-width="2"
                         viewBox="0 0 24 24"
                     >
+
                         <path
                             stroke-linecap="round"
                             stroke-linejoin="round"
                             d="M6 6l12 12M18 6L6 18"
                         />
+
                     </svg>
 
                 </button>
@@ -524,7 +533,7 @@
 
                     <div
                         id="detail-reason"
-                        class="mt-2 rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-700"
+                        class="mt-2 break-words rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-700"
                     >
                         —
                     </div>
@@ -544,7 +553,7 @@
 
                     <div
                         id="detail-rejection"
-                        class="mt-2 rounded-lg border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700"
+                        class="mt-2 break-words rounded-lg border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700"
                     >
                         —
                     </div>

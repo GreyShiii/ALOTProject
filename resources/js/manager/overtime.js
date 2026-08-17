@@ -7,6 +7,7 @@ const statusFilter =
 const dateFilter =
     document.getElementById("manager-overtime-date")
 
+
 const tableBody =
     document.getElementById("manager-overtime-table-body")
 
@@ -32,6 +33,13 @@ const approveButton =
 
 const rejectButton =
     document.getElementById("reject-overtime-btn")
+
+const confirmRejectButton =
+    document.getElementById("confirm-reject-overtime-btn")
+
+const cancelRejectButton =
+    document.getElementById("cancel-reject-overtime-btn")
+
 
 const rejectSection =
     document.getElementById("overtime-reject-section")
@@ -69,6 +77,7 @@ const reviewReason =
 
 
 let overtimeRequests = []
+
 let selectedOvertime = null
 
 
@@ -77,29 +86,41 @@ let selectedOvertime = null
 // =====================================================
 
 async function loadOvertimeRequests() {
-    try {
-        const response = await fetch(
-            "/manager/overtime/data",
-            {
-                headers: {
-                    Accept: "application/json",
-                },
-            },
-        )
 
-        const data = await response.json()
+    try {
+
+        const response =
+            await fetch(
+                "/manager/overtime/data",
+                {
+                    headers: {
+                        Accept:
+                            "application/json",
+                    },
+                },
+            )
+
+
+        const data =
+            await response.json()
+
 
         if (!response.ok) {
+
             console.error(data)
+
             return
         }
+
 
         overtimeRequests =
             data.overtimeRequests || []
 
+
         renderOvertimeRequests()
 
     } catch (error) {
+
         console.error(
             "LOAD MANAGER OVERTIME ERROR:",
             error,
@@ -113,31 +134,45 @@ async function loadOvertimeRequests() {
 // =====================================================
 
 function normalizeStatus(status) {
-    return String(status || "")
+
+    return String(
+        status || "",
+    )
         .toLowerCase()
         .trim()
 }
 
 
 function formatDate(date) {
+
     if (!date) {
         return "N/A"
     }
 
+
     return new Date(date)
-        .toLocaleDateString("en-US", {
-            month: "short",
-            day: "numeric",
-            year: "numeric",
-        })
+        .toLocaleDateString(
+            "en-US",
+            {
+                month: "short",
+                day: "numeric",
+                year: "numeric",
+            },
+        )
 }
 
 
 function statusBadge(status) {
+
     const normalized =
         normalizeStatus(status)
 
-    if (normalized === "pending") {
+
+    if (
+        normalized ===
+        "pending"
+    ) {
+
         return `
             <span class="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-700">
                 <span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
@@ -146,7 +181,12 @@ function statusBadge(status) {
         `
     }
 
-    if (normalized === "approved") {
+
+    if (
+        normalized ===
+        "approved"
+    ) {
+
         return `
             <span class="inline-flex items-center gap-1.5 rounded-full bg-green-50 px-2.5 py-1 text-xs font-semibold text-green-700">
                 <span class="h-1.5 w-1.5 rounded-full bg-green-500"></span>
@@ -154,6 +194,7 @@ function statusBadge(status) {
             </span>
         `
     }
+
 
     return `
         <span class="inline-flex items-center gap-1.5 rounded-full bg-red-50 px-2.5 py-1 text-xs font-semibold text-red-700">
@@ -169,18 +210,22 @@ function statusBadge(status) {
 // =====================================================
 
 function getFilteredRequests() {
+
     const search =
         searchInput.value
             .toLowerCase()
             .trim()
+
 
     const status =
         statusFilter.value
             .toLowerCase()
             .trim()
 
+
     const selectedDate =
         dateFilter.value
+
 
     return overtimeRequests.filter(
         (overtime) => {
@@ -188,13 +233,16 @@ function getFilteredRequests() {
             const employee =
                 overtime.employee
 
+
             const user =
                 employee?.user
+
 
             const employeeName =
                 user
                     ? `${user.first_name} ${user.last_name}`
                     : ""
+
 
             const searchableText = `
                 ${employeeName}
@@ -203,17 +251,26 @@ function getFilteredRequests() {
                 ${overtime.reason || ""}
             `.toLowerCase()
 
+
             const matchesSearch =
                 search === "" ||
-                searchableText.includes(search)
+                searchableText.includes(
+                    search,
+                )
+
 
             const matchesStatus =
                 status === "" ||
-                normalizeStatus(overtime.status) === status
+                normalizeStatus(
+                    overtime.status,
+                ) === status
+
 
             const matchesDate =
                 selectedDate === "" ||
-                selectedDate === overtime.date
+                selectedDate ===
+                    overtime.date
+
 
             return (
                 matchesSearch &&
@@ -229,27 +286,39 @@ function getFilteredRequests() {
 // TABLE ROW
 // =====================================================
 
-function createTableRow(overtime) {
+function createTableRow(
+    overtime,
+) {
+
     const employee =
         overtime.employee
 
+
     const user =
         employee?.user
+
 
     const employeeName =
         user
             ? `${user.first_name} ${user.last_name}`
             : "Unknown Employee"
 
+
     const row =
-        document.createElement("tr")
+        document.createElement(
+            "tr",
+        )
+
 
     row.className =
         "transition hover:bg-gray-50"
 
+
     row.innerHTML = `
         <td class="px-4 py-4">
+
             <div>
+
                 <p class="text-sm font-semibold text-gray-900">
                     ${employeeName}
                 </p>
@@ -257,26 +326,34 @@ function createTableRow(overtime) {
                 <p class="mt-1 text-xs text-gray-500">
                     ${user?.email || "—"}
                 </p>
+
             </div>
+
         </td>
+
 
         <td class="whitespace-nowrap px-4 py-4 text-sm text-gray-700">
             ${formatDate(overtime.date)}
         </td>
 
+
         <td class="whitespace-nowrap px-4 py-4 text-sm font-medium text-gray-900">
             ${overtime.hours} hrs
         </td>
+
 
         <td class="max-w-xs px-4 py-4 text-sm text-gray-700">
             ${overtime.reason || "—"}
         </td>
 
+
         <td class="px-4 py-4">
             ${statusBadge(overtime.status)}
         </td>
 
+
         <td class="px-4 py-4 text-right">
+
             <button
                 type="button"
                 class="view-manager-overtime-btn rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-100"
@@ -284,8 +361,10 @@ function createTableRow(overtime) {
             >
                 Review
             </button>
+
         </td>
     `
+
 
     return row
 }
@@ -295,23 +374,33 @@ function createTableRow(overtime) {
 // MOBILE CARD
 // =====================================================
 
-function createMobileCard(overtime) {
+function createMobileCard(
+    overtime,
+) {
+
     const employee =
         overtime.employee
 
+
     const user =
         employee?.user
+
 
     const employeeName =
         user
             ? `${user.first_name} ${user.last_name}`
             : "Unknown Employee"
 
+
     const card =
-        document.createElement("div")
+        document.createElement(
+            "div",
+        )
+
 
     card.className =
         "px-4 py-4"
+
 
     card.innerHTML = `
         <div class="flex items-start justify-between gap-3">
@@ -332,9 +421,11 @@ function createMobileCard(overtime) {
 
         </div>
 
+
         <div class="mt-3 grid grid-cols-2 gap-4">
 
             <div>
+
                 <p class="text-xs font-semibold uppercase tracking-wide text-gray-400">
                     Hours
                 </p>
@@ -342,9 +433,12 @@ function createMobileCard(overtime) {
                 <p class="text-sm text-gray-700">
                     ${overtime.hours} hrs
                 </p>
+
             </div>
 
+
             <div>
+
                 <p class="text-xs font-semibold uppercase tracking-wide text-gray-400">
                     Reason
                 </p>
@@ -352,9 +446,11 @@ function createMobileCard(overtime) {
                 <p class="truncate text-sm text-gray-700">
                     ${overtime.reason || "—"}
                 </p>
+
             </div>
 
         </div>
+
 
         <button
             type="button"
@@ -365,6 +461,7 @@ function createMobileCard(overtime) {
         </button>
     `
 
+
     return card
 }
 
@@ -374,28 +471,94 @@ function createMobileCard(overtime) {
 // =====================================================
 
 function renderOvertimeRequests() {
+
     const filtered =
         getFilteredRequests()
 
+
     tableBody.innerHTML = ""
+
     cardList.innerHTML = ""
 
-    if (filtered.length === 0) {
-        emptyMessage.classList.remove("hidden")
+
+    if (
+        filtered.length === 0
+    ) {
+
+        emptyMessage.classList.remove(
+            "hidden",
+        )
+
         return
     }
 
-    emptyMessage.classList.add("hidden")
 
-    filtered.forEach((overtime) => {
-        tableBody.appendChild(
-            createTableRow(overtime),
-        )
+    emptyMessage.classList.add(
+        "hidden",
+    )
 
-        cardList.appendChild(
-            createMobileCard(overtime),
-        )
-    })
+
+    filtered.forEach(
+        (overtime) => {
+
+            tableBody.appendChild(
+                createTableRow(
+                    overtime,
+                ),
+            )
+
+
+            cardList.appendChild(
+                createMobileCard(
+                    overtime,
+                ),
+            )
+        },
+    )
+}
+
+
+// =====================================================
+// RESET REJECTION MODE
+// =====================================================
+
+function resetRejectionMode() {
+
+    rejectSection.classList.add(
+        "hidden",
+    )
+
+
+    approveButton.classList.remove(
+        "hidden",
+    )
+
+
+    rejectButton.classList.remove(
+        "hidden",
+    )
+
+
+    confirmRejectButton.classList.add(
+        "hidden",
+    )
+
+
+    cancelRejectButton.classList.add(
+        "hidden",
+    )
+
+
+    rejectionReason.value = ""
+
+
+    errorMessage.textContent =
+        ""
+
+
+    errorMessage.classList.add(
+        "hidden",
+    )
 }
 
 
@@ -403,68 +566,98 @@ function renderOvertimeRequests() {
 // OPEN MODAL
 // =====================================================
 
-function openReviewModal(overtime) {
+function openReviewModal(
+    overtime,
+) {
+
     selectedOvertime =
         overtime
+
 
     const employee =
         overtime.employee
 
+
     const user =
         employee?.user
 
+
     const department =
         employee?.department
+
 
     reviewEmployee.textContent =
         user
             ? `${user.first_name} ${user.last_name}`
             : "Unknown Employee"
 
+
     reviewDepartment.textContent =
-        department?.name || "—"
+        department?.name ||
+        "—"
+
 
     reviewPosition.textContent =
-        employee?.position || "—"
+        employee?.position ||
+        "—"
+
 
     reviewDate.textContent =
-        formatDate(overtime.date)
+        formatDate(
+            overtime.date,
+        )
+
 
     reviewHours.textContent =
         `${overtime.hours} hours`
 
+
     reviewSubmitted.textContent =
-        formatDate(overtime.created_at)
+        formatDate(
+            overtime.created_at,
+        )
+
 
     reviewStatus.innerHTML =
-        statusBadge(overtime.status)
+        statusBadge(
+            overtime.status,
+        )
+
 
     reviewReason.textContent =
         overtime.reason ||
         "No reason provided."
 
-    rejectionReason.value = ""
 
-    errorMessage.textContent = ""
-    errorMessage.classList.add("hidden")
+    resetRejectionMode()
 
-    rejectSection.classList.add("hidden")
 
-    if (
-        normalizeStatus(overtime.status) === "pending"
-    ) {
+    const isPending =
+        normalizeStatus(
+            overtime.status,
+        ) === "pending"
 
-        approveButton.classList.remove("hidden")
-        rejectButton.classList.remove("hidden")
 
-    } else {
+    if (!isPending) {
 
-        approveButton.classList.add("hidden")
-        rejectButton.classList.add("hidden")
+        approveButton.classList.add(
+            "hidden",
+        )
+
+        rejectButton.classList.add(
+            "hidden",
+        )
     }
 
-    modal.classList.remove("hidden")
-    modal.classList.add("flex")
+
+    modal.classList.remove(
+        "hidden",
+    )
+
+
+    modal.classList.add(
+        "flex",
+    )
 }
 
 
@@ -473,22 +666,30 @@ function openReviewModal(overtime) {
 // =====================================================
 
 function closeReviewModal() {
-    modal.classList.add("hidden")
-    modal.classList.remove("flex")
 
-    selectedOvertime = null
-    rejectionReason.value = ""
+    modal.classList.add(
+        "hidden",
+    )
 
-    errorMessage.textContent = ""
-    errorMessage.classList.add("hidden")
 
-    rejectSection.classList.add("hidden")
+    modal.classList.remove(
+        "flex",
+    )
+
+
+    selectedOvertime =
+        null
+
+
+    resetRejectionMode()
 }
+
 
 closeModalButton.addEventListener(
     "click",
     closeReviewModal,
 )
+
 
 closeFooterButton.addEventListener(
     "click",
@@ -509,12 +710,17 @@ document.addEventListener(
                 ".view-manager-overtime-btn",
             )
 
+
         if (!button) {
             return
         }
 
+
         const overtimeId =
-            Number(button.dataset.id)
+            Number(
+                button.dataset.id,
+            )
+
 
         const overtime =
             overtimeRequests.find(
@@ -523,8 +729,12 @@ document.addEventListener(
                     overtimeId,
             )
 
+
         if (overtime) {
-            openReviewModal(overtime)
+
+            openReviewModal(
+                overtime,
+            )
         }
     },
 )
@@ -542,6 +752,15 @@ approveButton.addEventListener(
             return
         }
 
+
+        approveButton.disabled =
+            true
+
+
+        approveButton.textContent =
+            "Approving..."
+
+
         try {
 
             const response =
@@ -549,6 +768,7 @@ approveButton.addEventListener(
                     `/manager/overtime/${selectedOvertime.id}/approve`,
                     {
                         method: "POST",
+
                         headers: {
                             Accept:
                                 "application/json",
@@ -565,8 +785,10 @@ approveButton.addEventListener(
                     },
                 )
 
+
             const data =
                 await response.json()
+
 
             if (!response.ok) {
 
@@ -574,12 +796,15 @@ approveButton.addEventListener(
                     data.message ||
                     "Unable to approve request."
 
+
                 errorMessage.classList.remove(
                     "hidden",
                 )
 
+
                 return
             }
+
 
             const index =
                 overtimeRequests.findIndex(
@@ -590,12 +815,18 @@ approveButton.addEventListener(
                         ),
                 )
 
-            if (index !== -1) {
+
+            if (
+                index !== -1
+            ) {
+
                 overtimeRequests[index] =
                     data.overtimeRequest
             }
 
+
             closeReviewModal()
+
             renderOvertimeRequests()
 
         } catch (error) {
@@ -604,13 +835,21 @@ approveButton.addEventListener(
                 "APPROVE OVERTIME ERROR:",
                 error,
             )
+
+        } finally {
+
+            approveButton.disabled =
+                false
+
+            approveButton.textContent =
+                "Approve"
         }
     },
 )
 
 
 // =====================================================
-// SHOW REJECTION AREA
+// START REJECTION MODE
 // =====================================================
 
 rejectButton.addEventListener(
@@ -621,7 +860,81 @@ rejectButton.addEventListener(
             "hidden",
         )
 
+
+        approveButton.classList.add(
+            "hidden",
+        )
+
+
+        rejectButton.classList.add(
+            "hidden",
+        )
+
+
+        confirmRejectButton.classList.remove(
+            "hidden",
+        )
+
+
+        cancelRejectButton.classList.remove(
+            "hidden",
+        )
+
+
+        errorMessage.textContent =
+            ""
+
+
+        errorMessage.classList.add(
+            "hidden",
+        )
+
+
         rejectionReason.focus()
+    },
+)
+
+
+// =====================================================
+// CANCEL REJECTION
+// =====================================================
+
+cancelRejectButton.addEventListener(
+    "click",
+    () => {
+
+        resetRejectionMode()
+    },
+)
+
+
+// =====================================================
+// CONFIRM REJECTION
+// =====================================================
+
+confirmRejectButton.addEventListener(
+    "click",
+    submitRejection,
+)
+
+
+// =====================================================
+// CTRL + ENTER
+// =====================================================
+
+rejectionReason.addEventListener(
+    "keydown",
+    (event) => {
+
+        if (
+            event.key === "Enter" &&
+            event.ctrlKey
+        ) {
+
+            event.preventDefault()
+
+            submitRejection()
+        }
     },
 )
 
@@ -636,20 +949,37 @@ async function submitRejection() {
         return
     }
 
+
     const reason =
         rejectionReason.value.trim()
 
-    if (reason === "") {
+
+    if (
+        reason === ""
+    ) {
 
         errorMessage.textContent =
             "Please provide a rejection reason."
+
 
         errorMessage.classList.remove(
             "hidden",
         )
 
+
+        rejectionReason.focus()
+
         return
     }
+
+
+    confirmRejectButton.disabled =
+        true
+
+
+    confirmRejectButton.textContent =
+        "Rejecting..."
+
 
     try {
 
@@ -658,6 +988,7 @@ async function submitRejection() {
                 `/manager/overtime/${selectedOvertime.id}/reject`,
                 {
                     method: "POST",
+
                     headers: {
                         Accept:
                             "application/json",
@@ -682,17 +1013,26 @@ async function submitRejection() {
                 },
             )
 
+
         const data =
             await response.json()
 
+
         if (!response.ok) {
 
-            if (data.errors) {
+            if (
+                data.errors
+            ) {
 
-                errorMessage.textContent =
+                const firstError =
                     Object.values(
                         data.errors,
-                    )[0][0]
+                    )[0]
+
+
+                errorMessage.textContent =
+                    firstError?.[0] ||
+                    "Unable to reject request."
 
             } else {
 
@@ -701,12 +1041,15 @@ async function submitRejection() {
                     "Unable to reject request."
             }
 
+
             errorMessage.classList.remove(
                 "hidden",
             )
 
+
             return
         }
+
 
         const index =
             overtimeRequests.findIndex(
@@ -717,12 +1060,18 @@ async function submitRejection() {
                     ),
             )
 
-        if (index !== -1) {
+
+        if (
+            index !== -1
+        ) {
+
             overtimeRequests[index] =
                 data.overtimeRequest
         }
 
+
         closeReviewModal()
+
         renderOvertimeRequests()
 
     } catch (error) {
@@ -731,26 +1080,25 @@ async function submitRejection() {
             "REJECT OVERTIME ERROR:",
             error,
         )
+
+
+        errorMessage.textContent =
+            "Something went wrong while rejecting the request."
+
+
+        errorMessage.classList.remove(
+            "hidden",
+        )
+
+    } finally {
+
+        confirmRejectButton.disabled =
+            false
+
+        confirmRejectButton.textContent =
+            "Reject Request"
     }
 }
-
-
-// =====================================================
-// REJECTION TEXTAREA
-// =====================================================
-
-rejectionReason.addEventListener(
-    "keydown",
-    (event) => {
-
-        if (
-            event.key === "Enter" &&
-            event.ctrlKey
-        ) {
-            submitRejection()
-        }
-    },
-)
 
 
 // =====================================================
@@ -762,10 +1110,12 @@ searchInput.addEventListener(
     renderOvertimeRequests,
 )
 
+
 statusFilter.addEventListener(
     "change",
     renderOvertimeRequests,
 )
+
 
 dateFilter.addEventListener(
     "change",

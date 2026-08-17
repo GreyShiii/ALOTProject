@@ -1,124 +1,126 @@
-const leaveSearch =
-    document.getElementById("leave-search")
-
-const leaveStatusFilter =
-    document.getElementById("leave-status-filter")
-
-const leaveDepartmentFilter =
+const searchInput =
     document.getElementById(
-        "leave-department-filter",
+        "admin-overtime-search",
     )
 
-const leaveDateFilter =
-    document.getElementById("leave-date-filter")
-
-
-const leaveTableBody =
-    document.getElementById("leave-table-body")
-
-const leaveCardList =
-    document.getElementById("leave-card-list")
-
-const noLeaveResults =
-    document.getElementById("no-leave-results")
-
-
-const leaveDetailsModal =
+const statusFilter =
     document.getElementById(
-        "leave-details-modal",
+        "admin-overtime-status",
     )
 
-const closeLeaveDetails =
+const departmentFilter =
     document.getElementById(
-        "close-leave-details",
+        "admin-overtime-department",
     )
 
-const closeLeaveDetailsFooter =
+const dateFilter =
     document.getElementById(
-        "close-leave-details-footer",
+        "admin-overtime-date",
+    )
+
+
+const tableBody =
+    document.getElementById(
+        "admin-overtime-table-body",
+    )
+
+const cardList =
+    document.getElementById(
+        "admin-overtime-card-list",
+    )
+
+const emptyMessage =
+    document.getElementById(
+        "admin-overtime-empty",
+    )
+
+
+const modal =
+    document.getElementById(
+        "admin-overtime-modal",
+    )
+
+const closeModalButton =
+    document.getElementById(
+        "close-admin-overtime-modal",
+    )
+
+const closeFooterButton =
+    document.getElementById(
+        "close-admin-overtime-footer",
     )
 
 
 const detailEmployee =
     document.getElementById(
-        "detail-employee",
+        "admin-detail-employee",
     )
 
 const detailDepartment =
     document.getElementById(
-        "detail-department",
+        "admin-detail-department",
     )
 
 const detailPosition =
     document.getElementById(
-        "detail-position",
+        "admin-detail-position",
     )
 
-const detailLeaveType =
+const detailDate =
     document.getElementById(
-        "detail-leave-type",
+        "admin-detail-date",
     )
 
-const detailStartDate =
+const detailHours =
     document.getElementById(
-        "detail-start-date",
-    )
-
-const detailEndDate =
-    document.getElementById(
-        "detail-end-date",
-    )
-
-const detailDays =
-    document.getElementById(
-        "detail-days",
+        "admin-detail-hours",
     )
 
 const detailSubmitted =
     document.getElementById(
-        "detail-submitted",
+        "admin-detail-submitted",
     )
 
 const detailStatus =
     document.getElementById(
-        "detail-status",
+        "admin-detail-status",
     )
 
 const detailApprover =
     document.getElementById(
-        "detail-approver",
+        "admin-detail-approver",
     )
 
 const detailReason =
     document.getElementById(
-        "detail-reason",
+        "admin-detail-reason",
     )
 
 const detailRejectionContainer =
     document.getElementById(
-        "detail-rejection-container",
+        "admin-detail-rejection-container",
     )
 
 const detailRejection =
     document.getElementById(
-        "detail-rejection",
+        "admin-detail-rejection",
     )
 
 
-let leaveRequests = []
+let overtimeRequests = []
 
 
 // =====================================================
 // LOAD DATA
 // =====================================================
 
-async function loadLeaveRequests() {
+async function loadOvertimeRequests() {
 
     try {
 
         const response =
             await fetch(
-                "/admin/leave/data",
+                "/admin/overtime/data",
                 {
                     headers: {
                         Accept:
@@ -140,25 +142,25 @@ async function loadLeaveRequests() {
         }
 
 
-        leaveRequests =
-            data.leaveRequests || []
+        overtimeRequests =
+            data.overtimeRequests || []
 
 
-        leaveSearch.value = ""
+        searchInput.value = ""
 
-        leaveStatusFilter.value = ""
+        statusFilter.value = ""
 
-        leaveDepartmentFilter.value = ""
+        departmentFilter.value = ""
 
-        leaveDateFilter.value = ""
+        dateFilter.value = ""
 
 
-        renderLeaveRequests()
+        renderOvertimeRequests()
 
     } catch (error) {
 
         console.error(
-            "LOAD LEAVE REQUESTS ERROR:",
+            "LOAD ADMIN OVERTIME ERROR:",
             error,
         )
     }
@@ -166,8 +168,18 @@ async function loadLeaveRequests() {
 
 
 // =====================================================
-// FORMAT DATE
+// HELPERS
 // =====================================================
+
+function normalizeStatus(status) {
+
+    return String(
+        status || "",
+    )
+        .toLowerCase()
+        .trim()
+}
+
 
 function formatDate(date) {
 
@@ -187,60 +199,6 @@ function formatDate(date) {
         )
 }
 
-
-// =====================================================
-// CALCULATE DAYS
-// =====================================================
-
-function calculateDays(
-    startDate,
-    endDate,
-) {
-
-    if (
-        !startDate ||
-        !endDate
-    ) {
-
-        return 0
-    }
-
-
-    const start =
-        new Date(startDate)
-
-    const end =
-        new Date(endDate)
-
-
-    const difference =
-        Math.floor(
-            (end - start) /
-                (1000 * 60 * 60 * 24),
-        ) + 1
-
-
-    return difference
-}
-
-
-// =====================================================
-// NORMALIZE STATUS
-// =====================================================
-
-function normalizeStatus(status) {
-
-    return String(
-        status || "",
-    )
-        .toLowerCase()
-        .trim()
-}
-
-
-// =====================================================
-// STATUS BADGE
-// =====================================================
 
 function statusBadge(status) {
 
@@ -305,30 +263,30 @@ function statusBadge(status) {
 function getFilteredRequests() {
 
     const search =
-        leaveSearch.value
+        searchInput.value
             .toLowerCase()
             .trim()
 
 
-    const selectedStatus =
-        leaveStatusFilter.value
+    const status =
+        statusFilter.value
             .toLowerCase()
             .trim()
 
 
     const departmentId =
-        leaveDepartmentFilter.value
+        departmentFilter.value
 
 
     const selectedDate =
-        leaveDateFilter.value
+        dateFilter.value
 
 
-    return leaveRequests.filter(
-        (leave) => {
+    return overtimeRequests.filter(
+        (overtime) => {
 
             const employee =
-                leave.employee
+                overtime.employee
 
             const user =
                 employee?.user
@@ -348,8 +306,7 @@ function getFilteredRequests() {
                 ${user?.email || ""}
                 ${employee?.position || ""}
                 ${department?.name || ""}
-                ${leave.leave_type || ""}
-                ${leave.reason || ""}
+                ${overtime.reason || ""}
             `.toLowerCase()
 
 
@@ -360,16 +317,11 @@ function getFilteredRequests() {
                 )
 
 
-            const leaveStatus =
-                normalizeStatus(
-                    leave.status,
-                )
-
-
             const matchesStatus =
-                selectedStatus === "" ||
-                leaveStatus ===
-                    selectedStatus
+                status === "" ||
+                normalizeStatus(
+                    overtime.status,
+                ) === status
 
 
             const matchesDepartment =
@@ -384,12 +336,8 @@ function getFilteredRequests() {
 
             const matchesDate =
                 selectedDate === "" ||
-                (
-                    selectedDate >=
-                        leave.start_date &&
-                    selectedDate <=
-                        leave.end_date
-                )
+                selectedDate ===
+                    overtime.date
 
 
             return (
@@ -408,11 +356,11 @@ function getFilteredRequests() {
 // =====================================================
 
 function createTableRow(
-    leave,
+    overtime,
 ) {
 
     const employee =
-        leave.employee
+        overtime.employee
 
     const user =
         employee?.user
@@ -425,31 +373,6 @@ function createTableRow(
         user
             ? `${user.first_name} ${user.last_name}`
             : "Unknown Employee"
-
-
-    const startDate =
-        formatDate(
-            leave.start_date,
-        )
-
-
-    const endDate =
-        formatDate(
-            leave.end_date,
-        )
-
-
-    const days =
-        calculateDays(
-            leave.start_date,
-            leave.end_date,
-        )
-
-
-    const dateDisplay =
-        startDate === endDate
-            ? startDate
-            : `${startDate} – ${endDate}`
 
 
     const row =
@@ -485,28 +408,18 @@ function createTableRow(
         </td>
 
 
-        <td class="align-middle px-4 py-4 break-words text-sm font-medium text-gray-900">
-            ${leave.leave_type || "—"}
-        </td>
-
-
         <td class="align-middle whitespace-nowrap px-4 py-4 text-sm text-gray-700">
-            ${dateDisplay}
+            ${formatDate(overtime.date)}
         </td>
 
 
-        <td class="align-middle whitespace-nowrap px-4 py-4 text-sm text-gray-700">
-            ${days} ${days === 1 ? "day" : "days"}
-        </td>
-
-
-        <td class="align-middle whitespace-nowrap px-4 py-4 text-sm text-gray-500">
-            ${formatDate(leave.created_at)}
+        <td class="align-middle whitespace-nowrap px-4 py-4 text-sm font-medium text-gray-900">
+            ${overtime.hours} hrs
         </td>
 
 
         <td class="align-middle px-4 py-4">
-            ${statusBadge(leave.status)}
+            ${statusBadge(overtime.status)}
         </td>
 
 
@@ -514,8 +427,8 @@ function createTableRow(
 
             <button
                 type="button"
-                class="view-leave-btn rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 shadow-sm transition hover:bg-slate-100 hover:text-slate-900"
-                data-id="${leave.id}"
+                class="view-admin-overtime-btn rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 shadow-sm transition hover:bg-slate-100 hover:text-slate-900"
+                data-id="${overtime.id}"
             >
                 View
             </button>
@@ -533,11 +446,11 @@ function createTableRow(
 // =====================================================
 
 function createMobileCard(
-    leave,
+    overtime,
 ) {
 
     const employee =
-        leave.employee
+        overtime.employee
 
     const user =
         employee?.user
@@ -550,24 +463,6 @@ function createMobileCard(
         user
             ? `${user.first_name} ${user.last_name}`
             : "Unknown Employee"
-
-
-    const startDate =
-        formatDate(
-            leave.start_date,
-        )
-
-    const endDate =
-        formatDate(
-            leave.end_date,
-        )
-
-
-    const days =
-        calculateDays(
-            leave.start_date,
-            leave.end_date,
-        )
 
 
     const card =
@@ -596,21 +491,21 @@ function createMobileCard(
             </div>
 
 
-            ${statusBadge(leave.status)}
+            ${statusBadge(overtime.status)}
 
         </div>
 
 
-        <div class="mt-3 grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+        <div class="mt-3 grid grid-cols-2 gap-4">
 
             <div>
 
                 <p class="text-xs font-semibold uppercase tracking-wide text-gray-400">
-                    Leave Type
+                    Date
                 </p>
 
                 <p class="text-gray-700">
-                    ${leave.leave_type || "—"}
+                    ${formatDate(overtime.date)}
                 </p>
 
             </div>
@@ -619,37 +514,11 @@ function createMobileCard(
             <div>
 
                 <p class="text-xs font-semibold uppercase tracking-wide text-gray-400">
-                    Days
+                    Hours
                 </p>
 
                 <p class="text-gray-700">
-                    ${days}
-                </p>
-
-            </div>
-
-
-            <div>
-
-                <p class="text-xs font-semibold uppercase tracking-wide text-gray-400">
-                    Start
-                </p>
-
-                <p class="text-gray-700">
-                    ${startDate}
-                </p>
-
-            </div>
-
-
-            <div>
-
-                <p class="text-xs font-semibold uppercase tracking-wide text-gray-400">
-                    End
-                </p>
-
-                <p class="text-gray-700">
-                    ${endDate}
+                    ${overtime.hours} hrs
                 </p>
 
             </div>
@@ -659,8 +528,8 @@ function createMobileCard(
 
         <button
             type="button"
-            class="view-leave-btn mt-4 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 transition hover:bg-slate-100"
-            data-id="${leave.id}"
+            class="view-admin-overtime-btn mt-4 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 transition hover:bg-slate-100"
+            data-id="${overtime.id}"
         >
             View Details
         </button>
@@ -675,22 +544,22 @@ function createMobileCard(
 // RENDER
 // =====================================================
 
-function renderLeaveRequests() {
+function renderOvertimeRequests() {
 
-    const filteredRequests =
+    const filtered =
         getFilteredRequests()
 
 
-    leaveTableBody.innerHTML = ""
+    tableBody.innerHTML = ""
 
-    leaveCardList.innerHTML = ""
+    cardList.innerHTML = ""
 
 
     if (
-        filteredRequests.length === 0
+        filtered.length === 0
     ) {
 
-        noLeaveResults.classList.remove(
+        emptyMessage.classList.remove(
             "hidden",
         )
 
@@ -698,24 +567,24 @@ function renderLeaveRequests() {
     }
 
 
-    noLeaveResults.classList.add(
+    emptyMessage.classList.add(
         "hidden",
     )
 
 
-    filteredRequests.forEach(
-        (leave) => {
+    filtered.forEach(
+        (overtime) => {
 
-            leaveTableBody.appendChild(
+            tableBody.appendChild(
                 createTableRow(
-                    leave,
+                    overtime,
                 ),
             )
 
 
-            leaveCardList.appendChild(
+            cardList.appendChild(
                 createMobileCard(
-                    leave,
+                    overtime,
                 ),
             )
         },
@@ -724,15 +593,15 @@ function renderLeaveRequests() {
 
 
 // =====================================================
-// OPEN DETAILS
+// OPEN DETAILS MODAL
 // =====================================================
 
-function openLeaveDetails(
-    leave,
+function openOvertimeDetails(
+    overtime,
 ) {
 
     const employee =
-        leave.employee
+        overtime.employee
 
     const user =
         employee?.user
@@ -761,56 +630,34 @@ function openLeaveDetails(
         "—"
 
 
-    detailLeaveType.textContent =
-        leave.leave_type ||
-        "—"
-
-
-    detailStartDate.textContent =
+    detailDate.textContent =
         formatDate(
-            leave.start_date,
+            overtime.date,
         )
 
 
-    detailEndDate.textContent =
-        formatDate(
-            leave.end_date,
-        )
-
-
-    const days =
-        calculateDays(
-            leave.start_date,
-            leave.end_date,
-        )
-
-
-    detailDays.textContent =
-        `${days} ${
-            days === 1
-                ? "day"
-                : "days"
-        }`
+    detailHours.textContent =
+        `${overtime.hours} hours`
 
 
     detailSubmitted.textContent =
         formatDate(
-            leave.created_at,
+            overtime.created_at,
         )
 
 
     detailStatus.innerHTML =
         statusBadge(
-            leave.status,
+            overtime.status,
         )
 
 
     if (
-        leave.approver
+        overtime.approver
     ) {
 
         detailApprover.textContent =
-            `${leave.approver.first_name} ${leave.approver.last_name}`
+            `${overtime.approver.first_name} ${overtime.approver.last_name}`
 
     } else {
 
@@ -820,13 +667,13 @@ function openLeaveDetails(
 
 
     detailReason.textContent =
-        leave.reason ||
+        overtime.reason ||
         "No reason provided."
 
 
     const normalizedStatus =
         normalizeStatus(
-            leave.status,
+            overtime.status,
         )
 
 
@@ -841,7 +688,7 @@ function openLeaveDetails(
 
 
         detailRejection.textContent =
-            leave.rejection_reason ||
+            overtime.rejection_reason ||
             "No rejection reason provided."
 
     } else {
@@ -856,56 +703,56 @@ function openLeaveDetails(
     }
 
 
-    leaveDetailsModal.classList.remove(
+    modal.classList.remove(
         "hidden",
     )
 
 
-    leaveDetailsModal.classList.add(
+    modal.classList.add(
         "flex",
     )
 }
 
 
 // =====================================================
-// CLOSE DETAILS
+// CLOSE MODAL
 // =====================================================
 
-function closeDetailsModal() {
+function closeOvertimeDetails() {
 
-    leaveDetailsModal.classList.add(
+    modal.classList.add(
         "hidden",
     )
 
 
-    leaveDetailsModal.classList.remove(
+    modal.classList.remove(
         "flex",
     )
 }
 
 
-closeLeaveDetails.addEventListener(
+closeModalButton.addEventListener(
     "click",
-    closeDetailsModal,
+    closeOvertimeDetails,
 )
 
 
-closeLeaveDetailsFooter.addEventListener(
+closeFooterButton.addEventListener(
     "click",
-    closeDetailsModal,
+    closeOvertimeDetails,
 )
 
 
-leaveDetailsModal.addEventListener(
+modal.addEventListener(
     "click",
     (event) => {
 
         if (
             event.target ===
-            leaveDetailsModal
+            modal
         ) {
 
-            closeDetailsModal()
+            closeOvertimeDetails()
         }
 
     },
@@ -913,7 +760,7 @@ leaveDetailsModal.addEventListener(
 
 
 // =====================================================
-// BUTTON EVENT DELEGATION
+// VIEW BUTTONS
 // =====================================================
 
 document.addEventListener(
@@ -922,7 +769,7 @@ document.addEventListener(
 
         const button =
             event.target.closest(
-                ".view-leave-btn",
+                ".view-admin-overtime-btn",
             )
 
 
@@ -931,24 +778,24 @@ document.addEventListener(
         }
 
 
-        const leaveId =
+        const overtimeId =
             Number(
                 button.dataset.id,
             )
 
 
-        const leave =
-            leaveRequests.find(
+        const overtime =
+            overtimeRequests.find(
                 (item) =>
                     Number(item.id) ===
-                    leaveId,
+                    overtimeId,
             )
 
 
-        if (leave) {
+        if (overtime) {
 
-            openLeaveDetails(
-                leave,
+            openOvertimeDetails(
+                overtime,
             )
         }
     },
@@ -959,24 +806,24 @@ document.addEventListener(
 // FILTER EVENTS
 // =====================================================
 
-leaveSearch.addEventListener(
+searchInput.addEventListener(
     "input",
-    renderLeaveRequests,
+    renderOvertimeRequests,
 )
 
-leaveStatusFilter.addEventListener(
+statusFilter.addEventListener(
     "change",
-    renderLeaveRequests,
+    renderOvertimeRequests,
 )
 
-leaveDepartmentFilter.addEventListener(
+departmentFilter.addEventListener(
     "change",
-    renderLeaveRequests,
+    renderOvertimeRequests,
 )
 
-leaveDateFilter.addEventListener(
+dateFilter.addEventListener(
     "change",
-    renderLeaveRequests,
+    renderOvertimeRequests,
 )
 
 
@@ -984,4 +831,4 @@ leaveDateFilter.addEventListener(
 // INITIAL LOAD
 // =====================================================
 
-loadLeaveRequests()
+loadOvertimeRequests()

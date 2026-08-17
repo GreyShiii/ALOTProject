@@ -1,8 +1,8 @@
 @extends('layouts.app')
 
-@section('title', 'Leave Requests')
-@section('breadcrumb-parent', 'Manager')
-@section('breadcrumb-current', 'Leave Requests')
+@section('title', 'Overtime Requests')
+@section('breadcrumb-parent', 'Management')
+@section('breadcrumb-current', 'Overtime Requests')
 
 @section('content')
 
@@ -13,18 +13,18 @@
     <div class="mb-6">
 
         <h1 class="text-xl font-bold tracking-tight text-gray-900 sm:text-2xl">
-            Leave Requests
+            Overtime Requests
         </h1>
 
         <p class="mt-1 text-sm text-gray-500">
-            Review leave requests from your assigned employees.
+            Monitor overtime requests across the organization.
         </p>
 
     </div>
 
 
     {{-- =====================================================
-        REQUESTS CARD
+        MAIN CARD
     ===================================================== --}}
 
     <div class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
@@ -32,17 +32,13 @@
         {{-- HEADER --}}
         <div class="border-b border-gray-200 px-5 py-4">
 
-            <div>
+            <h2 class="text-lg font-semibold text-gray-900">
+                All Overtime Requests
+            </h2>
 
-                <h2 class="text-lg font-semibold text-gray-900">
-                    Team Leave Requests
-                </h2>
-
-                <p class="mt-1 text-sm text-gray-500">
-                    Approve or reject pending requests from your team.
-                </p>
-
-            </div>
+            <p class="mt-1 text-sm text-gray-500">
+                View employee overtime requests and their current status.
+            </p>
 
         </div>
 
@@ -53,13 +49,13 @@
 
         <div class="border-b border-gray-200 bg-gray-50 px-5 py-4">
 
-            <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
 
                 {{-- SEARCH --}}
                 <div>
 
                     <label
-                        for="manager-leave-search"
+                        for="admin-overtime-search"
                         class="text-xs font-semibold uppercase tracking-wide text-gray-500"
                     >
                         Search
@@ -67,8 +63,8 @@
 
                     <input
                         type="text"
-                        id="manager-leave-search"
-                        placeholder="Search employee, leave type..."
+                        id="admin-overtime-search"
+                        placeholder="Search employee, reason..."
                         class="mt-2 w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-700 outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                     >
 
@@ -79,14 +75,14 @@
                 <div>
 
                     <label
-                        for="manager-leave-status"
+                        for="admin-overtime-status"
                         class="text-xs font-semibold uppercase tracking-wide text-gray-500"
                     >
                         Status
                     </label>
 
                     <select
-                        id="manager-leave-status"
+                        id="admin-overtime-status"
                         class="mt-2 w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-700 outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                     >
 
@@ -111,11 +107,43 @@
                 </div>
 
 
+                {{-- DEPARTMENT --}}
+                <div>
+
+                    <label
+                        for="admin-overtime-department"
+                        class="text-xs font-semibold uppercase tracking-wide text-gray-500"
+                    >
+                        Department
+                    </label>
+
+                    <select
+                        id="admin-overtime-department"
+                        class="mt-2 w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-700 outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    >
+
+                        <option value="">
+                            All Departments
+                        </option>
+
+                        @foreach ($departments as $department)
+
+                            <option value="{{ $department->id }}">
+                                {{ $department->name }}
+                            </option>
+
+                        @endforeach
+
+                    </select>
+
+                </div>
+
+
                 {{-- DATE --}}
                 <div>
 
                     <label
-                        for="manager-leave-date"
+                        for="admin-overtime-date"
                         class="text-xs font-semibold uppercase tracking-wide text-gray-500"
                     >
                         Date
@@ -123,7 +151,7 @@
 
                     <input
                         type="date"
-                        id="manager-leave-date"
+                        id="admin-overtime-date"
                         class="mt-2 w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-700 outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                     >
 
@@ -140,33 +168,46 @@
 
         <div class="hidden overflow-x-auto md:block">
 
-            <table class="min-w-full divide-y divide-gray-200">
+            <table class="w-full table-fixed divide-y divide-gray-200">
+
+                {{-- LOCK COLUMN WIDTHS --}}
+                <colgroup>
+
+                    <col class="w-[24%]">
+                    <col class="w-[18%]">
+                    <col class="w-[15%]">
+                    <col class="w-[13%]">
+                    <col class="w-[15%]">
+                    <col class="w-[15%]">
+
+                </colgroup>
+
 
                 <thead class="bg-gray-50">
 
                     <tr>
 
-                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                        <th class="whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
                             Employee
                         </th>
 
-                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
-                            Leave Type
+                        <th class="whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                            Department
                         </th>
 
-                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                        <th class="whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
                             Date
                         </th>
 
-                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
-                            Submitted
+                        <th class="whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                            Hours
                         </th>
 
-                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                        <th class="whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
                             Status
                         </th>
 
-                        <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-gray-500">
+                        <th class="whitespace-nowrap px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-gray-500">
                             Action
                         </th>
 
@@ -176,11 +217,9 @@
 
 
                 <tbody
-                    id="manager-leave-table-body"
+                    id="admin-overtime-table-body"
                     class="divide-y divide-gray-200 bg-white"
-                >
-
-                </tbody>
+                ></tbody>
 
             </table>
 
@@ -192,28 +231,26 @@
         ================================================== --}}
 
         <div
-            id="manager-leave-card-list"
+            id="admin-overtime-card-list"
             class="divide-y divide-gray-200 md:hidden"
-        >
-
-        </div>
+        ></div>
 
 
         {{-- =================================================
-            EMPTY
+            EMPTY STATE
         ================================================== --}}
 
         <div
-            id="manager-leave-empty"
+            id="admin-overtime-empty"
             class="hidden px-6 py-12 text-center"
         >
 
             <p class="text-sm font-semibold text-gray-700">
-                No leave requests found.
+                No overtime requests found.
             </p>
 
             <p class="mt-1 text-xs text-gray-500">
-                Try changing your filters.
+                Try changing your search or filters.
             </p>
 
         </div>
@@ -222,11 +259,11 @@
 
 
     {{-- =====================================================
-        REVIEW MODAL
+        DETAILS MODAL
     ===================================================== --}}
 
     <div
-        id="manager-leave-modal"
+        id="admin-overtime-modal"
         class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 px-4"
     >
 
@@ -238,19 +275,21 @@
                 <div>
 
                     <h2 class="text-lg font-semibold text-gray-900">
-                        Leave Request
+                        Overtime Request Details
                     </h2>
 
                     <p class="mt-1 text-sm text-gray-500">
-                        Review the employee's leave request.
+                        Complete information for this request.
                     </p>
 
                 </div>
 
+
                 <button
                     type="button"
-                    id="close-manager-leave-modal"
+                    id="close-admin-overtime-modal"
                     class="flex h-10 w-10 items-center justify-center rounded-full border border-teal-300 text-teal-500 transition hover:bg-teal-50"
+                    aria-label="Close"
                 >
                     &times;
                 </button>
@@ -264,114 +303,130 @@
                 <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
 
                     <div>
+
                         <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">
                             Employee
                         </p>
 
                         <p
-                            id="review-employee"
+                            id="admin-detail-employee"
                             class="mt-1 text-sm font-semibold text-gray-900"
                         >
                             —
                         </p>
+
                     </div>
 
 
                     <div>
+
                         <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">
                             Department
                         </p>
 
                         <p
-                            id="review-department"
+                            id="admin-detail-department"
                             class="mt-1 text-sm text-gray-900"
                         >
                             —
                         </p>
+
                     </div>
 
 
                     <div>
+
                         <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">
                             Position
                         </p>
 
                         <p
-                            id="review-position"
+                            id="admin-detail-position"
                             class="mt-1 text-sm text-gray-900"
                         >
                             —
                         </p>
+
                     </div>
 
 
                     <div>
+
                         <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">
-                            Leave Type
+                            Date
                         </p>
 
                         <p
-                            id="review-leave-type"
+                            id="admin-detail-date"
+                            class="mt-1 text-sm text-gray-900"
+                        >
+                            —
+                        </p>
+
+                    </div>
+
+
+                    <div>
+
+                        <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                            Hours
+                        </p>
+
+                        <p
+                            id="admin-detail-hours"
                             class="mt-1 text-sm font-medium text-gray-900"
                         >
                             —
                         </p>
+
                     </div>
 
 
                     <div>
-                        <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">
-                            Start Date
-                        </p>
 
-                        <p
-                            id="review-start-date"
-                            class="mt-1 text-sm text-gray-900"
-                        >
-                            —
-                        </p>
-                    </div>
-
-
-                    <div>
-                        <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">
-                            End Date
-                        </p>
-
-                        <p
-                            id="review-end-date"
-                            class="mt-1 text-sm text-gray-900"
-                        >
-                            —
-                        </p>
-                    </div>
-
-
-                    <div>
                         <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">
                             Submitted
                         </p>
 
                         <p
-                            id="review-submitted"
+                            id="admin-detail-submitted"
                             class="mt-1 text-sm text-gray-900"
                         >
                             —
                         </p>
+
                     </div>
 
 
                     <div>
+
                         <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">
                             Status
                         </p>
 
                         <div
-                            id="review-status"
+                            id="admin-detail-status"
                             class="mt-1"
                         >
                             —
                         </div>
+
+                    </div>
+
+
+                    <div>
+
+                        <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                            Reviewed By
+                        </p>
+
+                        <p
+                            id="admin-detail-approver"
+                            class="mt-1 text-sm text-gray-900"
+                        >
+                            —
+                        </p>
+
                     </div>
 
                 </div>
@@ -385,8 +440,8 @@
                     </p>
 
                     <div
-                        id="review-reason"
-                        class="mt-2 rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-700"
+                        id="admin-detail-reason"
+                        class="mt-2 break-words rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-700"
                     >
                         —
                     </div>
@@ -394,32 +449,22 @@
                 </div>
 
 
-                {{-- ERROR --}}
+                {{-- REJECTION --}}
                 <div
-                    id="manager-leave-error"
-                    class="hidden rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
-                ></div>
-
-
-                {{-- REJECTION AREA --}}
-                <div
-                    id="reject-section"
+                    id="admin-detail-rejection-container"
                     class="hidden"
                 >
 
-                    <label
-                        for="rejection-reason"
-                        class="text-xs font-semibold uppercase tracking-wide text-gray-500"
-                    >
+                    <p class="text-xs font-semibold uppercase tracking-wide text-red-600">
                         Rejection Reason
-                    </label>
+                    </p>
 
-                    <textarea
-                        id="rejection-reason"
-                        rows="4"
-                        placeholder="Explain why this request is being rejected..."
-                        class="mt-2 w-full resize-none rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-700 outline-none transition focus:border-red-500 focus:ring-1 focus:ring-red-500"
-                    ></textarea>
+                    <div
+                        id="admin-detail-rejection"
+                        class="mt-2 break-words rounded-lg border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700"
+                    >
+                        —
+                    </div>
 
                 </div>
 
@@ -427,49 +472,14 @@
 
 
             {{-- FOOTER --}}
-            <div
-                id="manager-leave-actions"
-                class="flex flex-col-reverse gap-2 border-t border-gray-200 px-6 py-4 sm:flex-row sm:justify-end"
-            >
+            <div class="flex justify-end border-t border-gray-200 px-6 py-4">
 
                 <button
                     type="button"
-                    id="close-manager-leave-footer"
+                    id="close-admin-overtime-footer"
                     class="rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
                 >
                     Close
-                </button>
-
-                <button
-                    type="button"
-                    id="cancel-reject-leave-btn"
-                    class="hidden rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
-                >
-                    Cancel Reject
-                </button>
-
-                <button
-                    type="button"
-                    id="reject-leave-btn"
-                    class="rounded-lg bg-red-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-red-700"
-                >
-                    Reject
-                </button>
-
-                <button
-                    type="button"
-                    id="confirm-reject-leave-btn"
-                    class="hidden rounded-lg bg-red-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-red-700"
-                >
-                    Reject Request
-                </button>
-
-                <button
-                    type="button"
-                    id="approve-leave-btn"
-                    class="rounded-lg bg-green-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-green-700"
-                >
-                    Approve
                 </button>
 
             </div>
@@ -479,6 +489,6 @@
     </div>
 
 
-    @vite('resources/js/manager/leave.js')
+    @vite('resources/js/admin/overtime.js')
 
 @endsection
