@@ -8,6 +8,7 @@ use App\Http\Requests\Admin\UpdateEmployeeRequest;
 use App\Models\Department;
 use App\Models\Employee;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 
 class EmployeeController extends Controller
 {
@@ -16,15 +17,24 @@ class EmployeeController extends Controller
      */
     public function index()
     {
-        $employees = Employee::with(['user', 'department', 'manager'])->get();
+        $employees = Employee::with([
+            'user',
+            'department',
+            'manager.user',
+        ])->get();
+
         $departments = Department::all();
+
         $managers = Employee::with('user')
             ->whereHas('user', function ($query) {
                 $query->where('role', 'manager');
             })
             ->get();
 
-        return view('admin.employees.index', compact('employees', 'departments', 'managers'));
+        return view(
+            'admin.employees.index',
+            compact('employees', 'departments', 'managers')
+        );
     }
 
     /**
@@ -32,7 +42,7 @@ class EmployeeController extends Controller
      */
     public function create()
     {
-
+        //
     }
 
     /**
@@ -42,23 +52,30 @@ class EmployeeController extends Controller
     {
         $data = $request->validated();
 
-        $user = User::create([
-            'first_name' => $data['first_name'],
-            'last_name' => $data['last_name'],
-            'email' => $data['email'],
-            'password' => $data['password'],
-            'role' => $data['role'],
-        ]);
+        $employee = DB::transaction(function () use ($data) {
 
-        $employee = Employee::create([
-            'user_id' => $user->id,
-            'department_id' => $data['department_id'],
-            'manager_id' => $data['manager_id'] ?? null,
-            'position' => $data['position'],
-            'hire_date' => $data['hire_date'] ?? null,
-        ]);
+            $user = User::create([
+                'first_name' => $data['first_name'],
+                'last_name' => $data['last_name'],
+                'email' => $data['email'],
+                'password' => $data['password'],
+                'role' => $data['role'],
+            ]);
 
-        $employee->load(['user', 'department', 'manager.user']);
+            return Employee::create([
+                'user_id' => $user->id,
+                'department_id' => $data['department_id'],
+                'manager_id' => $data['manager_id'] ?? null,
+                'position' => $data['position'],
+                'hire_date' => $data['hire_date'] ?? null,
+            ]);
+        });
+
+        $employee->load([
+            'user',
+            'department',
+            'manager.user',
+        ]);
 
         return response()->json([
             'message' => 'Employee created successfully.',
@@ -71,8 +88,15 @@ class EmployeeController extends Controller
      */
     public function show(Employee $employee)
     {
-        $employee->load(['user', 'department', 'manager']);
-        return response()->json(['employee' => $employee]);
+        $employee->load([
+            'user',
+            'department',
+            'manager.user',
+        ]);
+
+        return response()->json([
+            'employee' => $employee,
+        ]);
     }
 
     /**
@@ -86,9 +110,21 @@ class EmployeeController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateEmployeeRequest $request, Employee $employee)
-    {
+    public function update(
+        UpdateEmployeeRequest $request,
+        Employee $employee
+    ) {
         $data = $request->validated();
+
+        $wasManager = $employee->user->role === 'manager';
+        $willBeManager = $data['role'] === 'manager';
+
+        DB::transaction(function () use (
+            $data,
+            $employee,
+            $wasManager,
+            $willBeManager
+        ) {
 
             $employee->user->update([
                 'first_name' => $data['first_name'],
@@ -98,7 +134,21 @@ class EmployeeController extends Controller
             ]);
 
             if (!empty($data['password'])) {
-                $employee->user->update(['password' => $data['password']]);
+                $employee->user->update([
+                    'password' => $data['password'],
+                ]);
+            }
+
+            /*
+             * If this employee used to be a Manager
+             * and is no longer a Manager, remove them
+             * from all subordinates.
+             */
+            if ($wasManager && !$willBeManager) {
+                Employee::where('manager_id', $employee->id)
+                    ->update([
+                        'manager_id' => null,
+                    ]);
             }
 
             $employee->update([
@@ -107,8 +157,13 @@ class EmployeeController extends Controller
                 'position' => $data['position'],
                 'hire_date' => $data['hire_date'] ?? null,
             ]);
+        });
 
-        $employee->load(['user', 'department', 'manager.user',]);
+        $employee->load([
+            'user',
+            'department',
+            'manager.user',
+        ]);
 
         return response()->json([
             'message' => 'Employee updated successfully.',
@@ -121,13 +176,28 @@ class EmployeeController extends Controller
      */
     public function destroy(Employee $employee)
     {
-        $user = $employee->user;
+        DB::transaction(function () use ($employee) {
 
-        $employee->delete();
-        $user->delete();
+            /*
+             * Remove this employee as the manager
+             * of any subordinates before deleting.
+             */
+            Employee::where('manager_id', $employee->id)
+                ->update([
+                    'manager_id' => null,
+                ]);
+
+            $user = $employee->user;
+
+            $employee->delete();
+
+            if ($user) {
+                $user->delete();
+            }
+        });
 
         return response()->json([
-            'message' => 'Employee deleted successfully',
+            'message' => 'Employee deleted successfully.',
             'employee_id' => $employee->id,
         ]);
     }

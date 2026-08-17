@@ -1,220 +1,715 @@
-const addUserButton = document.getElementById("add-user-btn");
-const addUserModal = document.getElementById("add-user-modal");
-const addUserForm = document.getElementById("add-user-form");
-const userTableBody = document.getElementById("user-table-body");
-const noUsers = document.getElementById("no-users");
-const deleteForms = document.querySelectorAll(".delete-user-form");
 const editForms = document.querySelectorAll(".edit-user-form");
+const deactivateForms = document.querySelectorAll(".deactivate-user-form");
+const activateForms = document.querySelectorAll(".activate-user-form");
 
-addUserButton.addEventListener("click", () => {
-    addUserModal.classList.remove("hidden");
-});
 
-userTableBody.addEventListener("click", (event) => {
-    if (event.target.classList.contains("view-user-btn")) {
-        const id = event.target.getAttribute("data-id");
-        document.getElementById(`view-user-modal-${id}`).classList.remove("hidden");
-    }
+// =====================================================
+// VIEW / EDIT / ACTIVATE / DEACTIVATE BUTTONS
+// =====================================================
 
-    if (event.target.classList.contains("edit-user-btn")) {
-        const id = event.target.getAttribute("data-id");
-        document.getElementById(`edit-user-modal-${id}`).classList.remove("hidden");
-    }
+document.addEventListener("click", (event) => {
 
-    if (event.target.classList.contains("delete-user-btn")) {
-        const id = event.target.getAttribute("data-id");
-        document.getElementById(`delete-user-modal-${id}`).classList.remove("hidden");
-    }
-});
+    const button = event.target;
 
-addUserForm.addEventListener("submit", async (event) => {
-    event.preventDefault();
 
-    document.getElementById("first-name-error").textContent = "";
-    document.getElementById("last-name-error").textContent = "";
-    document.getElementById("email-error").textContent = "";
-    document.getElementById("password-error").textContent = "";
-    document.getElementById("role-error").textContent = "";
-    document.getElementById("status-error").textContent = "";
+    // =================================================
+    // VIEW
+    // =================================================
 
-    try {
-        const formData = new FormData(event.target);
-        const response = await fetch(event.target.action, {
-            method: "POST",
-            body: formData,
-            headers: { "Accept": "application/json" },
-        });
+    if (button.classList.contains("view-user-btn")) {
 
-        const data = await response.json();
+        const userId = button.dataset.id;
 
-        if (!response.ok) {
-            if (data.errors) {
-                if (data.errors.first_name) {
-                    document.getElementById("first-name-error").textContent = data.errors.first_name[0];
-                }
-                if (data.errors.last_name) {
-                    document.getElementById("last-name-error").textContent = data.errors.last_name[0];
-                }
-                if (data.errors.email) {
-                    document.getElementById("email-error").textContent = data.errors.email[0];
-                }
-                if (data.errors.password) {
-                    document.getElementById("password-error").textContent = data.errors.password[0];
-                }
-                if (data.errors.role) {
-                    document.getElementById("role-error").textContent = data.errors.role[0];
-                }
-                if (data.errors.status) {
-                    document.getElementById("status-error").textContent = data.errors.status[0];
-                }
-            }
-            return;
+        const modal = document.getElementById(
+            `view-user-modal-${userId}`
+        );
+
+        if (modal) {
+            modal.classList.remove("hidden");
         }
 
-        const user = data.user;
-        const createdDate = new Date(user.created_at).toLocaleDateString("en-US", {
-            month: "short",
-            day: "numeric",
-            year: "numeric",
-        });
-
-        const roleBadge = getRoleBadge(user.role);
-        const statusBadge = getStatusBadge(user.status);
-
-        const row = document.createElement("tr");
-        row.id = `user-row-${user.id}`;
-        row.className = "transition hover:bg-gray-50";
-        row.innerHTML = `
-            <td class="px-3 py-4 text-center text-sm font-semibold text-gray-900">${user.first_name} ${user.last_name}</td>
-            <td class="px-3 py-4 text-center text-sm text-gray-700">${user.email}</td>
-            <td class="px-3 py-4 text-center">${roleBadge}</td>
-            <td class="whitespace-nowrap px-3 py-4 text-center text-sm text-gray-700">${createdDate}</td>
-            <td class="px-3 py-4 text-center">${statusBadge}</td>
-            <td class="whitespace-nowrap px-3 py-4 text-center">
-                <div class="flex items-center justify-center gap-2">
-                    <button type="button" data-id="${user.id}" class="view-user-btn rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 shadow-sm transition hover:bg-slate-100 hover:text-slate-900">View</button>
-                    <button type="button" data-id="${user.id}" class="edit-user-btn rounded-md border border-slate-200 bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-200">Edit</button>
-                    <button type="button" data-id="${user.id}" class="delete-user-btn rounded-md bg-red-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-red-700">Delete</button>
-                </div>
-            </td>
-        `;
-
-        noUsers?.remove();
-        userTableBody.appendChild(row);
-
-        addUserForm.reset();
-        addUserModal.classList.add("hidden");
-        window.location.reload();
-    } catch (error) {
-        console.error(error);
     }
+
+
+    // =================================================
+    // EDIT
+    // =================================================
+
+    if (button.classList.contains("edit-user-btn")) {
+
+        const userId = button.dataset.id;
+
+        const modal = document.getElementById(
+            `edit-user-modal-${userId}`
+        );
+
+        if (modal) {
+            modal.classList.remove("hidden");
+        }
+
+    }
+
+
+    // =================================================
+    // DEACTIVATE
+    // =================================================
+
+    if (button.classList.contains("deactivate-user-btn")) {
+
+        const userId = button.dataset.id;
+
+        const modal = document.getElementById(
+            `deactivate-user-modal-${userId}`
+        );
+
+        if (modal) {
+            modal.classList.remove("hidden");
+        }
+
+    }
+
+
+    // =================================================
+    // ACTIVATE
+    // =================================================
+
+    if (button.classList.contains("activate-user-btn")) {
+
+        const userId = button.dataset.id;
+
+        const modal = document.getElementById(
+            `activate-user-modal-${userId}`
+        );
+
+        if (modal) {
+            modal.classList.remove("hidden");
+        }
+
+    }
+
 });
 
+
+// =====================================================
+// EDIT USER
+// =====================================================
+
 editForms.forEach((form) => {
+
     form.addEventListener("submit", async (event) => {
+
         event.preventDefault();
 
         try {
-            const formData = new FormData(event.target);
-            const response = await fetch(event.target.action, {
+
+            const formData = new FormData(form);
+
+            const response = await fetch(form.action, {
                 method: "POST",
                 body: formData,
-                headers: { "Accept": "application/json" },
+                headers: {
+                    Accept: "application/json",
+                },
             });
 
             const data = await response.json();
 
             if (!response.ok) {
-                console.error(data);
+
+                console.error(
+                    "UPDATE USER ERROR:",
+                    data
+                );
+
                 return;
             }
 
             const user = data.user;
-            const createdDate = new Date(user.created_at).toLocaleDateString("en-US", {
-                month: "short",
-                day: "numeric",
-                year: "numeric",
-            });
 
-            const roleBadge = getRoleBadge(user.role);
-            const statusBadge = getStatusBadge(user.status);
+            updateUserRow(user);
+            updateUserCard(user);
 
-            const row = document.getElementById(`user-row-${user.id}`);
-            if (row) {
-                row.innerHTML = `
-                    <td class="px-3 py-4 text-center text-sm font-semibold text-gray-900">${user.first_name} ${user.last_name}</td>
-                    <td class="px-3 py-4 text-center text-sm text-gray-700">${user.email}</td>
-                    <td class="px-3 py-4 text-center">${roleBadge}</td>
-                    <td class="whitespace-nowrap px-3 py-4 text-center text-sm text-gray-700">${createdDate}</td>
-                    <td class="px-3 py-4 text-center">${statusBadge}</td>
-                    <td class="whitespace-nowrap px-3 py-4 text-center">
-                        <div class="flex items-center justify-center gap-2">
-                            <button type="button" data-id="${user.id}" class="view-user-btn rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 shadow-sm transition hover:bg-slate-100 hover:text-slate-900">View</button>
-                            <button type="button" data-id="${user.id}" class="edit-user-btn rounded-md border border-slate-200 bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-200">Edit</button>
-                            <button type="button" data-id="${user.id}" class="delete-user-btn rounded-md bg-red-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-red-700">Delete</button>
-                        </div>
-                    </td>
-                `;
+            const modal = document.getElementById(
+                `edit-user-modal-${user.id}`
+            );
+
+            if (modal) {
+                modal.classList.add("hidden");
             }
 
-            document.getElementById(`edit-user-modal-${user.id}`).classList.add("hidden");
-            window.location.reload();
         } catch (error) {
-            console.error(error);
+
+            console.error(
+                "EDIT USER ERROR:",
+                error
+            );
+
         }
+
     });
+
 });
 
-deleteForms.forEach((form) => {
+
+// =====================================================
+// DEACTIVATE USER
+// =====================================================
+
+deactivateForms.forEach((form) => {
+
     form.addEventListener("submit", async (event) => {
+
         event.preventDefault();
 
         try {
-            const formData = new FormData(event.target);
-            const response = await fetch(event.target.action, {
+
+            const formData = new FormData(form);
+
+            const response = await fetch(form.action, {
                 method: "POST",
                 body: formData,
-                headers: { "Accept": "application/json" },
+                headers: {
+                    Accept: "application/json",
+                },
             });
 
             const data = await response.json();
-            const userId = event.target.id.replace("delete-user-form-", "");
-            const errorMessage = document.getElementById(`delete-user-error-${userId}`);
+
+            const userId = form.id.replace(
+                "deactivate-user-form-",
+                ""
+            );
+
+            const errorMessage = document.getElementById(
+                `deactivate-user-error-${userId}`
+            );
 
             if (!response.ok) {
-                errorMessage.textContent = data.message;
-                errorMessage.classList.remove("hidden");
+
+                if (errorMessage) {
+
+                    errorMessage.textContent =
+                        data.message ||
+                        "Unable to deactivate user.";
+
+                    errorMessage.classList.remove("hidden");
+                }
+
                 return;
             }
 
-            document.getElementById(`user-row-${userId}`)?.remove();
-            document.getElementById(`user-card-${userId}`)?.remove();
+            const user = data.user;
 
-            document.getElementById(`delete-user-modal-${userId}`).classList.add("hidden");
-            errorMessage.classList.add("hidden");
-            errorMessage.textContent = "";
+            // Update desktop table
+            updateUserRow(user);
+
+            // Update mobile card
+            updateUserCard(user);
+
+            // Close deactivate modal
+            const modal = document.getElementById(
+                `deactivate-user-modal-${userId}`
+            );
+
+            if (modal) {
+                modal.classList.add("hidden");
+            }
+
+            // Clear error
+            if (errorMessage) {
+
+                errorMessage.textContent = "";
+
+                errorMessage.classList.add("hidden");
+            }
+
         } catch (error) {
-            console.error(error);
+
+            console.error(
+                "DEACTIVATE USER ERROR:",
+                error
+            );
+
         }
+
     });
+
 });
 
-function getRoleBadge(role) {
-    if (role === "admin") {
-        return `<span class="inline-flex rounded-full bg-purple-100 px-2.5 py-1 text-xs font-semibold text-purple-700">Admin</span>`;
+
+// =====================================================
+// ACTIVATE USER
+// =====================================================
+
+activateForms.forEach((form) => {
+
+    form.addEventListener("submit", async (event) => {
+
+        event.preventDefault();
+
+        try {
+
+            const formData = new FormData(form);
+
+            const response = await fetch(form.action, {
+                method: "POST",
+                body: formData,
+                headers: {
+                    Accept: "application/json",
+                },
+            });
+
+            const data = await response.json();
+
+            const userId = form.id.replace(
+                "activate-user-form-",
+                ""
+            );
+
+            const errorMessage = document.getElementById(
+                `activate-user-error-${userId}`
+            );
+
+            if (!response.ok) {
+
+                if (errorMessage) {
+
+                    errorMessage.textContent =
+                        data.message ||
+                        "Unable to activate user.";
+
+                    errorMessage.classList.remove("hidden");
+                }
+
+                return;
+            }
+
+            const user = data.user;
+
+            // Update desktop table
+            updateUserRow(user);
+
+            // Update mobile card
+            updateUserCard(user);
+
+            // Close activate modal
+            const modal = document.getElementById(
+                `activate-user-modal-${userId}`
+            );
+
+            if (modal) {
+                modal.classList.add("hidden");
+            }
+
+            // Clear error
+            if (errorMessage) {
+
+                errorMessage.textContent = "";
+
+                errorMessage.classList.add("hidden");
+            }
+
+        } catch (error) {
+
+            console.error(
+                "ACTIVATE USER ERROR:",
+                error
+            );
+
+        }
+
+    });
+
+});
+
+
+// =====================================================
+// UPDATE DESKTOP ROW
+// =====================================================
+
+function updateUserRow(user) {
+
+    const row = document.getElementById(
+        `user-row-${user.id}`
+    );
+
+    if (!row) {
+        return;
     }
 
-    if (role === "manager") {
-        return `<span class="inline-flex rounded-full bg-blue-100 px-2.5 py-1 text-xs font-semibold text-blue-700">Manager</span>`;
-    }
 
-    return `<span class="inline-flex rounded-full bg-gray-100 px-2.5 py-1 text-xs font-semibold text-gray-700">Employee</span>`;
+    // Name
+    row.children[0].textContent =
+        `${user.first_name} ${user.last_name}`;
+
+
+    // Email
+    row.children[1].textContent =
+        user.email;
+
+
+    // Role
+    updateRoleBadge(
+        row.children[2],
+        user.role
+    );
+
+
+    // Created date
+    row.children[3].textContent =
+        formatDate(user.created_at);
+
+
+    // Status
+    updateStatusBadge(
+        row.children[4],
+        user.status
+    );
+
+
+    // Action button
+    updateActionButton(
+        row.children[5],
+        user
+    );
+
 }
 
-function getStatusBadge(status) {
-    if (status === "active") {
-        return `<span class="inline-flex rounded-full bg-green-100 px-2.5 py-1 text-xs font-semibold text-green-700">Active</span>`;
+
+// =====================================================
+// UPDATE MOBILE CARD
+// =====================================================
+
+function updateUserCard(user) {
+
+    const card = document.getElementById(
+        `user-card-${user.id}`
+    );
+
+    if (!card) {
+        return;
     }
 
-    return `<span class="inline-flex rounded-full bg-red-100 px-2.5 py-1 text-xs font-semibold text-red-700">Inactive</span>`;
+
+    // Name
+    const nameElement = card.querySelector(
+        "[data-user-name]"
+    );
+
+    if (nameElement) {
+
+        nameElement.textContent =
+            `${user.first_name} ${user.last_name}`;
+
+    }
+
+
+    // Email
+    const emailElement = card.querySelector(
+        "[data-user-email]"
+    );
+
+    if (emailElement) {
+
+        emailElement.textContent =
+            user.email;
+
+    }
+
+
+    // Role
+    const roleElement = card.querySelector(
+        "[data-user-role]"
+    );
+
+    if (roleElement) {
+
+        updateRoleElement(
+            roleElement,
+            user.role
+        );
+
+    }
+
+
+    // Status
+    const statusElement = card.querySelector(
+        "[data-user-status]"
+    );
+
+    if (statusElement) {
+
+        updateStatusElement(
+            statusElement,
+            user.status
+        );
+
+    }
+
+
+    // Action button
+    updateMobileActionButton(
+        card,
+        user
+    );
+
+}
+
+
+// =====================================================
+// UPDATE ROLE BADGE
+// =====================================================
+
+function updateRoleBadge(cell, role) {
+
+    const badge = cell.querySelector(
+        "[data-user-role]"
+    );
+
+    if (!badge) {
+        return;
+    }
+
+    updateRoleElement(
+        badge,
+        role
+    );
+
+}
+
+
+// =====================================================
+// UPDATE ROLE
+// =====================================================
+
+function updateRoleElement(element, role) {
+
+    element.textContent =
+        capitalize(role);
+
+
+    element.classList.remove(
+        "bg-purple-100",
+        "text-purple-700",
+        "bg-blue-100",
+        "text-blue-700",
+        "bg-gray-100",
+        "text-gray-700"
+    );
+
+
+    if (role === "admin") {
+
+        element.classList.add(
+            "bg-purple-100",
+            "text-purple-700"
+        );
+
+    } else if (role === "manager") {
+
+        element.classList.add(
+            "bg-blue-100",
+            "text-blue-700"
+        );
+
+    } else {
+
+        element.classList.add(
+            "bg-gray-100",
+            "text-gray-700"
+        );
+
+    }
+
+}
+
+
+// =====================================================
+// UPDATE STATUS BADGE
+// =====================================================
+
+function updateStatusBadge(cell, status) {
+
+    const badge = cell.querySelector(
+        "[data-user-status]"
+    );
+
+    if (!badge) {
+        return;
+    }
+
+    updateStatusElement(
+        badge,
+        status
+    );
+
+}
+
+
+// =====================================================
+// UPDATE STATUS
+// =====================================================
+
+function updateStatusElement(element, status) {
+
+    element.textContent =
+        capitalize(status);
+
+
+    element.classList.remove(
+        "bg-green-100",
+        "text-green-700",
+        "bg-red-100",
+        "text-red-700"
+    );
+
+
+    if (status === "active") {
+
+        element.classList.add(
+            "bg-green-100",
+            "text-green-700"
+        );
+
+    } else {
+
+        element.classList.add(
+            "bg-red-100",
+            "text-red-700"
+        );
+
+    }
+
+}
+
+
+// =====================================================
+// UPDATE DESKTOP ACTION BUTTON
+// =====================================================
+
+function updateActionButton(cell, user) {
+
+    const oldButton = cell.querySelector(
+        ".activate-user-btn, .deactivate-user-btn"
+    );
+
+    if (!oldButton) {
+        return;
+    }
+
+
+    const newButton =
+        document.createElement("button");
+
+
+    newButton.type = "button";
+
+    newButton.dataset.id =
+        user.id;
+
+
+    if (user.status === "active") {
+
+        newButton.className =
+            "deactivate-user-btn w-[84px] rounded-md bg-amber-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-amber-700"
+
+        newButton.textContent =
+            "Deactivate";
+
+    } else {
+
+        newButton.className =
+            "activate-user-btn w-[84px] rounded-md bg-green-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-green-700";
+
+        newButton.textContent =
+            "Activate";
+
+    }
+
+
+    oldButton.replaceWith(
+        newButton
+    );
+
+}
+
+
+// =====================================================
+// UPDATE MOBILE ACTION BUTTON
+// =====================================================
+
+function updateMobileActionButton(card, user) {
+
+    const oldButton = card.querySelector(
+        ".activate-user-btn, .deactivate-user-btn"
+    );
+
+    if (!oldButton) {
+        return;
+    }
+
+
+    const newButton =
+        document.createElement("button");
+
+
+    newButton.type = "button";
+
+    newButton.dataset.id =
+        user.id;
+
+
+    if (user.status === "active") {
+
+        newButton.className =
+            "deactivate-user-btn flex-1 rounded-md bg-amber-600 px-3 py-2 text-xs font-medium text-white transition hover:bg-amber-700";
+
+        newButton.textContent =
+            "Deactivate";
+
+    } else {
+
+        newButton.className =
+            "activate-user-btn flex-1 rounded-md bg-green-600 px-3 py-2 text-xs font-medium text-white transition hover:bg-green-700";
+
+        newButton.textContent =
+            "Activate";
+
+    }
+
+
+    oldButton.replaceWith(
+        newButton
+    );
+
+}
+
+
+// =====================================================
+// DATE FORMAT
+// =====================================================
+
+function formatDate(date) {
+
+    return new Date(date).toLocaleDateString(
+        "en-US",
+        {
+            month: "short",
+            day: "numeric",
+            year: "numeric",
+        }
+    );
+
+}
+
+
+// =====================================================
+// CAPITALIZE
+// =====================================================
+
+function capitalize(value) {
+
+    return value.charAt(0).toUpperCase()
+        + value.slice(1);
+
 }
