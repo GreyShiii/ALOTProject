@@ -731,7 +731,10 @@
                     <li>
                         <a
                             href="{{ route('admin.overtime.index') }}"
-                            class="relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-slate-500"
+                            class="relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition
+                            {{ request()->routeIs('admin.overtime.*')
+                                ? 'bg-slate-800/70 font-semibold text-white'
+                                : 'text-slate-300 hover:bg-slate-800/50 hover:text-white' }}"
                         >
 
                             <svg
@@ -762,10 +765,13 @@
 
                     {{-- Profile --}}
                     <li>
-                        <a
-                            href="#"
-                            class="relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-slate-500"
-                        >
+                    <a
+                        href="{{ route('admin.profile.index') }}"
+                        class="relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition
+                        {{ request()->routeIs('admin.profile.*')
+                            ? 'bg-slate-800/70 font-semibold text-white'
+                            : 'text-slate-300 hover:bg-slate-800/50 hover:text-white' }}"
+                    >
 
                             <svg
                                 class="h-5 w-5 flex-shrink-0"

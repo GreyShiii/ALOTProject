@@ -275,37 +275,12 @@ Route::middleware('auth')->group(function () {
         ->name('admin.')
         ->group(function () {
 
-            /*
-            |------------------------------------------------------------------
-            | Dashboard
-            |------------------------------------------------------------------
-            */
-
+            // Dashboard
             Route::get('/dashboard', [AdminDashboardController::class, 'index'])
                 ->name('dashboard');
 
 
-            /*
-            |------------------------------------------------------------------
-            | Departments
-            |------------------------------------------------------------------
-            */
-
-            Route::resource('departments', DepartmentController::class)
-                ->only([
-                    'index',
-                    'store',
-                    'update',
-                    'destroy',
-                ]);
-
-
-            /*
-            |------------------------------------------------------------------
-            | Employees
-            |------------------------------------------------------------------
-            */
-
+            // Employees
             Route::resource('employees', EmployeeController::class)
                 ->only([
                     'index',
@@ -316,12 +291,7 @@ Route::middleware('auth')->group(function () {
                 ]);
 
 
-            /*
-            |------------------------------------------------------------------
-            | Users
-            |------------------------------------------------------------------
-            */
-
+            // Users
             Route::resource('users', UserController::class)
                 ->only([
                     'index',
@@ -335,33 +305,55 @@ Route::middleware('auth')->group(function () {
                 ->name('users.activate');
 
 
-            /*
-            |------------------------------------------------------------------
-            | Attendance
-            |------------------------------------------------------------------
-            */
+            // Departments
+            Route::resource('departments', DepartmentController::class)
+                ->only([
+                    'index',
+                    'store',
+                    'update',
+                    'destroy',
+                ]);
 
+
+            // Attendance
             Route::get('/attendance', [AdminAttendanceController::class, 'index'])
                 ->name('attendance.index');
 
 
-            /*
-            |------------------------------------------------------------------
-            | Leave Requests
-            |------------------------------------------------------------------
-            */
-
+            // Leave
             Route::get('/leave', [AdminLeaveController::class, 'index'])
                 ->name('leave.index');
 
             Route::get('/leave/data', [AdminLeaveController::class, 'data'])
                 ->name('leave.data');
 
+
+            // Overtime
             Route::get('/overtime', [AdminOvertimeController::class, 'index'])
                 ->name('overtime.index');
 
             Route::get('/overtime/data', [AdminOvertimeController::class, 'data'])
                 ->name('overtime.data');
+
+
+            // =================================================
+            // ADMIN PROFILE
+            // =================================================
+
+            Route::prefix('profile')
+                ->name('profile.')
+                ->group(function () {
+
+                    Route::get('/', [ProfileController::class, 'index'])
+                        ->name('index');
+
+                    Route::put('/', [ProfileController::class, 'update'])
+                        ->name('update');
+
+                    Route::put('/password', [ProfileController::class, 'updatePassword'])
+                        ->name('password.update');
+
+                });
 
         });
 
