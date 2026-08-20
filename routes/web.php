@@ -319,6 +319,9 @@ Route::middleware('auth')->group(function () {
             Route::get('/attendance', [AdminAttendanceController::class, 'index'])
                 ->name('attendance.index');
 
+            Route::get('/attendance/data', [AdminAttendanceController::class, 'data'])
+                ->name('attendance.data');
+
 
             // Leave
             Route::get('/leave', [AdminLeaveController::class, 'index'])

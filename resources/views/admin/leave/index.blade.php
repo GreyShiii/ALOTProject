@@ -580,7 +580,6 @@
 
     </div>
 
-
     @vite('resources/js/admin/leave.js')
 
 @endsection

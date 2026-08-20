@@ -98,6 +98,6 @@
 
 </div>
 
-@vite('resources/js/employee/attendance.js')
+{{-- @vite('resources/js/employee/attendance.js') --}}
 
 @endsection

@@ -9,13 +9,13 @@
         <div class="flex items-center gap-3">
 
             <div
-                class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-teal-400 text-xs font-bold">
-                ALO
+                class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-teal-800 text-xs font-bold">
+                ALOT
             </div>
 
             <div>
                 <p class="text-sm font-semibold leading-tight">
-                    Attendance, Leave &amp; ...
+                    Attendance, Leave &amp; Overtime Tracker
                 </p>
 
                 <p class="text-xs text-slate-400">
@@ -447,7 +447,7 @@
                         <a
                             href="{{ route('manager.profile.index') }}"
                             class="relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition
-                            {{ request()->routeIs('manager.profile')
+                            {{ request()->routeIs('manager.profile.index')
                                 ? 'bg-slate-800/70 font-semibold text-white'
                                 : 'text-slate-300 hover:bg-slate-800/50 hover:text-white' }}"
                         >
