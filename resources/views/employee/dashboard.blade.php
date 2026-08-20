@@ -334,4 +334,6 @@
         </div>
     </div>
 
+    @vite('resources/js/employee/employees.js')
+
 @endsection
