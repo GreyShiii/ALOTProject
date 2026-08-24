@@ -5,13 +5,10 @@ const leaveStatusFilter =
     document.getElementById("leave-status-filter")
 
 const leaveDepartmentFilter =
-    document.getElementById(
-        "leave-department-filter",
-    )
+    document.getElementById("leave-department-filter")
 
 const leaveDateFilter =
     document.getElementById("leave-date-filter")
-
 
 const leaveTableBody =
     document.getElementById("leave-table-body")
@@ -22,95 +19,66 @@ const leaveCardList =
 const noLeaveResults =
     document.getElementById("no-leave-results")
 
+const leavePagination =
+    document.getElementById("leave-pagination")
 
 const leaveDetailsModal =
-    document.getElementById(
-        "leave-details-modal",
-    )
+    document.getElementById("leave-details-modal")
 
 const closeLeaveDetails =
-    document.getElementById(
-        "close-leave-details",
-    )
+    document.getElementById("close-leave-details")
 
 const closeLeaveDetailsFooter =
-    document.getElementById(
-        "close-leave-details-footer",
-    )
-
+    document.getElementById("close-leave-details-footer")
 
 const detailEmployee =
-    document.getElementById(
-        "detail-employee",
-    )
+    document.getElementById("detail-employee")
 
 const detailDepartment =
-    document.getElementById(
-        "detail-department",
-    )
+    document.getElementById("detail-department")
 
 const detailPosition =
-    document.getElementById(
-        "detail-position",
-    )
+    document.getElementById("detail-position")
 
 const detailLeaveType =
-    document.getElementById(
-        "detail-leave-type",
-    )
+    document.getElementById("detail-leave-type")
 
 const detailStartDate =
-    document.getElementById(
-        "detail-start-date",
-    )
+    document.getElementById("detail-start-date")
 
 const detailEndDate =
-    document.getElementById(
-        "detail-end-date",
-    )
+    document.getElementById("detail-end-date")
 
 const detailDays =
-    document.getElementById(
-        "detail-days",
-    )
+    document.getElementById("detail-days")
 
 const detailSubmitted =
-    document.getElementById(
-        "detail-submitted",
-    )
+    document.getElementById("detail-submitted")
 
 const detailStatus =
-    document.getElementById(
-        "detail-status",
-    )
+    document.getElementById("detail-status")
 
 const detailApprover =
-    document.getElementById(
-        "detail-approver",
-    )
+    document.getElementById("detail-approver")
 
 const detailReason =
-    document.getElementById(
-        "detail-reason",
-    )
+    document.getElementById("detail-reason")
 
 const detailRejectionContainer =
-    document.getElementById(
-        "detail-rejection-container",
-    )
+    document.getElementById("detail-rejection-container")
 
 const detailRejection =
-    document.getElementById(
-        "detail-rejection",
-    )
+    document.getElementById("detail-rejection")
 
+const LEAVE_PER_PAGE =
+    10
 
-let leaveRequests = []
+let leaveRequests =
+    []
 
+let currentLeavePage =
+    1
 
-// =====================================================
-// LOAD DATA
-// =====================================================
 
 async function loadLeaveRequests() {
 
@@ -124,77 +92,75 @@ async function loadLeaveRequests() {
                         Accept:
                             "application/json",
                     },
-                },
+                }
             )
+
+
+        if (
+            !response.ok
+        ) {
+
+            console.error(
+                "LOAD LEAVE REQUESTS ERROR:",
+                response.status
+            )
+
+            return
+        }
 
 
         const data =
             await response.json()
 
 
-        if (!response.ok) {
-
-            console.error(data)
-
-            return
-        }
-
-
         leaveRequests =
             data.leaveRequests || []
 
 
-        leaveSearch.value = ""
+        renderLeaveRequests(
+            1
+        )
 
-        leaveStatusFilter.value = ""
-
-        leaveDepartmentFilter.value = ""
-
-        leaveDateFilter.value = ""
-
-
-        renderLeaveRequests()
-
-    } catch (error) {
+    } catch (
+        error
+    ) {
 
         console.error(
             "LOAD LEAVE REQUESTS ERROR:",
-            error,
+            error
         )
     }
 }
 
 
-// =====================================================
-// FORMAT DATE
-// =====================================================
+function formatDate(
+    date
+) {
 
-function formatDate(date) {
+    if (
+        !date
+    ) {
 
-    if (!date) {
         return "N/A"
     }
 
 
-    return new Date(date)
-        .toLocaleDateString(
-            "en-US",
-            {
-                month: "short",
-                day: "numeric",
-                year: "numeric",
-            },
-        )
+    return new Date(
+        date
+    ).toLocaleDateString(
+        "en-US",
+        {
+            month: "short",
+            day: "numeric",
+            year: "numeric",
+        }
+    )
 }
 
 
-// =====================================================
-// CALCULATE DAYS
-// =====================================================
-
 function calculateDays(
     startDate,
-    endDate,
+    endDate
 ) {
 
     if (
@@ -207,45 +173,45 @@ function calculateDays(
 
 
     const start =
-        new Date(startDate)
+        new Date(
+            startDate
+        )
 
     const end =
-        new Date(endDate)
+        new Date(
+            endDate
+        )
 
 
-    const difference =
-        Math.floor(
-            (end - start) /
-                (1000 * 60 * 60 * 24),
-        ) + 1
-
-
-    return difference
+    return Math.floor(
+        (
+            end - start
+        ) /
+            (1000 * 60 * 60 * 24)
+    ) + 1
 }
 
 
-// =====================================================
-// NORMALIZE STATUS
-// =====================================================
-
-function normalizeStatus(status) {
+function normalizeStatus(
+    status
+) {
 
     return String(
-        status || "",
+        status || ""
     )
         .toLowerCase()
         .trim()
 }
 
 
-// =====================================================
-// STATUS BADGE
-// =====================================================
-
-function statusBadge(status) {
+function statusBadge(
+    status
+) {
 
     const normalized =
-        normalizeStatus(status)
+        normalizeStatus(
+            status
+        )
 
 
     if (
@@ -298,10 +264,6 @@ function statusBadge(status) {
 }
 
 
-// =====================================================
-// FILTER
-// =====================================================
-
 function getFilteredRequests() {
 
     const search =
@@ -325,7 +287,9 @@ function getFilteredRequests() {
 
 
     return leaveRequests.filter(
-        (leave) => {
+        (
+            leave
+        ) => {
 
             const employee =
                 leave.employee
@@ -343,26 +307,28 @@ function getFilteredRequests() {
                     : ""
 
 
-            const searchableText = `
-                ${employeeName}
-                ${user?.email || ""}
-                ${employee?.position || ""}
-                ${department?.name || ""}
-                ${leave.leave_type || ""}
-                ${leave.reason || ""}
-            `.toLowerCase()
+            const searchableText =
+                `
+                    ${employeeName}
+                    ${user?.email || ""}
+                    ${employee?.position || ""}
+                    ${department?.name || ""}
+                    ${leave.leave_type || ""}
+                    ${leave.reason || ""}
+                `
+                    .toLowerCase()
 
 
             const matchesSearch =
                 search === "" ||
                 searchableText.includes(
-                    search,
+                    search
                 )
 
 
             const leaveStatus =
                 normalizeStatus(
-                    leave.status,
+                    leave.status
                 )
 
 
@@ -375,10 +341,10 @@ function getFilteredRequests() {
             const matchesDepartment =
                 departmentId === "" ||
                 String(
-                    employee?.department_id,
+                    employee?.department_id
                 ) ===
                     String(
-                        departmentId,
+                        departmentId
                     )
 
 
@@ -398,17 +364,13 @@ function getFilteredRequests() {
                 matchesDepartment &&
                 matchesDate
             )
-        },
+        }
     )
 }
 
 
-// =====================================================
-// DESKTOP ROW
-// =====================================================
-
 function createTableRow(
-    leave,
+    leave
 ) {
 
     const employee =
@@ -429,32 +391,32 @@ function createTableRow(
 
     const startDate =
         formatDate(
-            leave.start_date,
+            leave.start_date
         )
-
 
     const endDate =
         formatDate(
-            leave.end_date,
+            leave.end_date
         )
 
 
     const days =
         calculateDays(
             leave.start_date,
-            leave.end_date,
+            leave.end_date
         )
 
 
     const dateDisplay =
-        startDate === endDate
+        startDate ===
+            endDate
             ? startDate
             : `${startDate} – ${endDate}`
 
 
     const row =
         document.createElement(
-            "tr",
+            "tr"
         )
 
 
@@ -463,55 +425,41 @@ function createTableRow(
 
 
     row.innerHTML = `
-        <td class="align-middle px-4 py-4 break-words">
+        <td class="align-middle break-words px-4 py-4">
+            <p class="text-sm font-semibold text-gray-900">
+                ${employeeName}
+            </p>
 
-            <div>
-
-                <p class="text-sm font-semibold text-gray-900">
-                    ${employeeName}
-                </p>
-
-                <p class="mt-1 break-all text-xs text-gray-500">
-                    ${user?.email || "—"}
-                </p>
-
-            </div>
-
+            <p class="mt-1 break-all text-xs text-gray-500">
+                ${user?.email || "—"}
+            </p>
         </td>
 
-
-        <td class="align-middle px-4 py-4 break-words text-sm text-gray-700">
+        <td class="align-middle break-words px-4 py-4 text-sm text-gray-700">
             ${department?.name || "—"}
         </td>
 
-
-        <td class="align-middle px-4 py-4 break-words text-sm font-medium text-gray-900">
+        <td class="align-middle break-words px-4 py-4 text-sm font-medium text-gray-900">
             ${leave.leave_type || "—"}
         </td>
-
 
         <td class="align-middle whitespace-nowrap px-4 py-4 text-sm text-gray-700">
             ${dateDisplay}
         </td>
 
-
         <td class="align-middle whitespace-nowrap px-4 py-4 text-sm text-gray-700">
             ${days} ${days === 1 ? "day" : "days"}
         </td>
-
 
         <td class="align-middle whitespace-nowrap px-4 py-4 text-sm text-gray-500">
             ${formatDate(leave.created_at)}
         </td>
 
-
         <td class="align-middle px-4 py-4">
             ${statusBadge(leave.status)}
         </td>
 
-
         <td class="align-middle whitespace-nowrap px-4 py-4 text-right">
-
             <button
                 type="button"
                 class="view-leave-btn rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 shadow-sm transition hover:bg-slate-100 hover:text-slate-900"
@@ -519,7 +467,6 @@ function createTableRow(
             >
                 View
             </button>
-
         </td>
     `
 
@@ -528,12 +475,8 @@ function createTableRow(
 }
 
 
-// =====================================================
-// MOBILE CARD
-// =====================================================
-
 function createMobileCard(
-    leave,
+    leave
 ) {
 
     const employee =
@@ -554,25 +497,25 @@ function createMobileCard(
 
     const startDate =
         formatDate(
-            leave.start_date,
+            leave.start_date
         )
 
     const endDate =
         formatDate(
-            leave.end_date,
+            leave.end_date
         )
 
 
     const days =
         calculateDays(
             leave.start_date,
-            leave.end_date,
+            leave.end_date
         )
 
 
     const card =
         document.createElement(
-            "div",
+            "div"
         )
 
 
@@ -582,9 +525,7 @@ function createMobileCard(
 
     card.innerHTML = `
         <div class="flex items-start justify-between gap-3">
-
             <div class="min-w-0">
-
                 <p class="truncate text-sm font-semibold text-gray-900">
                     ${employeeName}
                 </p>
@@ -592,19 +533,13 @@ function createMobileCard(
                 <p class="mt-1 truncate text-xs text-gray-500">
                     ${department?.name || "—"}
                 </p>
-
             </div>
 
-
             ${statusBadge(leave.status)}
-
         </div>
 
-
         <div class="mt-3 grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
-
             <div>
-
                 <p class="text-xs font-semibold uppercase tracking-wide text-gray-400">
                     Leave Type
                 </p>
@@ -612,12 +547,9 @@ function createMobileCard(
                 <p class="text-gray-700">
                     ${leave.leave_type || "—"}
                 </p>
-
             </div>
 
-
             <div>
-
                 <p class="text-xs font-semibold uppercase tracking-wide text-gray-400">
                     Days
                 </p>
@@ -625,12 +557,9 @@ function createMobileCard(
                 <p class="text-gray-700">
                     ${days}
                 </p>
-
             </div>
 
-
             <div>
-
                 <p class="text-xs font-semibold uppercase tracking-wide text-gray-400">
                     Start
                 </p>
@@ -638,12 +567,9 @@ function createMobileCard(
                 <p class="text-gray-700">
                     ${startDate}
                 </p>
-
             </div>
 
-
             <div>
-
                 <p class="text-xs font-semibold uppercase tracking-wide text-gray-400">
                     End
                 </p>
@@ -651,11 +577,8 @@ function createMobileCard(
                 <p class="text-gray-700">
                     ${endDate}
                 </p>
-
             </div>
-
         </div>
-
 
         <button
             type="button"
@@ -671,64 +594,374 @@ function createMobileCard(
 }
 
 
-// =====================================================
-// RENDER
-// =====================================================
-
-function renderLeaveRequests() {
+function renderLeaveRequests(
+    page = 1
+) {
 
     const filteredRequests =
         getFilteredRequests()
 
 
-    leaveTableBody.innerHTML = ""
+    const totalRequests =
+        filteredRequests.length
 
-    leaveCardList.innerHTML = ""
+
+    const totalPages =
+        Math.ceil(
+            totalRequests /
+                LEAVE_PER_PAGE
+        )
 
 
     if (
-        filteredRequests.length === 0
+        totalPages === 0
+    ) {
+
+        currentLeavePage =
+            1
+
+    } else if (
+        page > totalPages
+    ) {
+
+        currentLeavePage =
+            totalPages
+
+    } else if (
+        page < 1
+    ) {
+
+        currentLeavePage =
+            1
+
+    } else {
+
+        currentLeavePage =
+            page
+    }
+
+
+    const startIndex =
+        (
+            currentLeavePage -
+            1
+        ) *
+            LEAVE_PER_PAGE
+
+
+    const endIndex =
+        startIndex +
+        LEAVE_PER_PAGE
+
+
+    const pageRequests =
+        filteredRequests.slice(
+            startIndex,
+            endIndex
+        )
+
+
+    leaveTableBody.innerHTML =
+        ""
+
+    leaveCardList.innerHTML =
+        ""
+
+
+    if (
+        pageRequests.length === 0
     ) {
 
         noLeaveResults.classList.remove(
-            "hidden",
+            "hidden"
+        )
+
+    } else {
+
+        noLeaveResults.classList.add(
+            "hidden"
+        )
+
+
+        pageRequests.forEach(
+            (
+                leave
+            ) => {
+
+                leaveTableBody.appendChild(
+                    createTableRow(
+                        leave
+                    )
+                )
+
+                leaveCardList.appendChild(
+                    createMobileCard(
+                        leave
+                    )
+                )
+            }
+        )
+    }
+
+
+    renderLeavePagination(
+        totalRequests,
+        totalPages
+    )
+}
+
+
+function renderLeavePagination(
+    totalRequests,
+    totalPages
+) {
+
+    leavePagination.innerHTML =
+        ""
+
+
+    if (
+        totalRequests <=
+        LEAVE_PER_PAGE
+    ) {
+
+        leavePagination.classList.add(
+            "hidden"
         )
 
         return
     }
 
 
-    noLeaveResults.classList.add(
-        "hidden",
+    leavePagination.classList.remove(
+        "hidden"
     )
 
 
-    filteredRequests.forEach(
-        (leave) => {
+    const wrapper =
+        document.createElement(
+            "div"
+        )
 
-            leaveTableBody.appendChild(
-                createTableRow(
-                    leave,
-                ),
+
+    wrapper.className =
+        "flex min-h-[72px] w-full items-center justify-between px-5 py-3"
+
+
+    const endRecord =
+        Math.min(
+            currentLeavePage *
+                LEAVE_PER_PAGE,
+            totalRequests
+        )
+
+
+    const information =
+        document.createElement(
+            "p"
+        )
+
+
+    information.className =
+        "text-xs text-gray-500"
+
+
+    information.innerHTML =
+        `
+            Showing
+            <span class="font-semibold text-gray-700">
+                ${endRecord}
+            </span>
+            of
+            <span class="font-semibold text-gray-700">
+                ${totalRequests}
+            </span>
+            records
+        `
+
+
+    const controls =
+        document.createElement(
+            "div"
+        )
+
+
+    controls.className =
+        "flex items-center gap-1"
+
+
+    const previousButton =
+        document.createElement(
+            "button"
+        )
+
+
+    previousButton.type =
+        "button"
+
+    previousButton.disabled =
+        currentLeavePage <= 1
+
+
+    previousButton.className =
+        "inline-flex h-9 items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 text-xs font-medium text-gray-500 shadow-sm transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+
+
+    previousButton.innerHTML =
+        `
+            <span class="text-base leading-none">
+                ‹
+            </span>
+
+            <span>
+                Previous
+            </span>
+        `
+
+
+    previousButton.addEventListener(
+        "click",
+        () => {
+
+            renderLeaveRequests(
+                currentLeavePage -
+                    1
+            )
+        }
+    )
+
+
+    controls.appendChild(
+        previousButton
+    )
+
+
+    for (
+        let page = 1;
+        page <= totalPages;
+        page++
+    ) {
+
+        const pageButton =
+            document.createElement(
+                "button"
             )
 
 
-            leaveCardList.appendChild(
-                createMobileCard(
-                    leave,
-                ),
+        pageButton.type =
+            "button"
+
+        pageButton.textContent =
+            page
+
+
+        pageButton.className =
+            "inline-flex h-9 min-w-9 items-center justify-center rounded-lg px-2.5 text-xs font-medium transition"
+
+
+        if (
+            page ===
+            currentLeavePage
+        ) {
+
+            pageButton.classList.add(
+                "border",
+                "border-gray-200",
+                "bg-gray-100",
+                "text-gray-800",
+                "shadow-sm"
             )
-        },
+
+        } else {
+
+            pageButton.classList.add(
+                "text-gray-700",
+                "hover:bg-gray-100"
+            )
+        }
+
+
+        pageButton.addEventListener(
+            "click",
+            () => {
+
+                renderLeaveRequests(
+                    page
+                )
+            }
+        )
+
+
+        controls.appendChild(
+            pageButton
+        )
+    }
+
+
+    const nextButton =
+        document.createElement(
+            "button"
+        )
+
+
+    nextButton.type =
+        "button"
+
+    nextButton.disabled =
+        currentLeavePage >=
+        totalPages
+
+
+    nextButton.className =
+        "inline-flex h-9 items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 text-xs font-medium text-gray-700 shadow-sm transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+
+
+    nextButton.innerHTML =
+        `
+            <span>
+                Next
+            </span>
+
+            <span class="text-base leading-none">
+                ›
+            </span>
+        `
+
+
+    nextButton.addEventListener(
+        "click",
+        () => {
+
+            renderLeaveRequests(
+                currentLeavePage +
+                    1
+            )
+        }
+    )
+
+
+    controls.appendChild(
+        nextButton
+    )
+
+
+    wrapper.appendChild(
+        information
+    )
+
+    wrapper.appendChild(
+        controls
+    )
+
+
+    leavePagination.appendChild(
+        wrapper
     )
 }
 
 
-// =====================================================
-// OPEN DETAILS
-// =====================================================
-
 function openLeaveDetails(
-    leave,
+    leave
 ) {
 
     const employee =
@@ -750,38 +983,33 @@ function openLeaveDetails(
     detailEmployee.textContent =
         employeeName
 
-
     detailDepartment.textContent =
         department?.name ||
         "—"
-
 
     detailPosition.textContent =
         employee?.position ||
         "—"
 
-
     detailLeaveType.textContent =
         leave.leave_type ||
         "—"
 
-
     detailStartDate.textContent =
         formatDate(
-            leave.start_date,
+            leave.start_date
         )
-
 
     detailEndDate.textContent =
         formatDate(
-            leave.end_date,
+            leave.end_date
         )
 
 
     const days =
         calculateDays(
             leave.start_date,
-            leave.end_date,
+            leave.end_date
         )
 
 
@@ -795,13 +1023,13 @@ function openLeaveDetails(
 
     detailSubmitted.textContent =
         formatDate(
-            leave.created_at,
+            leave.created_at
         )
 
 
     detailStatus.innerHTML =
         statusBadge(
-            leave.status,
+            leave.status
         )
 
 
@@ -826,7 +1054,7 @@ function openLeaveDetails(
 
     const normalizedStatus =
         normalizeStatus(
-            leave.status,
+            leave.status
         )
 
 
@@ -836,9 +1064,8 @@ function openLeaveDetails(
     ) {
 
         detailRejectionContainer.classList.remove(
-            "hidden",
+            "hidden"
         )
-
 
         detailRejection.textContent =
             leave.rejection_reason ||
@@ -847,9 +1074,8 @@ function openLeaveDetails(
     } else {
 
         detailRejectionContainer.classList.add(
-            "hidden",
+            "hidden"
         )
-
 
         detailRejection.textContent =
             ""
@@ -857,42 +1083,35 @@ function openLeaveDetails(
 
 
     leaveDetailsModal.classList.remove(
-        "hidden",
+        "hidden"
     )
 
-
     leaveDetailsModal.classList.add(
-        "flex",
+        "flex"
     )
 }
 
 
-// =====================================================
-// CLOSE DETAILS
-// =====================================================
-
 function closeDetailsModal() {
 
     leaveDetailsModal.classList.add(
-        "hidden",
+        "hidden"
     )
 
-
     leaveDetailsModal.classList.remove(
-        "flex",
+        "flex"
     )
 }
 
 
 closeLeaveDetails.addEventListener(
     "click",
-    closeDetailsModal,
+    closeDetailsModal
 )
-
 
 closeLeaveDetailsFooter.addEventListener(
     "click",
-    closeDetailsModal,
+    closeDetailsModal
 )
 
 
@@ -907,14 +1126,9 @@ leaveDetailsModal.addEventListener(
 
             closeDetailsModal()
         }
-
-    },
+    }
 )
 
-
-// =====================================================
-// BUTTON EVENT DELEGATION
-// =====================================================
 
 document.addEventListener(
     "click",
@@ -922,66 +1136,87 @@ document.addEventListener(
 
         const button =
             event.target.closest(
-                ".view-leave-btn",
+                ".view-leave-btn"
             )
 
 
-        if (!button) {
+        if (
+            !button
+        ) {
+
             return
         }
 
 
         const leaveId =
             Number(
-                button.dataset.id,
+                button.dataset.id
             )
 
 
         const leave =
             leaveRequests.find(
-                (item) =>
-                    Number(item.id) ===
-                    leaveId,
+                (
+                    item
+                ) =>
+                    Number(
+                        item.id
+                    ) ===
+                    leaveId
             )
 
 
-        if (leave) {
+        if (
+            leave
+        ) {
 
             openLeaveDetails(
-                leave,
+                leave
             )
         }
-    },
+    }
 )
 
 
-// =====================================================
-// FILTER EVENTS
-// =====================================================
-
 leaveSearch.addEventListener(
     "input",
-    renderLeaveRequests,
+    () => {
+
+        renderLeaveRequests(
+            1
+        )
+    }
 )
 
 leaveStatusFilter.addEventListener(
     "change",
-    renderLeaveRequests,
+    () => {
+
+        renderLeaveRequests(
+            1
+        )
+    }
 )
 
 leaveDepartmentFilter.addEventListener(
     "change",
-    renderLeaveRequests,
+    () => {
+
+        renderLeaveRequests(
+            1
+        )
+    }
 )
 
 leaveDateFilter.addEventListener(
     "change",
-    renderLeaveRequests,
+    () => {
+
+        renderLeaveRequests(
+            1
+        )
+    }
 )
 
-
-// =====================================================
-// INITIAL LOAD
-// =====================================================
 
 loadLeaveRequests()

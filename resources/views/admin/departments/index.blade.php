@@ -155,7 +155,7 @@
 
                 <div class="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
                     <button type="button" onclick="document.getElementById('add-department-modal').classList.add('hidden')" class="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 sm:w-auto">Cancel</button>
-                    <button type="submit" class="w-full rounded-lg bg-[#11458c] px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 sm:w-auto">Add Department</button>
+                    <button type="submit" class="w-full rounded-lg bg-[#11458c] px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-800 sm:w-auto">Add Department</button>
                 </div>
             </form>
         </div>
@@ -188,7 +188,7 @@
 
                     <div class="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
                         <button type="button" onclick="document.getElementById('edit-department-modal-{{ $department->id }}').classList.add('hidden')" class="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 sm:w-auto">Cancel</button>
-                        <button type="submit" class="w-full rounded-lg bg-[#11458c] px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 sm:w-auto">Save Changes</button>
+                        <button type="submit" class="w-full rounded-lg bg-[#11458c] px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-800 sm:w-auto">Save Changes</button>
                     </div>
                 </form>
             </div>

@@ -1,203 +1,320 @@
-const addEmployeeButton = document.getElementById("add-employee-btn")
-const addEmployeeModal = document.getElementById("add-employee-modal")
-const addEmployeeForm = document.getElementById("add-employee-form")
-const cancelAddEmployee = document.getElementById("cancel-add-employee")
-const employeeTableBody = document.getElementById("employee-table-body")
-const employeeError = document.getElementById("employee-error")
+const addEmployeeButton =
+    document.getElementById("add-employee-btn")
 
-// =====================================================
-// FILTER ELEMENTS
-// =====================================================
+const addEmployeeModal =
+    document.getElementById("add-employee-modal")
 
-const employeeSearch = document.getElementById("employee-search")
-const departmentFilter = document.getElementById("filter-department")
-const managerFilter = document.getElementById("filter-manager")
+const addEmployeeForm =
+    document.getElementById("add-employee-form")
 
-// =====================================================
-// ADD EMPLOYEE MODAL
-// =====================================================
+const cancelAddEmployee =
+    document.getElementById("cancel-add-employee")
 
-addEmployeeButton.addEventListener("click", () => {
-    addEmployeeModal.classList.remove("hidden")
-})
+const employeeTableBody =
+    document.getElementById("employee-table-body")
 
-// =====================================================
-// CANCEL ADD EMPLOYEE
-// =====================================================
+const employeeError =
+    document.getElementById("employee-error")
 
-cancelAddEmployee.addEventListener("click", () => {
-    addEmployeeModal.classList.add("hidden")
-    addEmployeeForm.reset()
-    employeeError.textContent = ""
-})
+const employeeSearch =
+    document.getElementById("employee-search")
 
-// =====================================================
-// ADD EMPLOYEE
-// =====================================================
+const departmentFilter =
+    document.getElementById("filter-department")
 
-addEmployeeForm.addEventListener("submit", async (event) => {
-    event.preventDefault()
-    employeeError.textContent = ""
+const managerFilter =
+    document.getElementById("filter-manager")
 
-    try {
-        const formData = new FormData(addEmployeeForm)
+const employeePagination =
+    document.getElementById("employee-pagination")
 
-        const response = await fetch(addEmployeeForm.action, {
-            method: "POST",
-            body: formData,
-            headers: {
-                Accept: "application/json",
-            },
-        })
+const employeeCardList =
+    document.getElementById("employee-card-list")
 
-        const data = await response.json()
+const EMPLOYEES_PER_PAGE =
+    10
 
-        console.log("ADD STATUS:", response.status)
-        console.log("ADD DATA:", data)
+let currentEmployeePage =
+    1
 
-        if (!response.ok) {
-            if (data.errors) {
-                employeeError.textContent =
-                    Object.values(data.errors)[0][0]
-            } else {
-                employeeError.textContent =
-                    data.message || "Something went wrong."
+
+addEmployeeButton.addEventListener(
+    "click",
+    () => {
+
+        addEmployeeModal.classList.remove(
+            "hidden"
+        )
+    }
+)
+
+
+cancelAddEmployee.addEventListener(
+    "click",
+    () => {
+
+        addEmployeeModal.classList.add(
+            "hidden"
+        )
+
+        addEmployeeForm.reset()
+
+        employeeError.textContent =
+            ""
+    }
+)
+
+
+addEmployeeForm.addEventListener(
+    "submit",
+    async (event) => {
+
+        event.preventDefault()
+
+        employeeError.textContent =
+            ""
+
+
+        try {
+
+            const formData =
+                new FormData(
+                    addEmployeeForm
+                )
+
+
+            const response =
+                await fetch(
+                    addEmployeeForm.action,
+                    {
+                        method: "POST",
+                        body: formData,
+                        headers: {
+                            Accept:
+                                "application/json",
+                        },
+                    }
+                )
+
+
+            const data =
+                await response.json()
+
+
+            if (
+                !response.ok
+            ) {
+
+                if (
+                    data.errors
+                ) {
+
+                    employeeError.textContent =
+                        Object.values(
+                            data.errors
+                        )[0][0]
+
+                } else {
+
+                    employeeError.textContent =
+                        data.message ||
+                        "Something went wrong."
+                }
+
+
+                return
             }
+
+
+            const noEmployees =
+                document.getElementById(
+                    "no-employees"
+                )
+
+
+            if (
+                noEmployees
+            ) {
+
+                noEmployees.remove()
+            }
+
+
+            addEmployeeToTable(
+                data.employee
+            )
+
+
+            updateManagerDropdown(
+                data.employee
+            )
+
+
+            addEmployeeModal.classList.add(
+                "hidden"
+            )
+
+            addEmployeeForm.reset()
+
+
+            filterEmployees(
+                currentEmployeePage
+            )
+
+        } catch (
+            error
+        ) {
+
+            console.error(
+                "ADD EMPLOYEE ERROR:",
+                error
+            )
+        }
+    }
+)
+
+
+employeeTableBody.addEventListener(
+    "click",
+    async (event) => {
+
+        if (
+            event.target.classList.contains(
+                "view-employee-btn"
+            )
+        ) {
+
+            showViewEmployee(
+                event.target
+            )
 
             return
         }
 
-        const noEmployees =
-            document.getElementById("no-employees")
 
-        if (noEmployees) {
-            noEmployees.remove()
-        }
-
-        addEmployeeToTable(data.employee)
-
-        // Add/remove Manager option if needed
-        updateManagerDropdown(data.employee)
-
-        addEmployeeModal.classList.add("hidden")
-        addEmployeeForm.reset()
-
-        filterEmployees()
-    } catch (error) {
-        console.error("ADD EMPLOYEE ERROR:", error)
-    }
-})
-
-// =====================================================
-// VIEW / EDIT / DELETE BUTTONS
-// EVENT DELEGATION
-// =====================================================
-
-employeeTableBody.addEventListener("click", async (event) => {
-
-    // =================================================
-    // VIEW
-    // =================================================
-
-    if (event.target.classList.contains("view-employee-btn")) {
-        showViewEmployee(event.target)
-        return
-    }
-
-
-    // =================================================
-    // EDIT
-    // =================================================
-
-    if (event.target.classList.contains("edit-employee-btn")) {
-
-        const id =
-            event.target.getAttribute("data-id")
-
-        try {
-
-            const response = await fetch(
-                `/admin/employees/${id}`,
-                {
-                    headers: {
-                        Accept: "application/json",
-                    },
-                }
+        if (
+            event.target.classList.contains(
+                "edit-employee-btn"
             )
+        ) {
 
-            const data = await response.json()
-
-            if (!response.ok) {
-                console.error(data)
-                return
-            }
-
-            populateEditForm(data.employee)
-
-            const editModal =
-                document.getElementById(
-                    "edit-employee-modal"
+            const id =
+                event.target.getAttribute(
+                    "data-id"
                 )
 
-            editModal.classList.remove("hidden")
 
-        } catch (error) {
+            try {
 
-            console.error(
-                "GET EMPLOYEE ERROR:",
+                const response =
+                    await fetch(
+                        `/admin/employees/${id}`,
+                        {
+                            headers: {
+                                Accept:
+                                    "application/json",
+                            },
+                        }
+                    )
+
+
+                const data =
+                    await response.json()
+
+
+                if (
+                    !response.ok
+                ) {
+
+                    console.error(
+                        data
+                    )
+
+                    return
+                }
+
+
+                populateEditForm(
+                    data.employee
+                )
+
+
+                const editModal =
+                    document.getElementById(
+                        "edit-employee-modal"
+                    )
+
+
+                editModal.classList.remove(
+                    "hidden"
+                )
+
+            } catch (
                 error
-            )
+            ) {
+
+                console.error(
+                    "GET EMPLOYEE ERROR:",
+                    error
+                )
+            }
+
+
+            return
         }
 
-        return
+
+        if (
+            event.target.classList.contains(
+                "delete-employee-btn"
+            )
+        ) {
+
+            const id =
+                event.target.getAttribute(
+                    "data-id"
+                )
+
+
+            const deleteModal =
+                document.getElementById(
+                    "delete-employee-modal"
+                )
+
+            const deleteForm =
+                document.getElementById(
+                    "delete-employee-form"
+                )
+
+            const deleteName =
+                document.getElementById(
+                    "delete-employee-name"
+                )
+
+
+            deleteForm.action =
+                `/admin/employees/${id}`
+
+            deleteForm.dataset.id =
+                id
+
+
+            deleteName.textContent =
+                `${event.target.dataset.firstName || ""} ${
+                    event.target.dataset.lastName || ""
+                }`.trim()
+
+
+            deleteModal.classList.remove(
+                "hidden"
+            )
+
+
+            return
+        }
     }
+)
 
-
-    // =================================================
-    // DELETE
-    // =================================================
-
-    if (event.target.classList.contains("delete-employee-btn")) {
-
-        const id =
-            event.target.getAttribute("data-id")
-
-        const deleteModal =
-            document.getElementById(
-                "delete-employee-modal"
-            )
-
-        const deleteForm =
-            document.getElementById(
-                "delete-employee-form"
-            )
-
-        const deleteName =
-            document.getElementById(
-                "delete-employee-name"
-            )
-
-        deleteForm.action =
-            `/admin/employees/${id}`
-
-        deleteForm.dataset.id = id
-
-        deleteName.textContent =
-            `${event.target.dataset.firstName || ""} ${
-                event.target.dataset.lastName || ""
-            }`.trim()
-
-        deleteModal.classList.remove(
-            "hidden"
-        )
-
-        return
-    }
-})
-
-// =====================================================
-// EDIT EMPLOYEE
-// =====================================================
 
 const editEmployeeModal =
     document.getElementById(
@@ -209,11 +326,13 @@ const editEmployeeForm =
         "edit-employee-form"
     )
 
+
 editEmployeeForm.addEventListener(
     "submit",
     async (event) => {
 
         event.preventDefault()
+
 
         try {
 
@@ -221,6 +340,7 @@ editEmployeeForm.addEventListener(
                 new FormData(
                     editEmployeeForm
                 )
+
 
             const response =
                 await fetch(
@@ -235,40 +355,45 @@ editEmployeeForm.addEventListener(
                     }
                 )
 
+
             const data =
                 await response.json()
 
-            console.log(
-                "EDIT STATUS:",
-                response.status
-            )
 
-            console.log(
-                "EDIT DATA:",
-                data
-            )
+            if (
+                !response.ok
+            ) {
 
-            if (!response.ok) {
-                console.error(data)
+                console.error(
+                    data
+                )
+
                 return
             }
+
 
             updateEmployeeRow(
                 data.employee
             )
 
-            // Keep Manager dropdown in sync
+
             updateManagerDropdown(
                 data.employee
             )
+
 
             editEmployeeModal.classList.add(
                 "hidden"
             )
 
-            filterEmployees()
 
-        } catch (error) {
+            filterEmployees(
+                currentEmployeePage
+            )
+
+        } catch (
+            error
+        ) {
 
             console.error(
                 "EDIT EMPLOYEE ERROR:",
@@ -278,22 +403,21 @@ editEmployeeForm.addEventListener(
     }
 )
 
-// =====================================================
-// CANCEL EDIT
-// =====================================================
 
 document
-    .getElementById("cancel-edit-employee")
-    .addEventListener("click", () => {
+    .getElementById(
+        "cancel-edit-employee"
+    )
+    .addEventListener(
+        "click",
+        () => {
 
-        editEmployeeModal.classList.add(
-            "hidden"
-        )
-    })
+            editEmployeeModal.classList.add(
+                "hidden"
+            )
+        }
+    )
 
-// =====================================================
-// VIEW EMPLOYEE MODAL
-// =====================================================
 
 const viewEmployeeModal =
     document.getElementById(
@@ -350,11 +474,10 @@ const viewEmployeeStatus =
         "view-employee-status"
     )
 
-// =====================================================
-// SHOW VIEW EMPLOYEE MODAL
-// =====================================================
 
-function showViewEmployee(button) {
+function showViewEmployee(
+    button
+) {
 
     const firstName =
         button.dataset.firstName
@@ -391,7 +514,12 @@ function showViewEmployee(button) {
         `${firstName} ${lastName}`
 
     viewEmployeeAccount.textContent =
-        `Employee record EMP-${String(employeeId).padStart(4, "0")}`
+        `Employee record EMP-${String(
+            employeeId
+        ).padStart(
+            4,
+            "0"
+        )}`
 
     viewEmployeeEmail.textContent =
         email
@@ -416,27 +544,23 @@ function showViewEmployee(button) {
         status.charAt(0).toUpperCase() +
         status.slice(1)
 
+
     viewEmployeeModal.classList.remove(
         "hidden"
     )
 }
 
-// =====================================================
-// CLOSE VIEW MODAL
-// =====================================================
 
 closeViewEmployee.addEventListener(
     "click",
     () => {
+
         viewEmployeeModal.classList.add(
             "hidden"
         )
     }
 )
 
-// =====================================================
-// DELETE EMPLOYEE
-// =====================================================
 
 const deleteEmployeeModal =
     document.getElementById(
@@ -448,21 +572,25 @@ const deleteEmployeeForm =
         "delete-employee-form"
     )
 
+
 deleteEmployeeForm.addEventListener(
     "submit",
     async (event) => {
 
         event.preventDefault()
 
+
         try {
 
             const id =
                 deleteEmployeeForm.dataset.id
 
+
             const formData =
                 new FormData(
                     deleteEmployeeForm
                 )
+
 
             const response =
                 await fetch(
@@ -477,46 +605,70 @@ deleteEmployeeForm.addEventListener(
                     }
                 )
 
+
             const data =
                 await response.json()
 
-            console.log(
-                "DELETE STATUS:",
-                response.status
-            )
 
-            console.log(
-                "DELETE DATA:",
-                data
-            )
+            if (
+                !response.ok
+            ) {
 
-            if (!response.ok) {
-                console.error(data)
+                console.error(
+                    data
+                )
+
                 return
             }
+
 
             const row =
                 document.getElementById(
                     `employee-row-${id}`
                 )
 
-            if (row) {
+
+            if (
+                row
+            ) {
+
                 row.remove()
             }
 
-            // Remove deleted employee from Manager dropdowns
-            removeManagerFromDropdown(id)
+
+            const card =
+                document.getElementById(
+                    `employee-card-${id}`
+                )
+
+
+            if (
+                card
+            ) {
+
+                card.remove()
+            }
+
+
+            removeManagerFromDropdown(
+                id
+            )
+
 
             deleteEmployeeModal.classList.add(
                 "hidden"
             )
+
 
             const remainingRows =
                 employeeTableBody.querySelectorAll(
                     "tr:not(#no-filter-results):not(#no-employees)"
                 )
 
-            if (remainingRows.length === 0) {
+
+            if (
+                remainingRows.length === 0
+            ) {
 
                 employeeTableBody.innerHTML = `
                     <tr id="no-employees">
@@ -530,7 +682,14 @@ deleteEmployeeForm.addEventListener(
                 `
             }
 
-        } catch (error) {
+
+            filterEmployees(
+                currentEmployeePage
+            )
+
+        } catch (
+            error
+        ) {
 
             console.error(
                 "DELETE EMPLOYEE ERROR:",
@@ -540,9 +699,6 @@ deleteEmployeeForm.addEventListener(
     }
 )
 
-// =====================================================
-// CANCEL DELETE
-// =====================================================
 
 document
     .getElementById(
@@ -558,55 +714,98 @@ document
         }
     )
 
-// =====================================================
-// POPULATE EDIT FORM
-// =====================================================
 
-function populateEditForm(employee) {
-    const form = document.getElementById("edit-employee-form")
+function populateEditForm(
+    employee
+) {
 
-    form.action = `/admin/employees/${employee.id}`
-
-    form.elements["first_name"].value = employee.user.first_name
-    form.elements["last_name"].value = employee.user.last_name
-    form.elements["email"].value = employee.user.email
-    form.elements["password"].value = ""
-    form.elements["role"].value = employee.user.role
-    form.elements["department_id"].value = employee.department_id
-    form.elements["position"].value = employee.position
-    form.elements["hire_date"].value =
-        employee.hire_date
-            ? employee.hire_date.substring(0, 10)
-            : ""
-
-    // Make sure the current manager exists in the dropdown
-    if (employee.manager) {
-        const managerSelect = form.elements["manager_id"]
-
-        let managerOption = managerSelect.querySelector(
-            `option[value="${employee.manager.id}"]`
+    const form =
+        document.getElementById(
+            "edit-employee-form"
         )
 
-        if (!managerOption) {
-            managerOption = document.createElement("option")
-            managerOption.value = employee.manager.id
+
+    form.action =
+        `/admin/employees/${employee.id}`
+
+
+    form.elements["first_name"].value =
+        employee.user.first_name
+
+    form.elements["last_name"].value =
+        employee.user.last_name
+
+    form.elements["email"].value =
+        employee.user.email
+
+    form.elements["password"].value =
+        ""
+
+    form.elements["role"].value =
+        employee.user.role
+
+    form.elements["department_id"].value =
+        employee.department_id
+
+    form.elements["position"].value =
+        employee.position
+
+    form.elements["hire_date"].value =
+        employee.hire_date
+            ? employee.hire_date.substring(
+                0,
+                10
+            )
+            : ""
+
+
+    if (
+        employee.manager
+    ) {
+
+        const managerSelect =
+            form.elements["manager_id"]
+
+
+        let managerOption =
+            managerSelect.querySelector(
+                `option[value="${employee.manager.id}"]`
+            )
+
+
+        if (
+            !managerOption
+        ) {
+
+            managerOption =
+                document.createElement(
+                    "option"
+                )
+
+
+            managerOption.value =
+                employee.manager.id
+
             managerOption.textContent =
                 `${employee.manager.user.first_name} ${employee.manager.user.last_name}`
 
-            managerSelect.appendChild(managerOption)
+
+            managerSelect.appendChild(
+                managerOption
+            )
         }
     }
 
-    // Set manager AFTER the option exists
+
     form.elements["manager_id"].value =
-        employee.manager_id ?? ""
+        employee.manager_id ??
+        ""
 }
 
-// =====================================================
-// BUILD ACTION BUTTONS
-// =====================================================
 
-function buildActionButtons(employee) {
+function buildActionButtons(
+    employee
+) {
 
     const user =
         employee.user
@@ -681,11 +880,10 @@ function buildActionButtons(employee) {
     `
 }
 
-// =====================================================
-// BUILD ROW CELLS
-// =====================================================
 
-function buildEmployeeCells(employee) {
+function buildEmployeeCells(
+    employee
+) {
 
     const user =
         employee.user
@@ -719,17 +917,18 @@ function buildEmployeeCells(employee) {
 
 
     const statusBadge =
-        user.status === "active"
+        user.status ===
+            "active"
             ? `
                 <span class="inline-flex items-center rounded-full border border-green-200 bg-green-50 px-2.5 py-1 text-xs font-semibold text-green-700">
                     Active
                 </span>
-              `
+            `
             : `
                 <span class="inline-flex items-center rounded-full border border-gray-200 bg-gray-100 px-2.5 py-1 text-xs font-semibold text-gray-600">
                     Inactive
                 </span>
-              `
+            `
 
 
     return `
@@ -741,7 +940,7 @@ function buildEmployeeCells(employee) {
             ${user.first_name} ${user.last_name}
         </td>
 
-        <td class="px-3 py-4 text-center text-sm text-gray-500 break-all">
+        <td class="break-all px-3 py-4 text-center text-sm text-gray-500">
             ${user.email}
         </td>
 
@@ -775,11 +974,10 @@ function buildEmployeeCells(employee) {
     `
 }
 
-// =====================================================
-// ADD EMPLOYEE TO TABLE
-// =====================================================
 
-function addEmployeeToTable(employee) {
+function addEmployeeToTable(
+    employee
+) {
 
     const department =
         employee.department
@@ -807,24 +1005,29 @@ function addEmployeeToTable(employee) {
                         : managerName
                 }"
             >
-                ${buildEmployeeCells(employee)}
+                ${buildEmployeeCells(
+                    employee
+                )}
             </tr>
         `
     )
 }
 
-// =====================================================
-// UPDATE EMPLOYEE ROW
-// =====================================================
 
-function updateEmployeeRow(employee) {
+function updateEmployeeRow(
+    employee
+) {
 
     const row =
         document.getElementById(
             `employee-row-${employee.id}`
         )
 
-    if (!row) {
+
+    if (
+        !row
+    ) {
+
         return
     }
 
@@ -839,6 +1042,7 @@ function updateEmployeeRow(employee) {
     row.dataset.department =
         department.name
 
+
     row.dataset.manager =
         manager
             ? `${manager.user.first_name} ${manager.user.last_name}`
@@ -851,11 +1055,10 @@ function updateEmployeeRow(employee) {
         )
 }
 
-// =====================================================
-// UPDATE MANAGER DROPDOWN
-// =====================================================
 
-function updateManagerDropdown(employee) {
+function updateManagerDropdown(
+    employee
+) {
 
     const managerSelects =
         document.querySelectorAll(
@@ -863,57 +1066,58 @@ function updateManagerDropdown(employee) {
         )
 
 
-    managerSelects.forEach((select) => {
+    managerSelects.forEach(
+        (
+            select
+        ) => {
 
-        const existingOption =
-            select.querySelector(
-                `option[value="${employee.id}"]`
-            )
+            const existingOption =
+                select.querySelector(
+                    `option[value="${employee.id}"]`
+                )
 
 
-        // =================================================
-        // USER IS A MANAGER
-        // =================================================
+            if (
+                employee.user.role ===
+                "manager"
+            ) {
 
-        if (
-            employee.user.role ===
-            "manager"
-        ) {
+                if (
+                    !existingOption
+                ) {
 
-            if (!existingOption) {
+                    const option =
+                        document.createElement(
+                            "option"
+                        )
 
-                const option =
-                    document.createElement(
-                        "option"
+
+                    option.value =
+                        employee.id
+
+
+                    option.textContent =
+                        `${employee.user.first_name} ${employee.user.last_name}`
+
+
+                    select.appendChild(
+                        option
                     )
+                }
 
-                option.value =
-                    employee.id
+            } else {
 
-                option.textContent =
-                    `${employee.user.first_name} ${employee.user.last_name}`
+                if (
+                    existingOption
+                ) {
 
-                select.appendChild(option)
+                    existingOption.remove()
+                }
             }
         }
-
-
-        // =================================================
-        // USER IS NO LONGER A MANAGER
-        // =================================================
-
-        else {
-
-            if (existingOption) {
-                existingOption.remove()
-            }
-        }
-    })
+    )
 }
 
-// =====================================================
-// REMOVE MANAGER FROM DROPDOWN
-// =====================================================
 
 function removeManagerFromDropdown(
     employeeId
@@ -925,24 +1129,31 @@ function removeManagerFromDropdown(
         )
 
 
-    managerSelects.forEach((select) => {
+    managerSelects.forEach(
+        (
+            select
+        ) => {
 
-        const option =
-            select.querySelector(
-                `option[value="${employeeId}"]`
-            )
+            const option =
+                select.querySelector(
+                    `option[value="${employeeId}"]`
+                )
 
-        if (option) {
-            option.remove()
+
+            if (
+                option
+            ) {
+
+                option.remove()
+            }
         }
-    })
+    )
 }
 
-// =====================================================
-// EMPLOYEE FILTERING
-// =====================================================
 
-function filterEmployees() {
+function filterEmployees(
+    page = 1
+) {
 
     const searchValue =
         employeeSearch.value
@@ -962,78 +1173,266 @@ function filterEmployees() {
             .trim()
 
 
-    const rows =
+    const tableRows =
         employeeTableBody.querySelectorAll(
             "tr:not(#no-employees):not(#no-filter-results)"
         )
 
 
-    let visibleRows = 0
+    const matchingTableRows = []
 
 
-    rows.forEach((row) => {
+    tableRows.forEach(
+        (
+            row
+        ) => {
 
-        const rowText =
-            row.textContent
-                .toLowerCase()
-
-        const matchesSearch =
-            rowText.includes(
-                searchValue
-            )
+            const rowText =
+                row.textContent
+                    .toLowerCase()
 
 
-        const rowDepartment =
-            (
-                row.dataset.department ||
-                ""
-            )
-                .toLowerCase()
-                .trim()
+            const matchesSearch =
+                rowText.includes(
+                    searchValue
+                )
 
 
-        const matchesDepartment =
-            departmentValue === "" ||
-            rowDepartment ===
-                departmentValue
+            const rowDepartment =
+                (
+                    row.dataset.department ||
+                    ""
+                )
+                    .toLowerCase()
+                    .trim()
 
 
-        const rowManager =
-            (
-                row.dataset.manager ||
-                ""
-            )
-                .toLowerCase()
-                .trim()
+            const matchesDepartment =
+                departmentValue === "" ||
+                rowDepartment ===
+                    departmentValue
 
 
-        const matchesManager =
-            managerValue === "" ||
-            rowManager ===
-                managerValue
+            const rowManager =
+                (
+                    row.dataset.manager ||
+                    ""
+                )
+                    .toLowerCase()
+                    .trim()
 
 
-        const shouldShow =
-            matchesSearch &&
-            matchesDepartment &&
-            matchesManager
+            const matchesManager =
+                managerValue === "" ||
+                rowManager ===
+                    managerValue
 
 
-        if (shouldShow) {
+            const shouldShow =
+                matchesSearch &&
+                matchesDepartment &&
+                matchesManager
 
-            row.classList.remove(
-                "hidden"
-            )
 
-            visibleRows++
+            if (
+                shouldShow
+            ) {
 
-        } else {
+                matchingTableRows.push(
+                    row
+                )
 
-            row.classList.add(
-                "hidden"
-            )
+            } else {
+
+                row.classList.add(
+                    "hidden"
+                )
+            }
         }
-    })
+    )
+
+
+    const mobileCards =
+        employeeCardList
+            ? employeeCardList.querySelectorAll(
+                "[id^='employee-card-']"
+            )
+            : []
+
+
+    const matchingMobileCards = []
+
+
+    mobileCards.forEach(
+        (
+            card
+        ) => {
+
+            const cardText =
+                card.textContent
+                    .toLowerCase()
+
+
+            const matchesSearch =
+                cardText.includes(
+                    searchValue
+                )
+
+
+            const cardDepartment =
+                (
+                    card.dataset.department ||
+                    ""
+                )
+                    .toLowerCase()
+                    .trim()
+
+
+            const matchesDepartment =
+                departmentValue === "" ||
+                cardDepartment ===
+                    departmentValue
+
+
+            const cardManager =
+                (
+                    card.dataset.manager ||
+                    ""
+                )
+                    .toLowerCase()
+                    .trim()
+
+
+            const matchesManager =
+                managerValue === "" ||
+                cardManager ===
+                    managerValue
+
+
+            const shouldShow =
+                matchesSearch &&
+                matchesDepartment &&
+                matchesManager
+
+
+            if (
+                shouldShow
+            ) {
+
+                matchingMobileCards.push(
+                    card
+                )
+
+            } else {
+
+                card.classList.add(
+                    "hidden"
+                )
+            }
+        }
+    )
+
+
+    const totalEmployees =
+        matchingTableRows.length
+
+
+    const totalPages =
+        Math.ceil(
+            totalEmployees /
+                EMPLOYEES_PER_PAGE
+        )
+
+
+    if (
+        totalPages === 0
+    ) {
+
+        currentEmployeePage =
+            1
+
+    } else if (
+        page > totalPages
+    ) {
+
+        currentEmployeePage =
+            totalPages
+
+    } else if (
+        page < 1
+    ) {
+
+        currentEmployeePage =
+            1
+
+    } else {
+
+        currentEmployeePage =
+            page
+    }
+
+
+    const startIndex =
+        (
+            currentEmployeePage -
+            1
+        ) *
+            EMPLOYEES_PER_PAGE
+
+
+    const endIndex =
+        startIndex +
+        EMPLOYEES_PER_PAGE
+
+
+    matchingTableRows.forEach(
+        (
+            row,
+            index
+        ) => {
+
+            if (
+                index >= startIndex &&
+                index < endIndex
+            ) {
+
+                row.classList.remove(
+                    "hidden"
+                )
+
+            } else {
+
+                row.classList.add(
+                    "hidden"
+                )
+            }
+        }
+    )
+
+
+    matchingMobileCards.forEach(
+        (
+            card,
+            index
+        ) => {
+
+            if (
+                index >= startIndex &&
+                index < endIndex
+            ) {
+
+                card.classList.remove(
+                    "hidden"
+                )
+
+            } else {
+
+                card.classList.add(
+                    "hidden"
+                )
+            }
+        }
+    )
 
 
     let noResults =
@@ -1043,57 +1442,345 @@ function filterEmployees() {
 
 
     if (
-        visibleRows === 0 &&
-        rows.length > 0
+        totalEmployees === 0 &&
+        tableRows.length > 0
     ) {
 
-        if (!noResults) {
+        if (
+            !noResults
+        ) {
 
             noResults =
                 document.createElement(
                     "tr"
                 )
 
+
             noResults.id =
                 "no-filter-results"
 
-            noResults.innerHTML = `
-                <td
-                    colspan="9"
-                    class="px-6 py-12 text-center text-sm text-gray-500"
-                >
-                    No employees match your filters.
-                </td>
-            `
+
+            noResults.innerHTML =
+                `
+                    <td
+                        colspan="9"
+                        class="px-6 py-12 text-center text-sm text-gray-500"
+                    >
+                        No employees match your filters.
+                    </td>
+                `
+
 
             employeeTableBody.appendChild(
                 noResults
             )
         }
 
-    } else {
+    } else if (
+        noResults
+    ) {
 
-        if (noResults) {
-            noResults.remove()
-        }
+        noResults.remove()
     }
+
+
+    renderEmployeePagination(
+        totalEmployees,
+        totalPages
+    )
 }
 
-// =====================================================
-// FILTER EVENT LISTENERS
-// =====================================================
+
+function renderEmployeePagination(
+    totalEmployees,
+    totalPages
+) {
+
+    if (
+        !employeePagination
+    ) {
+
+        return
+    }
+
+
+    employeePagination.innerHTML =
+        ""
+
+
+    if (
+        totalEmployees <=
+        EMPLOYEES_PER_PAGE
+    ) {
+
+        employeePagination.classList.add(
+            "hidden"
+        )
+
+        return
+    }
+
+
+    employeePagination.classList.remove(
+        "hidden"
+    )
+
+
+    const wrapper =
+        document.createElement(
+            "div"
+        )
+
+
+    wrapper.className =
+        "flex min-h-[72px] w-full items-center justify-between px-5 py-3"
+
+
+    const endRecord =
+        Math.min(
+            currentEmployeePage *
+                EMPLOYEES_PER_PAGE,
+            totalEmployees
+        )
+
+
+    const information =
+        document.createElement(
+            "p"
+        )
+
+
+    information.className =
+        "text-xs text-gray-500"
+
+
+    information.innerHTML =
+        `
+            Showing
+            <span class="font-semibold text-gray-700">
+                ${endRecord}
+            </span>
+            of
+            <span class="font-semibold text-gray-700">
+                ${totalEmployees}
+            </span>
+            records
+        `
+
+
+    const controls =
+        document.createElement(
+            "div"
+        )
+
+
+    controls.className =
+        "flex items-center gap-1"
+
+
+    const previousButton =
+        document.createElement(
+            "button"
+        )
+
+
+    previousButton.type =
+        "button"
+
+    previousButton.disabled =
+        currentEmployeePage <= 1
+
+
+    previousButton.className =
+        "inline-flex h-9 items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 text-xs font-medium text-gray-500 shadow-sm transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+
+
+    previousButton.innerHTML =
+        `
+            <span class="text-base leading-none">
+                ‹
+            </span>
+
+            <span>
+                Previous
+            </span>
+        `
+
+
+    previousButton.addEventListener(
+        "click",
+        () => {
+
+            filterEmployees(
+                currentEmployeePage -
+                    1
+            )
+        }
+    )
+
+
+    controls.appendChild(
+        previousButton
+    )
+
+
+    for (
+        let page = 1;
+        page <= totalPages;
+        page++
+    ) {
+
+        const pageButton =
+            document.createElement(
+                "button"
+            )
+
+
+        pageButton.type =
+            "button"
+
+        pageButton.textContent =
+            page
+
+
+        pageButton.className =
+            "inline-flex h-9 min-w-9 items-center justify-center rounded-lg px-2.5 text-xs font-medium transition"
+
+
+        if (
+            page ===
+            currentEmployeePage
+        ) {
+
+            pageButton.classList.add(
+                "border",
+                "border-gray-200",
+                "bg-gray-100",
+                "text-gray-800",
+                "shadow-sm"
+            )
+
+        } else {
+
+            pageButton.classList.add(
+                "text-gray-700",
+                "hover:bg-gray-100"
+            )
+        }
+
+
+        pageButton.addEventListener(
+            "click",
+            () => {
+
+                filterEmployees(
+                    page
+                )
+            }
+        )
+
+
+        controls.appendChild(
+            pageButton
+        )
+    }
+
+
+    const nextButton =
+        document.createElement(
+            "button"
+        )
+
+
+    nextButton.type =
+        "button"
+
+    nextButton.disabled =
+        currentEmployeePage >=
+        totalPages
+
+
+    nextButton.className =
+        "inline-flex h-9 items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 text-xs font-medium text-gray-700 shadow-sm transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+
+
+    nextButton.innerHTML =
+        `
+            <span>
+                Next
+            </span>
+
+            <span class="text-base leading-none">
+                ›
+            </span>
+        `
+
+
+    nextButton.addEventListener(
+        "click",
+        () => {
+
+            filterEmployees(
+                currentEmployeePage +
+                    1
+            )
+        }
+    )
+
+
+    controls.appendChild(
+        nextButton
+    )
+
+
+    wrapper.appendChild(
+        information
+    )
+
+    wrapper.appendChild(
+        controls
+    )
+
+
+    employeePagination.appendChild(
+        wrapper
+    )
+}
+
 
 employeeSearch.addEventListener(
     "input",
-    filterEmployees
+    () => {
+
+        filterEmployees(
+            1
+        )
+    }
 )
+
 
 departmentFilter.addEventListener(
     "change",
-    filterEmployees
+    () => {
+
+        filterEmployees(
+            1
+        )
+    }
 )
+
 
 managerFilter.addEventListener(
     "change",
-    filterEmployees
+    () => {
+
+        filterEmployees(
+            1
+        )
+    }
+)
+
+
+filterEmployees(
+    1
 )

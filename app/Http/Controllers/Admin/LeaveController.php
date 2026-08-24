@@ -5,13 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Department;
 use App\Models\LeaveRequest;
-use Illuminate\Http\Request;
 
 class LeaveController extends Controller
 {
-    /**
-     * Display all leave requests.
-     */
     public function index()
     {
         $leaveRequests = LeaveRequest::with([
@@ -22,17 +18,18 @@ class LeaveController extends Controller
             ->latest('created_at')
             ->get();
 
-        $departments = Department::orderBy('name')->get();
+        $departments =
+            Department::orderBy('name')->get();
 
         return view(
             'admin.leave.index',
-            compact('leaveRequests', 'departments')
+            compact(
+                'leaveRequests',
+                'departments'
+            )
         );
     }
 
-    /**
-     * Return all leave requests as JSON.
-     */
     public function data()
     {
         $leaveRequests = LeaveRequest::with([

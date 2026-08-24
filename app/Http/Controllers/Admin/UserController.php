@@ -12,19 +12,16 @@ use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
-    /**
-     * Display all users.
-     */
     public function index()
     {
-        $users = User::latest()->paginate(10);
+        $users = User::latest()->get();
 
-        return view('admin.users.index', compact('users'));
+        return view(
+            'admin.users.index',
+            compact('users')
+        );
     }
 
-    /**
-     * Update an existing user.
-     */
     public function update(Request $request, User $user)
     {
         $validated = $request->validate([
@@ -54,10 +51,6 @@ class UserController extends Controller
             ],
         ]);
 
-        /*
-         * Remember whether this user was a Manager
-         * before the update.
-         */
         $wasManager = $user->role === 'manager';
         $willBeManager = $validated['role'] === 'manager';
 
@@ -67,19 +60,13 @@ class UserController extends Controller
             $wasManager,
             $willBeManager
         ) {
-
             if (empty($validated['password'])) {
                 unset($validated['password']);
             }
 
             $user->update($validated);
 
-            /*
-             * If the user was a Manager but is no longer
-             * a Manager, clear their subordinates.
-             */
             if ($wasManager && !$willBeManager) {
-
                 $employee = $user->employee;
 
                 if ($employee) {
@@ -101,14 +88,11 @@ class UserController extends Controller
         ]);
     }
 
-    /**
-     * Deactivate a user.
-     */
     public function deactivate(User $user)
     {
         if (Auth::id() === $user->id) {
             return response()->json([
-                'message' => 'You cannot deactivate your own account.'
+                'message' => 'You cannot deactivate your own account.',
             ], 422);
         }
 
@@ -122,14 +106,11 @@ class UserController extends Controller
         ]);
     }
 
-    /**
-     * Activate a user.
-     */
     public function activate(User $user)
     {
         if (Auth::id() === $user->id) {
             return response()->json([
-                'message' => 'You cannot change your own account status.'
+                'message' => 'You cannot change your own account status.',
             ], 422);
         }
 
