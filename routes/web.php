@@ -155,17 +155,20 @@ Route::middleware('auth')->group(function () {
     |--------------------------------------------------------------------------
     */
 
-    Route::prefix('employee/overtime')
-        ->name('employee.overtime.')
-        ->group(function () {
+Route::prefix('employee/overtime')
+    ->name('employee.overtime.')
+    ->group(function () {
 
-            Route::get('/', [OvertimeController::class, 'index'])
-                ->name('index');
+        Route::get('/', [OvertimeController::class, 'index'])
+            ->name('index');
 
-            Route::post('/', [OvertimeController::class, 'store'])
-                ->name('store');
+        Route::get('/data', [OvertimeController::class, 'data'])
+            ->name('data');
 
-        });
+        Route::post('/', [OvertimeController::class, 'store'])
+            ->name('store');
+
+    });
 
 
     /*

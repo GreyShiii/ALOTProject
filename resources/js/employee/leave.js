@@ -1,58 +1,93 @@
 import { showToast } from "./employees";
 
 const openLeaveButton = document.getElementById("open-leave-modal");
+
 const leaveModal = document.getElementById("leave-request-modal");
+
 const closeLeaveButton = document.getElementById("close-leave-modal");
+
 const cancelLeaveButton = document.getElementById("cancel-leave-modal");
+
 const leaveForm = document.getElementById("leave-request-form");
 
 const leaveDetailsModal = document.getElementById("leave-details-modal");
+
 const closeLeaveDetailsButton = document.getElementById(
     "close-leave-details-modal",
 );
+
 const closeLeaveDetailsFooter = document.getElementById(
     "close-leave-details-button",
 );
 
 const searchInput = document.getElementById("leave-search");
+
 const statusFilter = document.getElementById("leave-status-filter");
+
 const leaveTableBody = document.getElementById("leave-table-body");
+
 const noFilteredResults = document.getElementById("no-filtered-leave-records");
 
+const leavePagination = document.getElementById("leave-pagination");
+
 const pendingCountElement = document.getElementById("pending-count");
+
 const approvedCountElement = document.getElementById("approved-count");
+
 const rejectedCountElement = document.getElementById("rejected-count");
+
 const totalCountElement = document.getElementById("total-count");
 
 const detailLeaveType = document.getElementById("detail-leave-type");
+
 const detailStatus = document.getElementById("detail-status");
+
 const detailStartDate = document.getElementById("detail-start-date");
+
 const detailEndDate = document.getElementById("detail-end-date");
+
 const detailDays = document.getElementById("detail-days");
+
 const detailSubmitted = document.getElementById("detail-submitted");
+
 const detailReason = document.getElementById("detail-reason");
+
 const detailRejectionContainer = document.getElementById(
     "detail-rejection-container",
 );
+
 const detailRejectionReason = document.getElementById(
     "detail-rejection-reason",
 );
 
-// =====================================================
-// LEAVE REQUEST MODAL
-// =====================================================
+const LEAVES_PER_PAGE = 10;
 
-openLeaveButton?.addEventListener("click", () => {
+let leaveRequests = [];
+
+let currentLeavePage = 1;
+
+function openLeaveModal() {
     leaveModal?.classList.remove("hidden");
-    leaveModal?.classList.add("flex");
-});
 
-const closeLeaveModal = () => {
+    leaveModal?.classList.add("flex");
+}
+
+function closeLeaveModal() {
     leaveModal?.classList.add("hidden");
+
     leaveModal?.classList.remove("flex");
-};
+}
+
+function closeLeaveDetailsModal() {
+    leaveDetailsModal?.classList.add("hidden");
+
+    leaveDetailsModal?.classList.remove("flex");
+}
+
+openLeaveButton?.addEventListener("click", openLeaveModal);
 
 closeLeaveButton?.addEventListener("click", closeLeaveModal);
+
 cancelLeaveButton?.addEventListener("click", closeLeaveModal);
 
 leaveModal?.addEventListener("click", (event) => {
@@ -61,108 +96,93 @@ leaveModal?.addEventListener("click", (event) => {
     }
 });
 
-// =====================================================
-// STATUS BADGE
-// =====================================================
+function normalizeStatus(status) {
+    return String(status || "")
+        .toLowerCase()
+        .trim();
+}
 
-const updateStatusBadge = (element, status) => {
-    if (!element) return;
+function formatDate(date) {
+    if (!date) {
+        return "—";
+    }
 
-    if (status === "Pending") {
-        element.innerHTML = `
-            <span class="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-700">
+    return new Date(date).toLocaleDateString("en-US", {
+        month: "short",
+        day: "2-digit",
+        year: "numeric",
+    });
+}
+
+function calculateDays(startDate, endDate) {
+    if (!startDate || !endDate) {
+        return 0;
+    }
+
+    const start = new Date(startDate);
+
+    const end = new Date(endDate);
+
+    return Math.floor((end - start) / (1000 * 60 * 60 * 24)) + 1;
+}
+
+function statusBadge(status) {
+    const normalized = normalizeStatus(status);
+
+    if (normalized === "pending") {
+        return `
+            <span class="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-700">
                 <span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
                 Pending
             </span>
         `;
-    } else if (status === "Approved") {
-        element.innerHTML = `
-            <span class="inline-flex items-center gap-1.5 rounded-full bg-green-50 px-2.5 py-1 text-xs font-semibold text-green-700">
+    }
+
+    if (normalized === "approved") {
+        return `
+            <span class="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-green-50 px-2.5 py-1 text-xs font-semibold text-green-700">
                 <span class="h-1.5 w-1.5 rounded-full bg-green-500"></span>
                 Approved
             </span>
         `;
-    } else {
-        element.innerHTML = `
-            <span class="inline-flex items-center gap-1.5 rounded-full bg-red-50 px-2.5 py-1 text-xs font-semibold text-red-700">
-                <span class="h-1.5 w-1.5 rounded-full bg-red-500"></span>
-                Rejected
-            </span>
-        `;
-    }
-};
-
-// =====================================================
-// CREATE LEAVE ROW
-// =====================================================
-
-const createLeaveRow = (leave) => {
-    const startDate = new Date(leave.start_date);
-    const endDate = new Date(leave.end_date);
-    const submittedDate = new Date(leave.created_at);
-
-    const days = Math.floor((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
-
-    const formattedStartDate = startDate.toLocaleDateString("en-US", {
-        month: "short",
-        day: "2-digit",
-        year: "numeric",
-    });
-
-    const formattedEndDate = endDate.toLocaleDateString("en-US", {
-        month: "short",
-        day: "2-digit",
-        year: "numeric",
-    });
-
-    const formattedSubmittedDate = submittedDate.toLocaleDateString("en-US", {
-        month: "short",
-        day: "2-digit",
-        year: "numeric",
-    });
-
-    let dateDisplay = formattedStartDate;
-
-    if (formattedStartDate !== formattedEndDate) {
-        dateDisplay = `${formattedStartDate} &ndash; ${formattedEndDate}`;
     }
 
-    let statusBadge = "";
+    return `
+        <span class="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-red-50 px-2.5 py-1 text-xs font-semibold text-red-700">
+            <span class="h-1.5 w-1.5 rounded-full bg-red-500"></span>
+            Rejected
+        </span>
+    `;
+}
 
-    if (leave.status === "Pending") {
-        statusBadge = `
-            <span class="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-700">
-                <span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
-                Pending
-            </span>
-        `;
-    } else if (leave.status === "Approved") {
-        statusBadge = `
-            <span class="inline-flex items-center gap-1.5 rounded-full bg-green-50 px-2.5 py-1 text-xs font-semibold text-green-700">
-                <span class="h-1.5 w-1.5 rounded-full bg-green-500"></span>
-                Approved
-            </span>
-        `;
-    } else {
-        statusBadge = `
-            <span class="inline-flex items-center gap-1.5 rounded-full bg-red-50 px-2.5 py-1 text-xs font-semibold text-red-700">
-                <span class="h-1.5 w-1.5 rounded-full bg-red-500"></span>
-                Rejected
-            </span>
-        `;
-    }
+function createLeaveRow(leave) {
+    const days = calculateDays(leave.start_date, leave.end_date);
+
+    const startDate = formatDate(leave.start_date);
+
+    const endDate = formatDate(leave.end_date);
+
+    const submittedDate = formatDate(leave.created_at);
+
+    const dateDisplay =
+        startDate === endDate ? startDate : `${startDate} – ${endDate}`;
 
     const row = document.createElement("tr");
 
-    row.className = "leave-row";
-    row.dataset.search = `${leave.leave_type} ${
-        leave.reason || ""
-    }`.toLowerCase();
-    row.dataset.status = leave.status;
+    row.className = "leave-row transition hover:bg-gray-50";
+
+    row.dataset.search = `
+            ${leave.leave_type || ""}
+            ${leave.reason || ""}
+        `.toLowerCase();
+
+    row.dataset.status = normalizeStatus(leave.status);
 
     row.innerHTML = `
-        <td class="whitespace-nowrap px-4 py-3 text-sm font-medium text-gray-900">
-            ${leave.leave_type}
+        <td class="px-4 py-3 text-sm font-medium text-gray-900">
+            <div class="truncate">
+                ${leave.leave_type || "—"}
+            </div>
         </td>
 
         <td class="whitespace-nowrap px-4 py-3 text-sm text-gray-700">
@@ -173,30 +193,25 @@ const createLeaveRow = (leave) => {
             ${days} ${days === 1 ? "day" : "days"}
         </td>
 
-        <td class="max-w-xs px-4 py-3 text-sm text-gray-700">
-            ${leave.reason || "—"}
+        <td class="px-4 py-3 text-sm text-gray-700">
+            <div class="truncate">
+                ${leave.reason || "—"}
+            </div>
         </td>
 
         <td class="whitespace-nowrap px-4 py-3 text-sm text-gray-500">
-            ${formattedSubmittedDate}
+            ${submittedDate}
         </td>
 
         <td class="whitespace-nowrap px-4 py-3">
-            ${statusBadge}
+            ${statusBadge(leave.status)}
         </td>
 
         <td class="whitespace-nowrap px-4 py-3 text-right">
             <button
                 type="button"
                 class="view-leave-btn rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 transition hover:bg-gray-50"
-                data-leave-type="${leave.leave_type}"
-                data-start-date="${formattedStartDate}"
-                data-end-date="${formattedEndDate}"
-                data-days="${days}"
-                data-reason="${leave.reason || "—"}"
-                data-submitted="${formattedSubmittedDate}"
-                data-status="${leave.status}"
-                data-rejection-reason="${leave.rejection_reason || ""}"
+                data-id="${leave.id}"
             >
                 View
             </button>
@@ -204,102 +219,288 @@ const createLeaveRow = (leave) => {
     `;
 
     return row;
-};
+}
 
-// =====================================================
-// LOAD LEAVES
-// =====================================================
+function getFilteredLeaves() {
+    const searchValue = searchInput?.value.toLowerCase().trim() || "";
+
+    const statusValue = normalizeStatus(statusFilter?.value);
+
+    return leaveRequests.filter((leave) => {
+        const searchText = `
+                    ${leave.leave_type || ""}
+                    ${leave.reason || ""}
+                `.toLowerCase();
+
+        const matchesSearch = searchText.includes(searchValue);
+
+        const matchesStatus =
+            statusValue === "" || normalizeStatus(leave.status) === statusValue;
+
+        return matchesSearch && matchesStatus;
+    });
+}
+
+function renderLeaveRequests(page = 1) {
+    const filteredLeaves = getFilteredLeaves();
+
+    const totalRequests = filteredLeaves.length;
+
+    const totalPages = Math.ceil(totalRequests / LEAVES_PER_PAGE);
+
+    if (totalPages === 0) {
+        currentLeavePage = 1;
+    } else if (page > totalPages) {
+        currentLeavePage = totalPages;
+    } else if (page < 1) {
+        currentLeavePage = 1;
+    } else {
+        currentLeavePage = page;
+    }
+
+    const startIndex = (currentLeavePage - 1) * LEAVES_PER_PAGE;
+
+    const endIndex = startIndex + LEAVES_PER_PAGE;
+
+    const pageRequests = filteredLeaves.slice(startIndex, endIndex);
+
+    leaveTableBody.innerHTML = "";
+
+    if (pageRequests.length === 0) {
+        noFilteredResults?.classList.remove("hidden");
+    } else {
+        noFilteredResults?.classList.add("hidden");
+
+        pageRequests.forEach((leave) => {
+            leaveTableBody.appendChild(createLeaveRow(leave));
+        });
+    }
+
+    renderPagination(totalRequests, totalPages);
+}
+
+function renderPagination(totalRequests, totalPages) {
+    leavePagination.innerHTML = "";
+
+    if (totalRequests <= LEAVES_PER_PAGE) {
+        leavePagination.classList.add("hidden");
+
+        return;
+    }
+
+    leavePagination.classList.remove("hidden");
+
+    const wrapper = document.createElement("div");
+
+    wrapper.className =
+        "flex min-h-[72px] w-full items-center justify-between px-5 py-3";
+
+    const endRecord = Math.min(
+        currentLeavePage * LEAVES_PER_PAGE,
+        totalRequests,
+    );
+
+    const information = document.createElement("p");
+
+    information.className = "text-xs text-gray-500";
+
+    information.innerHTML = `
+            Showing
+            <span class="font-semibold text-gray-700">
+                ${endRecord}
+            </span>
+            of
+            <span class="font-semibold text-gray-700">
+                ${totalRequests}
+            </span>
+            records
+        `;
+
+    const controls = document.createElement("div");
+
+    controls.className = "flex items-center gap-1";
+
+    const previousButton = document.createElement("button");
+
+    previousButton.type = "button";
+
+    previousButton.disabled = currentLeavePage <= 1;
+
+    previousButton.className =
+        "inline-flex h-9 items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 text-xs font-medium text-gray-500 shadow-sm transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50";
+
+    previousButton.innerHTML = `
+            <span class="text-base leading-none">
+                ‹
+            </span>
+
+            <span>
+                Previous
+            </span>
+        `;
+
+    previousButton.addEventListener("click", () => {
+        renderLeaveRequests(currentLeavePage - 1);
+    });
+
+    controls.appendChild(previousButton);
+
+    for (let page = 1; page <= totalPages; page++) {
+        const pageButton = document.createElement("button");
+
+        pageButton.type = "button";
+
+        pageButton.textContent = page;
+
+        pageButton.className =
+            "inline-flex h-9 min-w-9 items-center justify-center rounded-lg px-2.5 text-xs font-medium transition";
+
+        if (page === currentLeavePage) {
+            pageButton.classList.add(
+                "border",
+                "border-gray-200",
+                "bg-gray-100",
+                "text-gray-800",
+                "shadow-sm",
+            );
+        } else {
+            pageButton.classList.add("text-gray-700", "hover:bg-gray-100");
+        }
+
+        pageButton.addEventListener("click", () => {
+            renderLeaveRequests(page);
+        });
+
+        controls.appendChild(pageButton);
+    }
+
+    const nextButton = document.createElement("button");
+
+    nextButton.type = "button";
+
+    nextButton.disabled = currentLeavePage >= totalPages;
+
+    nextButton.className =
+        "inline-flex h-9 items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 text-xs font-medium text-gray-700 shadow-sm transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50";
+
+    nextButton.innerHTML = `
+            <span>
+                Next
+            </span>
+
+            <span class="text-base leading-none">
+                ›
+            </span>
+        `;
+
+    nextButton.addEventListener("click", () => {
+        renderLeaveRequests(currentLeavePage + 1);
+    });
+
+    controls.appendChild(nextButton);
+
+    wrapper.appendChild(information);
+
+    wrapper.appendChild(controls);
+
+    leavePagination.appendChild(wrapper);
+}
+
+function updateCounts() {
+    let pending = 0;
+
+    let approved = 0;
+
+    let rejected = 0;
+
+    leaveRequests.forEach((leave) => {
+        const status = normalizeStatus(leave.status);
+
+        if (status === "pending") {
+            pending++;
+        }
+
+        if (status === "approved") {
+            approved++;
+        }
+
+        if (status === "rejected") {
+            rejected++;
+        }
+    });
+
+    if (pendingCountElement) {
+        pendingCountElement.textContent = pending;
+    }
+
+    if (approvedCountElement) {
+        approvedCountElement.textContent = approved;
+    }
+
+    if (rejectedCountElement) {
+        rejectedCountElement.textContent = rejected;
+    }
+
+    if (totalCountElement) {
+        totalCountElement.textContent = leaveRequests.length;
+    }
+}
 
 async function loadLeaves() {
-    if (!leaveTableBody) return;
-
-    leaveTableBody.innerHTML = `
-        <tr>
-            <td colspan="7" class="px-4 py-10 text-center">
-                <p class="text-sm text-gray-500">
-                    Loading leave requests...
-                </p>
-            </td>
-        </tr>
-    `;
-
     try {
-        const response = await fetch("/employee/leave/data");
-
-        if (!response.ok) {
-            throw new Error(`HTTP Response status error: ${response.status}`);
-        }
-
-        const data = await response.json();
-
-        console.log("Leave data:", data);
-
-        if (pendingCountElement) {
-            pendingCountElement.textContent = data.pendingCount ?? 0;
-        }
-
-        if (approvedCountElement) {
-            approvedCountElement.textContent = data.approvedCount ?? 0;
-        }
-
-        if (rejectedCountElement) {
-            rejectedCountElement.textContent = data.rejectedCount ?? 0;
-        }
-
-        if (totalCountElement) {
-            totalCountElement.textContent = data.totalCount ?? 0;
-        }
-
-        leaveTableBody.innerHTML = "";
-
-        if (!data.leaves || data.leaves.length === 0) {
-            leaveTableBody.innerHTML = `
+        leaveTableBody.innerHTML = `
                 <tr>
-                    <td colspan="7" class="px-4 py-10 text-center">
-                        <p class="text-sm font-semibold text-gray-700">
-                            No leave requests found.
-                        </p>
-
-                        <p class="mt-1 text-xs text-gray-500">
-                            You have not submitted any leave requests yet.
+                    <td
+                        colspan="7"
+                        class="px-4 py-10 text-center"
+                    >
+                        <p class="text-sm text-gray-500">
+                            Loading leave requests...
                         </p>
                     </td>
                 </tr>
             `;
 
-            return;
-        }
+        const response = await fetch("/employee/leave/data", {
+            headers: {
+                Accept: "application/json",
 
-        data.leaves.forEach((leave) => {
-            const row = createLeaveRow(leave);
-
-            leaveTableBody.appendChild(row);
+                "X-Requested-With": "XMLHttpRequest",
+            },
         });
 
-        attachViewButtons();
-        filterLeaves();
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        leaveRequests = data.leaves || [];
+
+        updateCounts();
+
+        renderLeaveRequests(1);
     } catch (error) {
+        console.error("LOAD LEAVE ERROR:", error);
+
         leaveTableBody.innerHTML = `
-            <tr>
-                <td colspan="7" class="px-4 py-10 text-center">
-                    <p class="text-sm font-semibold text-red-600">
-                        Failed to load leave requests.
-                    </p>
+                <tr>
+                    <td
+                        colspan="7"
+                        class="px-4 py-10 text-center"
+                    >
+                        <p class="text-sm font-semibold text-red-600">
+                            Failed to load leave requests.
+                        </p>
 
-                    <p class="mt-1 text-xs text-gray-500">
-                        ${error.message}
-                    </p>
-                </td>
-            </tr>
-        `;
-
-        console.error("Error:", error);
+                        <p class="mt-1 text-xs text-gray-500">
+                            ${error.message}
+                        </p>
+                    </td>
+                </tr>
+            `;
     }
 }
-
-// =====================================================
-// SUBMIT LEAVE REQUEST
-// =====================================================
 
 leaveForm?.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -312,119 +513,93 @@ leaveForm?.addEventListener("submit", async (event) => {
             body: formData,
             headers: {
                 "X-Requested-With": "XMLHttpRequest",
+
                 Accept: "application/json",
             },
         });
 
         const data = await response.json().catch(() => null);
 
-        console.log("Response:", data);
+        if (!response.ok) {
+            if (data?.errors) {
+                const firstError = Object.values(data.errors)[0];
 
-        if (response.ok && data && (data.success || data.data)) {
-            const record = data.data || data;
-
-            showToast(data.message)
-
-            // Remove empty-state row
-            const noRecordsRow = leaveTableBody?.querySelector("tr");
-
-            if (
-                noRecordsRow &&
-                noRecordsRow.textContent.includes("No leave requests found.")
-            ) {
-                noRecordsRow.remove();
+                alert(
+                    Array.isArray(firstError)
+                        ? firstError[0]
+                        : "Please check your input.",
+                );
+            } else {
+                alert(data?.message || "Unable to submit leave request.");
             }
 
-            // Create the new leave row
-            const newRow = createLeaveRow(record);
-
-            // Add it to the beginning of the table
-            leaveTableBody?.prepend(newRow);
-
-            // Update summary counts
-            if (pendingCountElement) {
-                pendingCountElement.textContent =
-                    Number(pendingCountElement.textContent) + 1;
-            }
-
-            if (totalCountElement) {
-                totalCountElement.textContent =
-                    Number(totalCountElement.textContent) + 1;
-            }
-
-            // Add View button event to the new row
-            const viewButton = newRow.querySelector(".view-leave-btn");
-
-            if (viewButton) {
-                viewButton.addEventListener("click", () => {
-                    openLeaveDetails(viewButton);
-                });
-            }
-
-            // Apply current filters
-            filterLeaves();
-
-            // Reset and close form
-            closeLeaveModal();
-            leaveForm.reset();
+            return;
         }
 
-        else if (data && data.errors) {
-            const firstError = Object.values(data.errors)[0];
+        const record = data?.data || data?.leave || data?.leaveRequest;
 
-            alert(
-                Array.isArray(firstError)
-                    ? firstError[0]
-                    : "Please check your input.",
-            );
+        if (record) {
+            leaveRequests.unshift(record);
+
+            updateCounts();
+
+            renderLeaveRequests(1);
+        } else {
+            await loadLeaves();
         }
 
-        else {
-            alert("Unable to submit leave request.");
+        closeLeaveModal();
+
+        leaveForm.reset();
+
+        if (typeof showToast === "function") {
+            showToast(data?.message || "Leave request submitted successfully.");
         }
     } catch (error) {
-        console.error("Leave request error:", error);
+        console.error("SUBMIT LEAVE ERROR:", error);
+
         alert("Something went wrong. Please try again.");
     }
 });
 
-const openLeaveDetails = (button) => {
-    const status = button.dataset.status;
-    const rejectionReason = button.dataset.rejectionReason || "";
-
+function openLeaveDetails(leave) {
     if (detailLeaveType) {
-        detailLeaveType.textContent = button.dataset.leaveType || "—";
+        detailLeaveType.textContent = leave.leave_type || "—";
     }
 
     if (detailStartDate) {
-        detailStartDate.textContent = button.dataset.startDate || "—";
+        detailStartDate.textContent = formatDate(leave.start_date);
     }
 
     if (detailEndDate) {
-        detailEndDate.textContent = button.dataset.endDate || "—";
+        detailEndDate.textContent = formatDate(leave.end_date);
     }
 
-    const days = button.dataset.days || "—";
+    const days = calculateDays(leave.start_date, leave.end_date);
 
     if (detailDays) {
-        detailDays.textContent = `${days} ${days == 1 ? "day" : "days"}`;
+        detailDays.textContent = `${days} ${days === 1 ? "day" : "days"}`;
     }
 
     if (detailSubmitted) {
-        detailSubmitted.textContent = button.dataset.submitted || "—";
+        detailSubmitted.textContent = formatDate(leave.created_at);
     }
 
     if (detailReason) {
-        detailReason.textContent = button.dataset.reason || "—";
+        detailReason.textContent = leave.reason || "—";
     }
 
-    updateStatusBadge(detailStatus, status);
+    if (detailStatus) {
+        detailStatus.innerHTML = statusBadge(leave.status);
+    }
 
-    if (status === "Rejected" && rejectionReason.trim() !== "") {
+    const normalized = normalizeStatus(leave.status);
+
+    if (normalized === "rejected" && leave.rejection_reason) {
         detailRejectionContainer?.classList.remove("hidden");
 
         if (detailRejectionReason) {
-            detailRejectionReason.textContent = rejectionReason;
+            detailRejectionReason.textContent = leave.rejection_reason;
         }
     } else {
         detailRejectionContainer?.classList.add("hidden");
@@ -435,21 +610,25 @@ const openLeaveDetails = (button) => {
     }
 
     leaveDetailsModal?.classList.remove("hidden");
+
     leaveDetailsModal?.classList.add("flex");
-};
+}
 
-const attachViewButtons = () => {
-    document.querySelectorAll(".view-leave-btn").forEach((button) => {
-        button.addEventListener("click", () => {
-            openLeaveDetails(button);
-        });
-    });
-};
+document.addEventListener("click", (event) => {
+    const button = event.target.closest(".view-leave-btn");
 
-const closeLeaveDetailsModal = () => {
-    leaveDetailsModal?.classList.add("hidden");
-    leaveDetailsModal?.classList.remove("flex");
-};
+    if (!button) {
+        return;
+    }
+
+    const leaveId = Number(button.dataset.id);
+
+    const leave = leaveRequests.find((item) => Number(item.id) === leaveId);
+
+    if (leave) {
+        openLeaveDetails(leave);
+    }
+});
 
 closeLeaveDetailsButton?.addEventListener("click", closeLeaveDetailsModal);
 
@@ -460,41 +639,14 @@ leaveDetailsModal?.addEventListener("click", (event) => {
         closeLeaveDetailsModal();
     }
 });
-const filterLeaves = () => {
-    const searchValue = searchInput?.value.toLowerCase().trim() || "";
 
-    const statusValue = statusFilter?.value.toLowerCase().trim() || "";
+searchInput?.addEventListener("input", () => {
+    renderLeaveRequests(1);
+});
 
-    const leaveRows = document.querySelectorAll(".leave-row");
-
-    let visibleRows = 0;
-
-    leaveRows.forEach((row) => {
-        const searchText = (
-            row.dataset.search || row.textContent
-        ).toLowerCase();
-
-        const rowStatus = (row.dataset.status || "").toLowerCase();
-
-        const matchesSearch = searchText.includes(searchValue);
-
-        const matchesStatus = statusValue === "" || rowStatus === statusValue;
-
-        if (matchesSearch && matchesStatus) {
-            row.classList.remove("hidden");
-            visibleRows++;
-        } else {
-            row.classList.add("hidden");
-        }
-    });
-
-    if (noFilteredResults) {
-        noFilteredResults.classList.toggle("hidden", visibleRows !== 0);
-    }
-};
-
-searchInput?.addEventListener("input", filterLeaves);
-statusFilter?.addEventListener("change", filterLeaves);
+statusFilter?.addEventListener("change", () => {
+    renderLeaveRequests(1);
+});
 
 document.addEventListener("keydown", (event) => {
     if (event.key !== "Escape") {
@@ -502,6 +654,7 @@ document.addEventListener("keydown", (event) => {
     }
 
     closeLeaveModal();
+
     closeLeaveDetailsModal();
 });
 

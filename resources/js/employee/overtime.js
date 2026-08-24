@@ -1,312 +1,1249 @@
-import { showToast } from "./employees";
+import { showToast } from "./employees"
 
-document.addEventListener("DOMContentLoaded", function () {
-    const searchInput = document.getElementById("overtime-search");
-    const statusFilter = document.getElementById("overtime-status-filter");
-    const noFilteredRecords = document.getElementById("no-filtered-overtime-records",);
+const searchInput =
+    document.getElementById("overtime-search")
 
-    // Helper function to format dates as "Aug 19, 2026"
-    function formatDate(dateString) {
-        if (!dateString) return "—";
-        const date = new Date(dateString);
-        if (isNaN(date.getTime())) return dateString;
-        return date.toLocaleDateString("en-US", {
+const statusFilter =
+    document.getElementById("overtime-status-filter")
+
+const overtimeTableBody =
+    document.getElementById("overtime-table-body")
+
+const noFilteredRecords =
+    document.getElementById(
+        "no-filtered-overtime-records"
+    )
+
+const overtimePagination =
+    document.getElementById("overtime-pagination")
+
+const requestModal =
+    document.getElementById("overtime-request-modal")
+
+const openRequestButton =
+    document.getElementById("open-overtime-modal")
+
+const closeRequestButton =
+    document.getElementById("close-overtime-modal")
+
+const cancelRequestButton =
+    document.getElementById("cancel-overtime-modal")
+
+const requestForm =
+    document.getElementById("overtime-request-form")
+
+const detailsModal =
+    document.getElementById("overtime-details-modal")
+
+const closeDetailsButton =
+    document.getElementById(
+        "close-overtime-details-modal"
+    )
+
+const closeDetailsFooterButton =
+    document.getElementById(
+        "close-overtime-details-button"
+    )
+
+const detailDate =
+    document.getElementById(
+        "detail-overtime-date"
+    )
+
+const detailHours =
+    document.getElementById(
+        "detail-overtime-hours"
+    )
+
+const detailStatus =
+    document.getElementById(
+        "detail-overtime-status"
+    )
+
+const detailSubmitted =
+    document.getElementById(
+        "detail-overtime-submitted"
+    )
+
+const detailReason =
+    document.getElementById(
+        "detail-overtime-reason"
+    )
+
+const rejectionContainer =
+    document.getElementById(
+        "detail-overtime-rejection-container"
+    )
+
+const rejectionReason =
+    document.getElementById(
+        "detail-overtime-rejection-reason"
+    )
+
+const OVERTIME_PER_PAGE =
+    10
+
+let currentPage =
+    1
+
+let allOvertimeRequests =
+    []
+
+
+function formatDate(
+    date
+) {
+
+    if (
+        !date
+    ) {
+
+        return "—"
+    }
+
+
+    const formatted =
+        new Date(
+            date
+        )
+
+
+    if (
+        isNaN(
+            formatted.getTime()
+        )
+    ) {
+
+        return date
+    }
+
+
+    return formatted.toLocaleDateString(
+        "en-US",
+        {
             month: "short",
             day: "numeric",
             year: "numeric",
-        });
+        }
+    )
+}
+
+
+function normalizeStatus(
+    status
+) {
+
+    return String(
+        status || ""
+    )
+        .toLowerCase()
+        .trim()
+}
+
+
+function statusBadge(
+    status
+) {
+
+    const normalized =
+        normalizeStatus(
+            status
+        )
+
+
+    if (
+        normalized ===
+        "pending"
+    ) {
+
+        return `
+            <span class="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-700">
+                <span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
+                Pending
+            </span>
+        `
     }
 
-    function filterOvertime() {
-        if (!searchInput) return;
 
-        const searchValue = searchInput.value.toLowerCase().trim();
-        const statusValue = statusFilter ? statusFilter.value : "";
-        const currentRows = document.querySelectorAll(".overtime-row");
-        let visibleRows = 0;
+    if (
+        normalized ===
+        "approved"
+    ) {
 
-        currentRows.forEach(function (row) {
-            const searchText = (row.dataset.search || "").toLowerCase();
-            const rowStatus = row.dataset.status || "";
-            const matchesSearch = searchText.includes(searchValue);
+        return `
+            <span class="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-green-50 px-2.5 py-1 text-xs font-semibold text-green-700">
+                <span class="h-1.5 w-1.5 rounded-full bg-green-500"></span>
+                Approved
+            </span>
+        `
+    }
+
+
+    return `
+        <span class="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-red-50 px-2.5 py-1 text-xs font-semibold text-red-700">
+            <span class="h-1.5 w-1.5 rounded-full bg-red-500"></span>
+            Rejected
+        </span>
+    `
+}
+
+
+function getFilteredOvertime() {
+
+    const searchValue =
+        searchInput?.value
+            .toLowerCase()
+            .trim() || ""
+
+
+    const statusValue =
+        normalizeStatus(
+            statusFilter?.value
+        )
+
+
+    return allOvertimeRequests.filter(
+        (
+            overtime
+        ) => {
+
+            const dateText =
+                formatDate(
+                    overtime.date
+                )
+
+
+            const searchText =
+                `
+                    ${dateText}
+                    ${overtime.hours || ""}
+                    ${overtime.reason || ""}
+                `
+                    .toLowerCase()
+
+
+            const matchesSearch =
+                searchText.includes(
+                    searchValue
+                )
+
+
             const matchesStatus =
-                statusValue === "" || rowStatus === statusValue;
+                statusValue === "" ||
+                normalizeStatus(
+                    overtime.status
+                ) === statusValue
 
-            if (matchesSearch && matchesStatus) {
-                row.classList.remove("hidden");
-                visibleRows++;
-            } else {
-                row.classList.add("hidden");
-            }
-        });
 
-        if (noFilteredRecords) {
-            noFilteredRecords.classList.toggle(
-                "hidden",
-                visibleRows !== 0 || currentRows.length === 0,
-            );
+            return (
+                matchesSearch &&
+                matchesStatus
+            )
         }
+    )
+}
+
+
+function createOvertimeRow(
+    overtime
+) {
+
+    const formattedDate =
+        formatDate(
+            overtime.date
+        )
+
+
+    const formattedSubmitted =
+        formatDate(
+            overtime.created_at
+        )
+
+
+    const hours =
+        Number(
+            overtime.hours || 0
+        )
+
+
+    const row =
+        document.createElement(
+            "tr"
+        )
+
+
+    row.className =
+        "overtime-row transition hover:bg-gray-50"
+
+
+    row.innerHTML = `
+        <td class="whitespace-nowrap px-4 py-3 text-sm font-medium text-gray-900">
+            ${formattedDate}
+        </td>
+
+        <td class="whitespace-nowrap px-4 py-3 text-sm text-gray-700">
+            ${hours.toFixed(2)}
+            ${hours === 1 ? "hour" : "hours"}
+        </td>
+
+        <td class="px-4 py-3 text-sm text-gray-700">
+            <div class="truncate">
+                ${overtime.reason || "—"}
+            </div>
+        </td>
+
+        <td class="whitespace-nowrap px-4 py-3 text-sm text-gray-500">
+            ${formattedSubmitted}
+        </td>
+
+        <td class="whitespace-nowrap px-4 py-3">
+            ${statusBadge(
+                overtime.status
+            )}
+        </td>
+
+        <td class="whitespace-nowrap px-4 py-3 text-right">
+            <button
+                type="button"
+                class="view-overtime-button rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 transition hover:bg-gray-50"
+                data-id="${overtime.id}"
+            >
+                View
+            </button>
+        </td>
+    `
+
+
+    return row
+}
+
+
+function renderOvertime(
+    records
+) {
+
+    overtimeTableBody.innerHTML =
+        ""
+
+
+    if (
+        records.length ===
+        0
+    ) {
+
+        noFilteredRecords?.classList.remove(
+            "hidden"
+        )
+
+        return
     }
 
-    if (searchInput) {
-        searchInput.addEventListener("input", filterOvertime);
+
+    noFilteredRecords?.classList.add(
+        "hidden"
+    )
+
+
+    records.forEach(
+        (
+            overtime
+        ) => {
+
+            overtimeTableBody.appendChild(
+                createOvertimeRow(
+                    overtime
+                )
+            )
+        }
+    )
+}
+
+
+function renderPagination(
+    totalRecords,
+    totalPages
+) {
+
+    overtimePagination.innerHTML =
+        ""
+
+
+    if (
+        totalRecords <=
+        OVERTIME_PER_PAGE
+    ) {
+
+        overtimePagination.classList.add(
+            "hidden"
+        )
+
+        return
     }
 
-    if (statusFilter) {
-        statusFilter.addEventListener("change", filterOvertime);
-    }
 
-    // Modal Request Handling
-    const requestModal = document.getElementById("overtime-request-modal");
-    const openRequestButton = document.getElementById("open-overtime-modal");
-    const closeRequestButton = document.getElementById("close-overtime-modal");
-    const cancelRequestButton = document.getElementById(
-        "cancel-overtime-modal",
-    );
-    const requestForm = document.getElementById("overtime-request-form");
+    overtimePagination.classList.remove(
+        "hidden"
+    )
 
-    function openRequestModal() {
-        if (!requestModal) return;
-        requestModal.classList.remove("hidden");
-        requestModal.classList.add("flex");
-    }
 
-    function closeRequestModal() {
-        if (!requestModal) return;
-        requestModal.classList.add("hidden");
-        requestModal.classList.remove("flex");
-    }
+    const wrapper =
+        document.createElement(
+            "div"
+        )
 
-    if (openRequestButton) {
-        openRequestButton.addEventListener("click", openRequestModal);
-    }
 
-    if (closeRequestButton) {
-        closeRequestButton.addEventListener("click", closeRequestModal);
-    }
+    wrapper.className =
+        "flex min-h-[72px] w-full items-center justify-between px-5 py-3"
 
-    if (cancelRequestButton) {
-        cancelRequestButton.addEventListener("click", closeRequestModal);
-    }
 
-    if (requestModal) {
-        requestModal.addEventListener("click", function (event) {
-            if (event.target === requestModal) {
-                closeRequestModal();
+    const endRecord =
+        Math.min(
+            currentPage *
+                OVERTIME_PER_PAGE,
+            totalRecords
+        )
+
+
+    const information =
+        document.createElement(
+            "p"
+        )
+
+
+    information.className =
+        "text-xs text-gray-500"
+
+
+    information.innerHTML =
+        `
+            Showing
+            <span class="font-semibold text-gray-700">
+                ${endRecord}
+            </span>
+            of
+            <span class="font-semibold text-gray-700">
+                ${totalRecords}
+            </span>
+            records
+        `
+
+
+    const controls =
+        document.createElement(
+            "div"
+        )
+
+
+    controls.className =
+        "flex items-center gap-1"
+
+
+    const previousButton =
+        document.createElement(
+            "button"
+        )
+
+
+    previousButton.type =
+        "button"
+
+    previousButton.disabled =
+        currentPage <= 1
+
+
+    previousButton.className =
+        "inline-flex h-9 items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 text-xs font-medium text-gray-500 shadow-sm transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+
+
+    previousButton.innerHTML =
+        `
+            <span class="text-base leading-none">
+                ‹
+            </span>
+
+            <span>
+                Previous
+            </span>
+        `
+
+
+    previousButton.addEventListener(
+        "click",
+        () => {
+
+            renderPage(
+                currentPage -
+                    1
+            )
+        }
+    )
+
+
+    controls.appendChild(
+        previousButton
+    )
+
+
+    for (
+        let page = 1;
+        page <= totalPages;
+        page++
+    ) {
+
+        const pageButton =
+            document.createElement(
+                "button"
+            )
+
+
+        pageButton.type =
+            "button"
+
+        pageButton.textContent =
+            page
+
+
+        pageButton.className =
+            "inline-flex h-9 min-w-9 items-center justify-center rounded-lg px-2.5 text-xs font-medium transition"
+
+
+        if (
+            page ===
+            currentPage
+        ) {
+
+            pageButton.classList.add(
+                "border",
+                "border-gray-200",
+                "bg-gray-100",
+                "text-gray-800",
+                "shadow-sm"
+            )
+
+        } else {
+
+            pageButton.classList.add(
+                "text-gray-700",
+                "hover:bg-gray-100"
+            )
+        }
+
+
+        pageButton.addEventListener(
+            "click",
+            () => {
+
+                renderPage(
+                    page
+                )
             }
-        });
+        )
+
+
+        controls.appendChild(
+            pageButton
+        )
     }
 
-    if (requestForm) {
-        requestForm.addEventListener("submit", async function (event) {
-            event.preventDefault();
 
-            const submitButton = requestForm.querySelector('button[type="submit"]',);
-            const formData = new FormData(requestForm);
+    const nextButton =
+        document.createElement(
+            "button"
+        )
 
-            if (submitButton) {
-                submitButton.disabled = true;
-                submitButton.textContent = "Submitting...";
-            }
 
-            try {
-                const response = await fetch(requestForm.action, {
-                    method: "POST",
-                    body: formData,
+    nextButton.type =
+        "button"
+
+    nextButton.disabled =
+        currentPage >=
+        totalPages
+
+
+    nextButton.className =
+        "inline-flex h-9 items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 text-xs font-medium text-gray-700 shadow-sm transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+
+
+    nextButton.innerHTML =
+        `
+            <span>
+                Next
+            </span>
+
+            <span class="text-base leading-none">
+                ›
+            </span>
+        `
+
+
+    nextButton.addEventListener(
+        "click",
+        () => {
+
+            renderPage(
+                currentPage +
+                    1
+            )
+        }
+    )
+
+
+    controls.appendChild(
+        nextButton
+    )
+
+
+    wrapper.appendChild(
+        information
+    )
+
+    wrapper.appendChild(
+        controls
+    )
+
+
+    overtimePagination.appendChild(
+        wrapper
+    )
+}
+
+
+function renderPage(
+    page = 1
+) {
+
+    const filtered =
+        getFilteredOvertime()
+
+
+    const totalRecords =
+        filtered.length
+
+
+    const totalPages =
+        Math.ceil(
+            totalRecords /
+                OVERTIME_PER_PAGE
+        )
+
+
+    if (
+        totalPages === 0
+    ) {
+
+        currentPage =
+            1
+
+    } else if (
+        page > totalPages
+    ) {
+
+        currentPage =
+            totalPages
+
+    } else if (
+        page < 1
+    ) {
+
+        currentPage =
+            1
+
+    } else {
+
+        currentPage =
+            page
+    }
+
+
+    const startIndex =
+        (
+            currentPage -
+            1
+        ) *
+            OVERTIME_PER_PAGE
+
+
+    const endIndex =
+        startIndex +
+        OVERTIME_PER_PAGE
+
+
+    const pageRecords =
+        filtered.slice(
+            startIndex,
+            endIndex
+        )
+
+
+    renderOvertime(
+        pageRecords
+    )
+
+
+    renderPagination(
+        totalRecords,
+        totalPages
+    )
+}
+
+
+async function loadOvertime() {
+
+    try {
+
+        overtimeTableBody.innerHTML =
+            `
+                <tr>
+                    <td
+                        colspan="6"
+                        class="px-4 py-10 text-center"
+                    >
+                        <p class="text-sm text-gray-500">
+                            Loading overtime requests...
+                        </p>
+                    </td>
+                </tr>
+            `
+
+
+        const response =
+            await fetch(
+                "/employee/overtime/data",
+                {
                     headers: {
-                        "X-Requested-With": "XMLHttpRequest",
-                        Accept: "application/json",
+                        Accept:
+                            "application/json",
+
+                        "X-Requested-With":
+                            "XMLHttpRequest",
                     },
-                });
-
-                const data = await response.json().catch(() => null);
-
-                if (response.ok && data && (data.success || data.data)) {
-                    showToast(data.message)
-                    const record = data.data || data;
+                }
+            )
 
 
-                    // 1. Remove empty state rows if present
-                    const noRecordsRow = document.getElementById("no-overtime-records");
-                    if (noRecordsRow) {
-                        noRecordsRow.remove();
+        if (
+            !response.ok
+        ) {
+
+            throw new Error(
+                `HTTP ${response.status}`
+            )
+        }
+
+
+        const data =
+            await response.json()
+
+
+        allOvertimeRequests =
+            data.overtimeRequests ||
+            data.overtimes ||
+            data.data ||
+            []
+
+
+        renderPage(
+            1
+        )
+
+    } catch (
+        error
+    ) {
+
+        console.error(
+            "LOAD OVERTIME ERROR:",
+            error
+        )
+
+
+        overtimeTableBody.innerHTML =
+            `
+                <tr>
+                    <td
+                        colspan="6"
+                        class="px-4 py-10 text-center"
+                    >
+                        <p class="text-sm font-semibold text-red-600">
+                            Failed to load overtime requests.
+                        </p>
+
+                        <p class="mt-1 text-xs text-gray-500">
+                            ${error.message}
+                        </p>
+                    </td>
+                </tr>
+            `
+    }
+}
+
+
+openRequestButton?.addEventListener(
+    "click",
+    () => {
+
+        requestModal?.classList.remove(
+            "hidden"
+        )
+
+        requestModal?.classList.add(
+            "flex"
+        )
+    }
+)
+
+
+function closeRequestModal() {
+
+    requestModal?.classList.add(
+        "hidden"
+    )
+
+    requestModal?.classList.remove(
+        "flex"
+    )
+}
+
+
+closeRequestButton?.addEventListener(
+    "click",
+    closeRequestModal
+)
+
+cancelRequestButton?.addEventListener(
+    "click",
+    closeRequestModal
+)
+
+
+requestModal?.addEventListener(
+    "click",
+    (event) => {
+
+        if (
+            event.target ===
+            requestModal
+        ) {
+
+            closeRequestModal()
+        }
+    }
+)
+
+
+requestForm?.addEventListener(
+    "submit",
+    async (event) => {
+
+        event.preventDefault()
+
+
+        const submitButton =
+            requestForm.querySelector(
+                'button[type="submit"]'
+            )
+
+
+        const formData =
+            new FormData(
+                requestForm
+            )
+
+
+        if (
+            submitButton
+        ) {
+
+            submitButton.disabled =
+                true
+
+            submitButton.textContent =
+                "Submitting..."
+        }
+
+
+        try {
+
+            const response =
+                await fetch(
+                    requestForm.action,
+                    {
+                        method: "POST",
+                        body: formData,
+                        headers: {
+                            "X-Requested-With":
+                                "XMLHttpRequest",
+
+                            Accept:
+                                "application/json",
+                        },
                     }
+                )
 
-                    // 2. Format values for UI
-                    const formattedDate = formatDate(record.date);
-                    const formattedSubmitted = formatDate(record.created_at || new Date());
-                    const searchableText = `${formattedDate} ${record.hours} ${record.reason || ""}`.toLowerCase();
 
-                    // 3. Build 6-column HTML matching UI design
-                    const newRowHtml = `
-                        <tr class="overtime-row border-b border-gray-100 hover:bg-gray-50/50 transition"
-                            data-search="${searchableText}"
-                            data-status="${record.status}">
-                            <td class="px-4 py-3 text-sm font-semibold text-gray-900">${formattedDate}</td>
-                            <td class="px-4 py-3 text-sm text-gray-600">${record.hours} ${parseFloat(record.hours) === 1 ? 'hour' : 'hours'}</td>
-                            <td class="px-4 py-3 text-sm text-gray-600">${record.reason || '—'}</td>
-                            <td class="px-4 py-3 text-sm text-gray-600">${formattedSubmitted}</td>
-                            <td class="px-4 py-3 text-sm">
-                                <span class="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-700">
-                                    <span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
-                                    ${record.status}
-                                </span>
-                            </td>
-                            <td class="px-4 py-3 text-sm text-right">
-                                <button type="button"
-                                    class="view-overtime-button rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 transition"
-                                    data-date="${formattedDate}"
-                                    data-hours="${record.hours}"
-                                    data-reason="${record.reason || ''}"
-                                    data-submitted="${formattedSubmitted}"
-                                    data-status="${record.status}"
-                                    data-rejection-reason="">
-                                    View
-                                </button>
-                            </td>
-                        </tr>
-                    `;
+            const data =
+                await response.json()
+                    .catch(
+                        () => null
+                    )
 
-                    // 4. Insert row into <tbody>
-                    const tableBody = document.getElementById("overtime-table-body") || document.querySelector("tbody");
-                    if (tableBody) {
-                        tableBody.insertAdjacentHTML("afterbegin", newRowHtml);
-                    }
 
-                    // 5. Reset form & close modal
-                    requestForm.reset();
-                    closeRequestModal();
+            if (
+                !response.ok
+            ) {
 
-                    // 6. Re-run search/status filter
-                    filterOvertime();
+                if (
+                    data?.errors
+                ) {
 
-                } else if (data && data.errors) {
-                    const firstError = Object.values(data.errors)[0];
+                    const firstError =
+                        Object.values(
+                            data.errors
+                        )[0]
+
+
                     alert(
-                        Array.isArray(firstError)
+                        Array.isArray(
+                            firstError
+                        )
                             ? firstError[0]
-                            : "Please check your input.",
-                    );
+                            : "Please check your input."
+                    )
+
                 } else {
-                    alert("Unable to submit overtime request.");
+
+                    alert(
+                        data?.message ||
+                        "Unable to submit overtime request."
+                    )
                 }
-            } catch (error) {
-                console.error("Overtime request error:", error);
-                alert("Something went wrong. Please try again.");
-            } finally {
-                if (submitButton) {
-                    submitButton.disabled = false;
-                    submitButton.textContent = "Submit Overtime Request";
-                }
+
+
+                return
             }
-        });
-    }
 
-    // Modal Details Handling (Using Event Delegation)
-    const detailsModal = document.getElementById("overtime-details-modal");
-    const closeDetailsButton = document.getElementById(
-        "close-overtime-details-modal",
-    );
-    const closeDetailsFooterButton = document.getElementById(
-        "close-overtime-details-button",
-    );
 
-    const detailDate = document.getElementById("detail-overtime-date");
-    const detailHours = document.getElementById("detail-overtime-hours");
-    const detailStatus = document.getElementById("detail-overtime-status");
-    const detailSubmitted = document.getElementById(
-        "detail-overtime-submitted",
-    );
-    const detailReason = document.getElementById("detail-overtime-reason");
-    const rejectionContainer = document.getElementById(
-        "detail-overtime-rejection-container",
-    );
-    const rejectionReason = document.getElementById(
-        "detail-overtime-rejection-reason",
-    );
+            const record =
+                data?.data ||
+                data?.overtime ||
+                data?.overtimeRequest
 
-    document.addEventListener("click", function (event) {
-        const button = event.target.closest(".view-overtime-button");
-        if (!button) return;
 
-        const date = button.dataset.date;
-        const hours = button.dataset.hours;
-        const reason = button.dataset.reason;
-        const submitted = button.dataset.submitted;
-        const status = button.dataset.status;
-        const rejection = button.dataset.rejectionReason;
+            if (
+                record
+            ) {
 
-        if (detailDate) detailDate.textContent = date;
+                allOvertimeRequests.unshift(
+                    record
+                )
 
-        if (detailHours) {
-            detailHours.textContent = `${hours} ${
-                parseFloat(hours) === 1 ? "hour" : "hours"
-            }`;
-        }
-
-        if (detailSubmitted) detailSubmitted.textContent = submitted;
-        if (detailReason) detailReason.textContent = reason || "—";
-
-        if (detailStatus) {
-            if (status === "Pending") {
-                detailStatus.innerHTML = `
-                    <span class="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-700">
-                        <span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
-                        Pending
-                    </span>
-                `;
-            } else if (status === "Approved") {
-                detailStatus.innerHTML = `
-                    <span class="inline-flex items-center gap-1.5 rounded-full bg-green-50 px-2.5 py-1 text-xs font-semibold text-green-700">
-                        <span class="h-1.5 w-1.5 rounded-full bg-green-500"></span>
-                        Approved
-                    </span>
-                `;
             } else {
-                detailStatus.innerHTML = `
-                    <span class="inline-flex items-center gap-1.5 rounded-full bg-red-50 px-2.5 py-1 text-xs font-semibold text-red-700">
-                        <span class="h-1.5 w-1.5 rounded-full bg-red-500"></span>
-                        Rejected
-                    </span>
-                `;
+
+                await loadOvertime()
+            }
+
+
+            renderPage(
+                1
+            )
+
+
+            requestForm.reset()
+
+            closeRequestModal()
+
+
+            if (
+                typeof showToast ===
+                "function"
+            ) {
+
+                showToast(
+                    data?.message ||
+                    "Overtime request submitted successfully."
+                )
+            }
+
+        } catch (
+            error
+        ) {
+
+            console.error(
+                "OVERTIME REQUEST ERROR:",
+                error
+            )
+
+            alert(
+                "Something went wrong. Please try again."
+            )
+
+        } finally {
+
+            if (
+                submitButton
+            ) {
+
+                submitButton.disabled =
+                    false
+
+                submitButton.textContent =
+                    "Submit Overtime Request"
             }
         }
+    }
+)
 
-        if (rejectionContainer && rejectionReason) {
-            if (status === "Rejected" && rejection) {
-                rejectionContainer.classList.remove("hidden");
-                rejectionReason.textContent = rejection;
-            } else {
-                rejectionContainer.classList.add("hidden");
-                rejectionReason.textContent = "—";
-            }
+
+function openDetails(
+    overtime
+) {
+
+    const date =
+        formatDate(
+            overtime.date
+        )
+
+
+    const hours =
+        Number(
+            overtime.hours || 0
+        )
+
+
+    if (
+        detailDate
+    ) {
+
+        detailDate.textContent =
+            date
+    }
+
+
+    if (
+        detailHours
+    ) {
+
+        detailHours.textContent =
+            `${hours.toFixed(2)} ${
+                hours === 1
+                    ? "hour"
+                    : "hours"
+            }`
+    }
+
+
+    if (
+        detailSubmitted
+    ) {
+
+        detailSubmitted.textContent =
+            formatDate(
+                overtime.created_at
+            )
+    }
+
+
+    if (
+        detailReason
+    ) {
+
+        detailReason.textContent =
+            overtime.reason ||
+            "—"
+    }
+
+
+    if (
+        detailStatus
+    ) {
+
+        detailStatus.innerHTML =
+            statusBadge(
+                overtime.status
+            )
+    }
+
+
+    const normalized =
+        normalizeStatus(
+            overtime.status
+        )
+
+
+    if (
+        normalized ===
+            "rejected" &&
+        overtime.rejection_reason
+    ) {
+
+        rejectionContainer?.classList.remove(
+            "hidden"
+        )
+
+
+        if (
+            rejectionReason
+        ) {
+
+            rejectionReason.textContent =
+                overtime.rejection_reason
         }
 
-        if (detailsModal) {
-            detailsModal.classList.remove("hidden");
-            detailsModal.classList.add("flex");
+    } else {
+
+        rejectionContainer?.classList.add(
+            "hidden"
+        )
+
+
+        if (
+            rejectionReason
+        ) {
+
+            rejectionReason.textContent =
+                "—"
         }
-    });
-
-    function closeDetailsModal() {
-        if (!detailsModal) return;
-        detailsModal.classList.add("hidden");
-        detailsModal.classList.remove("flex");
     }
 
-    if (closeDetailsButton) {
-        closeDetailsButton.addEventListener("click", closeDetailsModal);
-    }
 
-    if (closeDetailsFooterButton) {
-        closeDetailsFooterButton.addEventListener("click", closeDetailsModal);
-    }
+    detailsModal?.classList.remove(
+        "hidden"
+    )
 
-    if (detailsModal) {
-        detailsModal.addEventListener("click", function (event) {
-            if (event.target === detailsModal) {
-                closeDetailsModal();
-            }
-        });
+    detailsModal?.classList.add(
+        "flex"
+    )
+}
+
+
+document.addEventListener(
+    "click",
+    (event) => {
+
+        const button =
+            event.target.closest(
+                ".view-overtime-button"
+            )
+
+
+        if (
+            !button
+        ) {
+
+            return
+        }
+
+
+        const overtimeId =
+            Number(
+                button.dataset.id
+            )
+
+
+        const overtime =
+            allOvertimeRequests.find(
+                (
+                    item
+                ) =>
+                    Number(
+                        item.id
+                    ) ===
+                    overtimeId
+            )
+
+
+        if (
+            overtime
+        ) {
+
+            openDetails(
+                overtime
+            )
+        }
     }
-});
+)
+
+
+function closeDetails() {
+
+    detailsModal?.classList.add(
+        "hidden"
+    )
+
+    detailsModal?.classList.remove(
+        "flex"
+    )
+}
+
+
+closeDetailsButton?.addEventListener(
+    "click",
+    closeDetails
+)
+
+closeDetailsFooterButton?.addEventListener(
+    "click",
+    closeDetails
+)
+
+
+detailsModal?.addEventListener(
+    "click",
+    (event) => {
+
+        if (
+            event.target ===
+            detailsModal
+        ) {
+
+            closeDetails()
+        }
+    }
+)
+
+
+searchInput?.addEventListener(
+    "input",
+    () => {
+
+        renderPage(
+            1
+        )
+    }
+)
+
+
+statusFilter?.addEventListener(
+    "change",
+    () => {
+
+        renderPage(
+            1
+        )
+    }
+)
+
+
+document.addEventListener(
+    "keydown",
+    (event) => {
+
+        if (
+            event.key ===
+            "Escape"
+        ) {
+
+            closeRequestModal()
+
+            closeDetails()
+        }
+    }
+)
+
+
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
+
+        loadOvertime()
+    }
+)
