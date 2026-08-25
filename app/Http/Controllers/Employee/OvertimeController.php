@@ -131,54 +131,24 @@ class OvertimeController extends Controller
 
         $validated =
             $request->validate([
-                'date' => [
-                    'required',
-                    'date',
-                ],
-
-                'hours' => [
-                    'required',
-                    'numeric',
-                    'min:0.5',
-                    'max:24',
-                ],
-
-                'reason' => [
-                    'nullable',
-                    'string',
-                    'max:500',
-                ],
+                'date' => ['required', 'date',],
+                'hours' => ['required', 'numeric', 'min:0.5', 'max:6',],
+                'reason' => ['nullable', 'string', 'max:500',],
             ]);
-
 
         $overtime =
             OvertimeRequest::create([
-                'employee_id' =>
-                $employee->id,
-
-                'date' =>
-                $validated['date'],
-
-                'hours' =>
-                $validated['hours'],
-
-                'reason' =>
-                $validated['reason'] ??
-                    null,
-
-                'status' =>
-                'Pending',
-            ]);
-
+                'employee_id' => $employee->id,
+                'date' => $validated['date'],
+                'hours' => $validated['hours'],
+                'reason' => $validated['reason'] ?? null,
+                'status' => 'Pending',
+                ]);
 
         return response()->json([
             'success' => true,
-
-            'message' =>
-            'Overtime request submitted successfully!',
-
-            'data' =>
-            $overtime,
+            'message' => 'Overtime request submitted successfully!',
+            'data' => $overtime,
         ]);
     }
 }

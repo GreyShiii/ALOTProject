@@ -19,6 +19,7 @@ export default defineConfig({
                 'resources/js/admin/users.js',
 
                 // Employee
+                'resources/js/employee/attendance.js',
                 'resources/js/employee/dashboard.js',
                 'resources/js/employee/employees.js',
                 'resources/js/employee/leave.js',
@@ -26,9 +27,11 @@ export default defineConfig({
                 'resources/js/employee/profile.js',
 
                 // Manager
+                'resources/js/manager/attendance.js',
                 'resources/js/manager/leave.js',
                 'resources/js/manager/overtime.js',
                 'resources/js/manager/profile.js',
+                'resources/js/manager/team.js',
             ],
             refresh: true,
         }),

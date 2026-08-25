@@ -121,20 +121,6 @@
                 @endif
             </div>
         </div>
-
-        <div class="flex flex-wrap items-center gap-2 border-t border-gray-200 bg-gray-50 px-5 py-3 text-sm">
-            <span class="text-gray-500">Preview state:</span>
-            <button type="button" data-preview="not_started"
-                class="preview-state rounded-md px-2.5 py-1 text-xs font-medium text-gray-600 hover:bg-gray-200">Not
-                Started</button>
-            <button type="button" data-preview="working"
-                class="preview-state rounded-md px-2.5 py-1 text-xs font-medium text-gray-600 hover:bg-gray-200">Working</button>
-            <button type="button" data-preview="completed"
-                class="preview-state rounded-md px-2.5 py-1 text-xs font-medium text-gray-600 hover:bg-gray-200">Completed</button>
-            <button type="button" data-preview="on_leave"
-                class="preview-state rounded-md px-2.5 py-1 text-xs font-medium text-gray-600 hover:bg-gray-200">On
-                Leave</button>
-        </div>
     </div>
 
     <div class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">

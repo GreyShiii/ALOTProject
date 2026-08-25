@@ -430,6 +430,14 @@ requestModal?.addEventListener("click", (event) => {
 requestForm?.addEventListener("submit", async (event) => {
     event.preventDefault();
 
+    const hoursInput = document.getElementById("overtime_hours");
+    const hoursValue = parseFloat(hoursInput?.value || 0);
+
+    if (hoursValue > 6) {
+        alert("Overtime hours cannot exceed 6 hours per request.");
+        return;
+    }
+
     const submitButton = requestForm.querySelector('button[type="submit"]');
 
     const formData = new FormData(requestForm);

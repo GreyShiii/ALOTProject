@@ -177,7 +177,7 @@
 
         <div class="overflow-x-auto">
 
-            <table class="w-full table-fixed divide-y divide-gray-200">
+            <table class="w-full min-w-[700px] divide-y divide-gray-200">
 
                 <thead class="bg-gray-50">
                     <tr>

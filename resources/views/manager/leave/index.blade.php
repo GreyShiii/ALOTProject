@@ -40,36 +40,24 @@
 
                 <div>
 
-                    <label
-                        for="manager-leave-search"
-                        class="text-xs font-semibold uppercase tracking-wide text-gray-500"
-                    >
+                    <label for="manager-leave-search" class="text-xs font-semibold uppercase tracking-wide text-gray-500">
                         Search
                     </label>
 
-                    <input
-                        type="text"
-                        id="manager-leave-search"
-                        placeholder="Search employee, leave type..."
-                        class="mt-2 w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-700 outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                    >
+                    <input type="text" id="manager-leave-search" placeholder="Search employee, leave type..."
+                        class="mt-2 w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-700 outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
 
                 </div>
 
 
                 <div>
 
-                    <label
-                        for="manager-leave-status"
-                        class="text-xs font-semibold uppercase tracking-wide text-gray-500"
-                    >
+                    <label for="manager-leave-status" class="text-xs font-semibold uppercase tracking-wide text-gray-500">
                         Status
                     </label>
 
-                    <select
-                        id="manager-leave-status"
-                        class="mt-2 w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-700 outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                    >
+                    <select id="manager-leave-status"
+                        class="mt-2 w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-700 outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
 
                         <option value="">
                             All Status
@@ -94,18 +82,12 @@
 
                 <div>
 
-                    <label
-                        for="manager-leave-date"
-                        class="text-xs font-semibold uppercase tracking-wide text-gray-500"
-                    >
+                    <label for="manager-leave-date" class="text-xs font-semibold uppercase tracking-wide text-gray-500">
                         Date
                     </label>
 
-                    <input
-                        type="date"
-                        id="manager-leave-date"
-                        class="mt-2 w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-700 outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                    >
+                    <input type="date" id="manager-leave-date"
+                        class="mt-2 w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-700 outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
 
                 </div>
 
@@ -161,26 +143,17 @@
                 </thead>
 
 
-                <tbody
-                    id="manager-leave-table-body"
-                    class="divide-y divide-gray-200 bg-white"
-                ></tbody>
+                <tbody id="manager-leave-table-body" class="divide-y divide-gray-200 bg-white"></tbody>
 
             </table>
 
         </div>
 
 
-        <div
-            id="manager-leave-card-list"
-            class="divide-y divide-gray-200 md:hidden"
-        ></div>
+        <div id="manager-leave-card-list" class="divide-y divide-gray-200 md:hidden"></div>
 
 
-        <div
-            id="manager-leave-empty"
-            class="hidden px-6 py-12 text-center"
-        >
+        <div id="manager-leave-empty" class="hidden px-6 py-12 text-center">
 
             <p class="text-sm font-semibold text-gray-700">
                 No leave requests found.
@@ -193,18 +166,12 @@
         </div>
 
 
-        <div
-            id="manager-leave-pagination"
-            class="border-t border-gray-200 bg-white"
-        ></div>
+        <div id="manager-leave-pagination" class="border-t border-gray-200 bg-white"></div>
 
     </div>
 
 
-    <div
-        id="manager-leave-modal"
-        class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 px-4"
-    >
+    <div id="manager-leave-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 px-4">
 
         <div class="w-full max-w-xl rounded-xl bg-white shadow-xl">
 
@@ -223,11 +190,8 @@
                 </div>
 
 
-                <button
-                    type="button"
-                    id="close-manager-leave-modal"
-                    class="flex h-10 w-10 items-center justify-center rounded-full border border-teal-300 text-teal-500 transition hover:bg-teal-50"
-                >
+                <button type="button" id="close-manager-leave-modal"
+                    class="flex h-10 w-10 items-center justify-center rounded-full border border-teal-300 text-teal-500 transition hover:bg-teal-50">
                     &times;
                 </button>
 
@@ -244,10 +208,7 @@
                             Employee
                         </p>
 
-                        <p
-                            id="review-employee"
-                            class="mt-1 text-sm font-semibold text-gray-900"
-                        >
+                        <p id="review-employee" class="mt-1 text-sm font-semibold text-gray-900">
                             —
                         </p>
 
@@ -260,10 +221,7 @@
                             Department
                         </p>
 
-                        <p
-                            id="review-department"
-                            class="mt-1 text-sm text-gray-900"
-                        >
+                        <p id="review-department" class="mt-1 text-sm text-gray-900">
                             —
                         </p>
 
@@ -276,10 +234,7 @@
                             Position
                         </p>
 
-                        <p
-                            id="review-position"
-                            class="mt-1 text-sm text-gray-900"
-                        >
+                        <p id="review-position" class="mt-1 text-sm text-gray-900">
                             —
                         </p>
 
@@ -292,10 +247,7 @@
                             Leave Type
                         </p>
 
-                        <p
-                            id="review-leave-type"
-                            class="mt-1 text-sm font-medium text-gray-900"
-                        >
+                        <p id="review-leave-type" class="mt-1 text-sm font-medium text-gray-900">
                             —
                         </p>
 
@@ -308,10 +260,7 @@
                             Start Date
                         </p>
 
-                        <p
-                            id="review-start-date"
-                            class="mt-1 text-sm text-gray-900"
-                        >
+                        <p id="review-start-date" class="mt-1 text-sm text-gray-900">
                             —
                         </p>
 
@@ -324,10 +273,7 @@
                             End Date
                         </p>
 
-                        <p
-                            id="review-end-date"
-                            class="mt-1 text-sm text-gray-900"
-                        >
+                        <p id="review-end-date" class="mt-1 text-sm text-gray-900">
                             —
                         </p>
 
@@ -340,10 +286,7 @@
                             Submitted
                         </p>
 
-                        <p
-                            id="review-submitted"
-                            class="mt-1 text-sm text-gray-900"
-                        >
+                        <p id="review-submitted" class="mt-1 text-sm text-gray-900">
                             —
                         </p>
 
@@ -356,10 +299,7 @@
                             Status
                         </p>
 
-                        <div
-                            id="review-status"
-                            class="mt-1"
-                        >
+                        <div id="review-status" class="mt-1">
                             —
                         </div>
 
@@ -374,92 +314,61 @@
                         Reason
                     </p>
 
-                    <div
-                        id="review-reason"
-                        class="mt-2 rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-700"
-                    >
+                    <div id="review-reason"
+                        class="mt-2 rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-700">
                         —
                     </div>
 
                 </div>
 
 
-                <div
-                    id="manager-leave-error"
-                    class="hidden rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
-                ></div>
+                <div id="manager-leave-error"
+                    class="hidden rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"></div>
 
 
-                <div
-                    id="reject-section"
-                    class="hidden"
-                >
+                <div id="reject-section" class="hidden">
 
-                    <label
-                        for="rejection-reason"
-                        class="text-xs font-semibold uppercase tracking-wide text-gray-500"
-                    >
+                    <label for="rejection-reason" class="text-xs font-semibold uppercase tracking-wide text-gray-500">
                         Rejection Reason
                     </label>
 
-                    <textarea
-                        id="rejection-reason"
-                        rows="4"
-                        placeholder="Explain why this request is being rejected..."
-                        class="mt-2 w-full resize-none rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-700 outline-none transition focus:border-red-500 focus:ring-1 focus:ring-red-500"
-                    ></textarea>
+                    <textarea id="rejection-reason" rows="4" placeholder="Explain why this request is being rejected..."
+                        class="mt-2 w-full resize-none rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-700 outline-none transition focus:border-red-500 focus:ring-1 focus:ring-red-500"></textarea>
 
                 </div>
 
             </div>
 
 
-            <div
-                id="manager-leave-actions"
-                class="flex flex-col-reverse gap-2 border-t border-gray-200 px-6 py-4 sm:flex-row sm:justify-end"
-            >
+            <div id="manager-leave-actions"
+                class="flex flex-col-reverse gap-2 border-t border-gray-200 px-6 py-4 sm:flex-row sm:justify-end">
 
-                <button
-                    type="button"
-                    id="close-manager-leave-footer"
-                    class="rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
-                >
+                <button type="button" id="close-manager-leave-footer"
+                    class="rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50">
                     Close
                 </button>
 
 
-                <button
-                    type="button"
-                    id="cancel-reject-leave-btn"
-                    class="hidden rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
-                >
+                <button type="button" id="cancel-reject-leave-btn"
+                    class="hidden rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50">
                     Cancel Reject
                 </button>
 
 
-                <button
-                    type="button"
-                    id="reject-leave-btn"
-                    class="rounded-lg bg-red-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-red-700"
-                >
+                <button type="button" id="reject-leave-btn"
+                    class="rounded-lg bg-red-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-red-700">
                     Reject
                 </button>
 
 
-                <button
-                    type="button"
-                    id="confirm-reject-leave-btn"
-                    class="hidden rounded-lg bg-red-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-red-700"
-                >
+                <button type="button" id="confirm-reject-leave-btn"
+                    class="hidden rounded-lg bg-red-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-red-700">
                     Reject Request
                 </button>
 
 
-                <button
-                    type="button"
-                    id="approve-leave-btn"
-                    class="rounded-lg bg-green-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-green-700"
-                >
+                <button type="button" id="approve-leave-btn"
+                    class="rounded-lg bg-green-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-green-700">
                     Approve
                 </button>
 
