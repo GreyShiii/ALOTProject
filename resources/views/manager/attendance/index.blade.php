@@ -205,16 +205,7 @@
 
         <div class="overflow-x-auto">
 
-            <table class="w-full table-fixed divide-y divide-gray-200">
-
-                <colgroup>
-                    <col class="w-[20%]">
-                    <col class="w-[20%]">
-                    <col class="w-[20%]">
-                    <col class="w-[20%]">
-                    <col class="w-[20%]">
-                </colgroup>
-
+            <table class="w-full min-w-[700px] divide-y divide-gray-200">
 
                 <thead class="bg-gray-50">
 
@@ -313,17 +304,7 @@
 
         <div class="overflow-x-auto">
 
-            <table class="w-full table-fixed divide-y divide-gray-200">
-
-                <colgroup>
-                    <col class="w-[23%]">
-                    <col class="w-[15%]">
-                    <col class="w-[14%]">
-                    <col class="w-[14%]">
-                    <col class="w-[14%]">
-                    <col class="w-[20%]">
-                </colgroup>
-
+            <table class="w-full min-w-[700px] divide-y divide-gray-200">
 
                 <thead class="bg-gray-50">
 
