@@ -20,6 +20,7 @@ use App\Http\Controllers\Manager\LeaveController as ManagerLeaveController;
 use App\Http\Controllers\Manager\OvertimeController as ManagerOvertimeController;
 use App\Http\Controllers\Manager\TeamController;
 use App\Http\Controllers\Manager\DashboardController as ManagerDashboardController;
+use App\Http\Controllers\Manager\AttendanceController as ManagerAttendanceController;
 
 use Illuminate\Support\Facades\Route;
 
@@ -240,6 +241,24 @@ Route::prefix('employee/overtime')
     Route::get('/manager/team', [TeamController::class, 'index'])
         ->name('manager.team.index');
 
+
+    Route::prefix('manager/attendance')
+    ->name('manager.attendance.')
+    ->group(function () {
+
+        Route::get('/', [ManagerAttendanceController::class, 'index'])
+            ->name('index');
+
+        Route::get('/data', [ManagerAttendanceController::class, 'data'])
+            ->name('data');
+
+        Route::post('/time-in', [ManagerAttendanceController::class, 'timeIn'])
+            ->name('timeIn');
+
+        Route::post('/time-out', [ManagerAttendanceController::class, 'timeOut'])
+            ->name('timeOut');
+
+    });
 
     /*
     |--------------------------------------------------------------------------
