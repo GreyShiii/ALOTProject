@@ -249,22 +249,22 @@
                 <thead class="bg-gray-50">
                     <tr>
                         <th
-                            class="whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                            class="whitespace-nowrap px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-gray-500">
                             Type</th>
                         <th
-                            class="whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                            class="whitespace-nowrap px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-gray-500">
                             Date / Range</th>
                         <th
-                            class="whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                            class="whitespace-nowrap px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-gray-500">
                             Reason</th>
                         <th
-                            class="whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                            class="whitespace-nowrap px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-gray-500">
                             Submitted</th>
                         <th
-                            class="whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                            class="whitespace-nowrap px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-gray-500">
                             Status</th>
                         <th
-                            class="whitespace-nowrap px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-gray-500">
+                            class="whitespace-nowrap px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-gray-500">
                             Actions</th>
                     </tr>
                 </thead>
@@ -272,23 +272,23 @@
 
                     @forelse ($recentRequests as $request)
                         <tr>
-                            <td class="whitespace-nowrap px-4 py-3 text-sm font-medium text-gray-900">
+                            <td class="whitespace-nowrap px-4 py-3 text-sm font-medium text-gray-900 text-center">
                                 {{ $request['type'] }}
                             </td>
 
-                            <td class="whitespace-nowrap px-4 py-3 text-sm text-gray-700">
+                            <td class="whitespace-nowrap px-4 py-3 text-sm text-gray-700 text-center">
                                 {{ $request['date'] }}
                             </td>
 
-                            <td class="px-4 py-3 text-sm text-gray-700">
+                            <td class="px-4 py-3 text-sm text-gray-700 text-center">
                                 {{ $request['reason'] ?? '—' }}
                             </td>
 
-                            <td class="whitespace-nowrap px-4 py-3 text-sm text-gray-500">
+                            <td class="whitespace-nowrap px-4 py-3 text-sm text-gray-500 text-center">
                                 {{ $request['submitted'] }}
                             </td>
 
-                            <td class="whitespace-nowrap px-4 py-3">
+                            <td class="whitespace-nowrap px-4 py-3 text-center">
 
                                 @if ($request['status'] === 'Pending')
                                     <span
@@ -312,7 +312,7 @@
 
                             </td>
 
-                            <td class="whitespace-nowrap px-4 py-3 text-right">
+                            <td class="whitespace-nowrap px-4 py-3 text-center">
                                 <a href="{{ $request['type'] === 'Overtime' ? route('employee.overtime.index') : route('employee.leave.index') }}"
                                     class="rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 transition hover:bg-gray-50">
                                     View

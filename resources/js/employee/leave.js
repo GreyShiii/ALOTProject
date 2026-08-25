@@ -179,35 +179,35 @@ function createLeaveRow(leave) {
     row.dataset.status = normalizeStatus(leave.status);
 
     row.innerHTML = `
-        <td class="px-4 py-3 text-sm font-medium text-gray-900">
+        <td class="px-4 py-3 text-sm font-medium text-gray-900 text-center">
             <div class="truncate">
                 ${leave.leave_type || "—"}
             </div>
         </td>
 
-        <td class="whitespace-nowrap px-4 py-3 text-sm text-gray-700">
+        <td class="whitespace-nowrap px-4 py-3 text-sm text-gray-700 text-center">
             ${dateDisplay}
         </td>
 
-        <td class="whitespace-nowrap px-4 py-3 text-sm text-gray-700">
+        <td class="whitespace-nowrap px-4 py-3 text-sm text-gray-700 text-center">
             ${days} ${days === 1 ? "day" : "days"}
         </td>
 
-        <td class="px-4 py-3 text-sm text-gray-700">
+        <td class="px-4 py-3 text-sm text-gray-700 text-center">
             <div class="truncate">
                 ${leave.reason || "—"}
             </div>
         </td>
 
-        <td class="whitespace-nowrap px-4 py-3 text-sm text-gray-500">
+        <td class="whitespace-nowrap px-4 py-3 text-sm text-gray-500 text-center">
             ${submittedDate}
         </td>
 
-        <td class="whitespace-nowrap px-4 py-3">
+        <td class="whitespace-nowrap px-4 py-3 text-center">
             ${statusBadge(leave.status)}
         </td>
 
-        <td class="whitespace-nowrap px-4 py-3 text-right">
+        <td class="whitespace-nowrap px-4 py-3 text-center">
             <button
                 type="button"
                 class="view-leave-btn rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 transition hover:bg-gray-50"

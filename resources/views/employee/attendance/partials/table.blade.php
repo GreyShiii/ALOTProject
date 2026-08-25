@@ -5,23 +5,23 @@
         <thead class="bg-gray-50">
             <tr>
 
-                <th class="whitespace-nowrap px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                <th class="whitespace-nowrap px-5 py-3 text-center text-xs font-semibold uppercase tracking-wide text-gray-500">
                     Date
                 </th>
 
-                <th class="whitespace-nowrap px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                <th class="whitespace-nowrap px-5 py-3 text-center text-xs font-semibold uppercase tracking-wide text-gray-500">
                     Time In
                 </th>
 
-                <th class="whitespace-nowrap px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                <th class="whitespace-nowrap px-5 py-3 text-center text-xs font-semibold uppercase tracking-wide text-gray-500">
                     Time Out
                 </th>
 
-                <th class="whitespace-nowrap px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                <th class="whitespace-nowrap px-5 py-3 text-center text-xs font-semibold uppercase tracking-wide text-gray-500">
                     Total Hours
                 </th>
 
-                <th class="whitespace-nowrap px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                <th class="whitespace-nowrap px-5 py-3 text-center text-xs font-semibold uppercase tracking-wide text-gray-500">
                     Status
                 </th>
 
@@ -48,22 +48,22 @@
 
                 <tr>
 
-                    <td class="whitespace-nowrap px-5 py-3 text-sm font-medium text-gray-900">
+                    <td class="whitespace-nowrap px-5 py-3 text-sm font-medium text-gray-900 text-center">
                         {{ $attendance->date->format('M j, Y') }}
                     </td>
 
 
-                    <td class="whitespace-nowrap px-5 py-3 text-sm text-gray-700">
+                    <td class="whitespace-nowrap px-5 py-3 text-sm text-gray-700 text-center">
                         {{ $attendance->time_in?->format('h:i A') ?? '—' }}
                     </td>
 
 
-                    <td class="whitespace-nowrap px-5 py-3 text-sm text-gray-700">
+                    <td class="whitespace-nowrap px-5 py-3 text-sm text-gray-700 text-center">
                         {{ $attendance->time_out?->format('h:i A') ?? '—' }}
                     </td>
 
 
-                    <td class="whitespace-nowrap px-5 py-3 text-sm text-gray-700">
+                    <td class="whitespace-nowrap px-5 py-3 text-sm text-gray-700 text-center">
 
                         @if ($attendance->time_in && $attendance->time_out)
 
@@ -84,7 +84,7 @@
                     </td>
 
 
-                    <td class="whitespace-nowrap px-5 py-3">
+                    <td class="whitespace-nowrap px-5 py-3 text-center">
 
                         @if ($attendanceStatus === 'completed')
 
