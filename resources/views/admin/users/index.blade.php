@@ -464,7 +464,7 @@
                             New Password
                         </label>
 
-                        <input type="password" name="password" placeholder="Leave blank to keep current password"
+                        <input type="password" name="password" minlength="8" placeholder="Leave blank to keep current password"
                             class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/30">
                     </div>
 

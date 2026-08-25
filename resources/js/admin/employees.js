@@ -149,8 +149,24 @@ const editEmployeeModal = document.getElementById("edit-employee-modal");
 
 const editEmployeeForm = document.getElementById("edit-employee-form");
 
+const editEmployeeError = document.getElementById("edit-employee-error");
+
 editEmployeeForm.addEventListener("submit", async (event) => {
     event.preventDefault();
+
+    editEmployeeError.textContent = "";
+    editEmployeeError.classList.add("hidden");
+
+    const password = editEmployeeForm.elements["password"].value;
+
+    if (password !== "" && password.length < 8) {
+        editEmployeeError.textContent =
+            "Password must be at least 8 characters.";
+
+        editEmployeeError.classList.remove("hidden");
+
+        return;
+    }
 
     try {
         const formData = new FormData(editEmployeeForm);
@@ -166,20 +182,38 @@ editEmployeeForm.addEventListener("submit", async (event) => {
         const data = await response.json();
 
         if (!response.ok) {
-            console.error(data);
+            if (data.errors) {
+                editEmployeeError.textContent =
+                    Object.values(data.errors)[0][0];
+            } else {
+                editEmployeeError.textContent =
+                    data.message || "Something went wrong.";
+            }
+
+            editEmployeeError.classList.remove("hidden");
 
             return;
         }
 
         updateEmployeeRow(data.employee);
-
         updateManagerDropdown(data.employee);
 
         editEmployeeModal.classList.add("hidden");
 
+        editEmployeeError.textContent = "";
+        editEmployeeError.classList.add("hidden");
+
+        editEmployeeForm.reset();
+
         filterEmployees(currentEmployeePage);
+
     } catch (error) {
         console.error("EDIT EMPLOYEE ERROR:", error);
+
+        editEmployeeError.textContent =
+            "Something went wrong. Please try again.";
+
+        editEmployeeError.classList.remove("hidden");
     }
 });
 
@@ -187,6 +221,9 @@ document
     .getElementById("cancel-edit-employee")
     .addEventListener("click", () => {
         editEmployeeModal.classList.add("hidden");
+
+        editEmployeeError.textContent = "";
+        editEmployeeError.classList.add("hidden");
     });
 
 const viewEmployeeModal = document.getElementById("view-employee-modal");

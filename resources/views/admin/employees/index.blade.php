@@ -342,7 +342,7 @@
                         Password
                     </label>
 
-                    <input type="password" name="password" placeholder="••••••••"
+                    <input type="password" name="password" minlength="8" placeholder="••••••••"
                         class="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 transition focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30">
 
                     <p class="mt-1.5 text-xs text-gray-500">
@@ -454,6 +454,8 @@
                 @csrf
                 @method('PUT')
 
+                <p id="edit-employee-error" class="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 empty:hidden"></p>
+
                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div>
                         <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-gray-600">
@@ -488,7 +490,7 @@
                         Password
                     </label>
 
-                    <input type="password" name="password" placeholder="Leave blank to keep current password"
+                    <input type="password" name="password" minlength="8" placeholder="Leave blank to keep current password"
                         class="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 transition focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30">
 
                     <p class="mt-1.5 text-xs text-gray-500">
