@@ -424,6 +424,9 @@
                     Update the system account information.
                 </p>
 
+                <p id="edit-user-error-{{ $user->id }}"
+                    class="mb-4 hidden rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"></p>
+
                 <form id="edit-user-form-{{ $user->id }}" class="edit-user-form space-y-4" method="POST"
                     action="{{ route('admin.users.update', $user) }}">
                     @csrf
@@ -472,15 +475,15 @@
 
                         <select name="role"
                             class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/30">
-                            <option value="employee" @selected($user->role === 'employee')}>
+                            <option value="employee" @selected($user->role === 'employee')>
                                 Employee
                             </option>
 
-                            <option value="manager" @selected($user->role === 'manager')}>
+                            <option value="manager" @selected($user->role === 'manager')>
                                 Manager
                             </option>
 
-                            <option value="admin" @selected($user->role === 'admin')}>
+                            <option value="admin" @selected($user->role === 'admin')>
                                 Admin
                             </option>
                         </select>
@@ -493,11 +496,11 @@
 
                         <select name="status"
                             class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/30">
-                            <option value="active" @selected($user->status === 'active')}>
+                            <option value="active" @selected($user->status === 'active')>
                                 Active
                             </option>
 
-                            <option value="inactive" @selected($user->status === 'inactive')}>
+                            <option value="inactive" @selected($user->status === 'inactive')>
                                 Inactive
                             </option>
                         </select>

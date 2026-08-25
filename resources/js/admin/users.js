@@ -35,6 +35,8 @@ document.addEventListener("click", (event) => {
         if (modal) {
             modal.classList.remove("hidden");
         }
+
+        return;
     }
 
     if (button.classList.contains("edit-user-btn")) {
@@ -43,8 +45,30 @@ document.addEventListener("click", (event) => {
         const modal = document.getElementById(`edit-user-modal-${userId}`);
 
         if (modal) {
+            const row = document.getElementById(`user-row-${userId}`);
+
+            const role = row?.dataset.role;
+
+            const status = row?.dataset.status;
+
+            const roleSelect = modal.querySelector('select[name="role"]');
+
+            const statusSelect = modal.querySelector(
+                'select[name="status"]',
+            );
+
+            if (roleSelect && role) {
+                roleSelect.value = role;
+            }
+
+            if (statusSelect && status) {
+                statusSelect.value = status;
+            }
+
             modal.classList.remove("hidden");
         }
+
+        return;
     }
 
     if (button.classList.contains("deactivate-user-btn")) {
@@ -57,6 +81,8 @@ document.addEventListener("click", (event) => {
         if (modal) {
             modal.classList.remove("hidden");
         }
+
+        return;
     }
 
     if (button.classList.contains("activate-user-btn")) {
@@ -74,6 +100,17 @@ editForms.forEach((form) => {
     form.addEventListener("submit", async (event) => {
         event.preventDefault();
 
+        const userId = form.id.replace("edit-user-form-", "");
+
+        const errorMessage = document.getElementById(
+            `edit-user-error-${userId}`,
+        );
+
+        if (errorMessage) {
+            errorMessage.textContent = "";
+            errorMessage.classList.add("hidden");
+        }
+
         try {
             const formData = new FormData(form);
 
@@ -88,7 +125,23 @@ editForms.forEach((form) => {
             const data = await response.json();
 
             if (!response.ok) {
-                console.error("UPDATE USER ERROR:", data);
+                if (errorMessage) {
+                    if (data.errors) {
+                        const firstError =
+                            Object.values(data.errors)[0];
+
+                        errorMessage.textContent =
+                            Array.isArray(firstError)
+                                ? firstError[0]
+                                : "Please check your input.";
+                    } else {
+                        errorMessage.textContent =
+                            data.message ||
+                            "Unable to update user.";
+                    }
+
+                    errorMessage.classList.remove("hidden");
+                }
 
                 return;
             }
@@ -96,10 +149,16 @@ editForms.forEach((form) => {
             const user = data.user;
 
             updateUserRow(user);
-
             updateUserCard(user);
 
-            const modal = document.getElementById(`edit-user-modal-${user.id}`);
+            if (errorMessage) {
+                errorMessage.textContent = "";
+                errorMessage.classList.add("hidden");
+            }
+
+            const modal = document.getElementById(
+                `edit-user-modal-${user.id}`,
+            );
 
             if (modal) {
                 modal.classList.add("hidden");
@@ -108,6 +167,13 @@ editForms.forEach((form) => {
             filterUsers(currentUserPage);
         } catch (error) {
             console.error("EDIT USER ERROR:", error);
+
+            if (errorMessage) {
+                errorMessage.textContent =
+                    "Something went wrong. Please try again.";
+
+                errorMessage.classList.remove("hidden");
+            }
         }
     });
 });
@@ -432,12 +498,16 @@ function filterUsers(page = 1) {
 
         const matchesSearch = rowText.includes(searchValue);
 
-        const matchesRole = roleValue === "" || row.dataset.role === roleValue;
+        const matchesRole =
+            roleValue === "" || row.dataset.role === roleValue;
 
         const matchesStatus =
             statusValue === "" || row.dataset.status === statusValue;
 
-        const shouldShow = matchesSearch && matchesRole && matchesStatus;
+        const shouldShow =
+            matchesSearch &&
+            matchesRole &&
+            matchesStatus;
 
         if (shouldShow) {
             matchingRows.push(row);
@@ -457,12 +527,16 @@ function filterUsers(page = 1) {
 
         const matchesSearch = cardText.includes(searchValue);
 
-        const matchesRole = roleValue === "" || card.dataset.role === roleValue;
+        const matchesRole =
+            roleValue === "" || card.dataset.role === roleValue;
 
         const matchesStatus =
             statusValue === "" || card.dataset.status === statusValue;
 
-        const shouldShow = matchesSearch && matchesRole && matchesStatus;
+        const shouldShow =
+            matchesSearch &&
+            matchesRole &&
+            matchesStatus;
 
         if (shouldShow) {
             matchingCards.push(card);
@@ -473,7 +547,9 @@ function filterUsers(page = 1) {
 
     const totalUsers = matchingRows.length;
 
-    const totalPages = Math.ceil(totalUsers / USERS_PER_PAGE);
+    const totalPages = Math.ceil(
+        totalUsers / USERS_PER_PAGE,
+    );
 
     if (totalPages === 0) {
         currentUserPage = 1;
@@ -485,12 +561,19 @@ function filterUsers(page = 1) {
         currentUserPage = page;
     }
 
-    const startIndex = (currentUserPage - 1) * USERS_PER_PAGE;
+    const startIndex =
+        (currentUserPage - 1) *
+        USERS_PER_PAGE;
 
-    const endIndex = startIndex + USERS_PER_PAGE;
+    const endIndex =
+        startIndex +
+        USERS_PER_PAGE;
 
     matchingRows.forEach((row, index) => {
-        if (index >= startIndex && index < endIndex) {
+        if (
+            index >= startIndex &&
+            index < endIndex
+        ) {
             row.classList.remove("hidden");
         } else {
             row.classList.add("hidden");
@@ -498,40 +581,59 @@ function filterUsers(page = 1) {
     });
 
     matchingCards.forEach((card, index) => {
-        if (index >= startIndex && index < endIndex) {
+        if (
+            index >= startIndex &&
+            index < endIndex
+        ) {
             card.classList.remove("hidden");
         } else {
             card.classList.add("hidden");
         }
     });
 
-    let noResults = document.getElementById("no-filter-results");
+    let noResults =
+        document.getElementById(
+            "no-filter-results",
+        );
 
-    if (totalUsers === 0 && rows.length > 0) {
+    if (
+        totalUsers === 0 &&
+        rows.length > 0
+    ) {
         if (!noResults) {
-            noResults = document.createElement("tr");
+            noResults =
+                document.createElement("tr");
 
-            noResults.id = "no-filter-results";
+            noResults.id =
+                "no-filter-results";
 
             noResults.innerHTML = `
-                    <td
-                        colspan="6"
-                        class="px-6 py-12 text-center text-sm text-gray-500"
-                    >
-                        No users match your filters.
-                    </td>
-                `;
+                <td
+                    colspan="6"
+                    class="px-6 py-12 text-center text-sm text-gray-500"
+                >
+                    No users match your filters.
+                </td>
+            `;
 
-            userTableBody.appendChild(noResults);
+            userTableBody.appendChild(
+                noResults,
+            );
         }
     } else if (noResults) {
         noResults.remove();
     }
 
-    renderUserPagination(totalUsers, totalPages);
+    renderUserPagination(
+        totalUsers,
+        totalPages,
+    );
 }
 
-function renderUserPagination(totalUsers, totalPages) {
+function renderUserPagination(
+    totalUsers,
+    totalPages,
+) {
     if (!userPagination) {
         return;
     }
@@ -539,76 +641,107 @@ function renderUserPagination(totalUsers, totalPages) {
     userPagination.innerHTML = "";
 
     if (totalUsers <= USERS_PER_PAGE) {
-        userPagination.classList.add("hidden");
+        userPagination.classList.add(
+            "hidden",
+        );
 
         return;
     }
 
-    userPagination.classList.remove("hidden");
+    userPagination.classList.remove(
+        "hidden",
+    );
 
-    const wrapper = document.createElement("div");
+    const wrapper =
+        document.createElement("div");
 
     wrapper.className =
         "flex min-h-[72px] w-full items-center justify-between px-5 py-3";
 
-    const endRecord = Math.min(currentUserPage * USERS_PER_PAGE, totalUsers);
+    const endRecord = Math.min(
+        currentUserPage *
+            USERS_PER_PAGE,
+        totalUsers,
+    );
 
-    const information = document.createElement("p");
+    const information =
+        document.createElement("p");
 
-    information.className = "text-xs text-gray-500";
+    information.className =
+        "text-xs text-gray-500";
 
     information.innerHTML = `
-            Showing
-            <span class="font-semibold text-gray-700">
-                ${endRecord}
-            </span>
-            of
-            <span class="font-semibold text-gray-700">
-                ${totalUsers}
-            </span>
-            records
-        `;
+        Showing
+        <span class="font-semibold text-gray-700">
+            ${endRecord}
+        </span>
+        of
+        <span class="font-semibold text-gray-700">
+            ${totalUsers}
+        </span>
+        records
+    `;
 
-    const controls = document.createElement("div");
+    const controls =
+        document.createElement("div");
 
-    controls.className = "flex items-center gap-1";
+    controls.className =
+        "flex items-center gap-1";
 
-    const previousButton = document.createElement("button");
+    const previousButton =
+        document.createElement("button");
 
     previousButton.type = "button";
 
-    previousButton.disabled = currentUserPage <= 1;
+    previousButton.disabled =
+        currentUserPage <= 1;
 
     previousButton.className =
         "inline-flex h-9 items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 text-xs font-medium text-gray-500 shadow-sm transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50";
 
     previousButton.innerHTML = `
-            <span class="text-base leading-none">
-                ‹
-            </span>
+        <span class="text-base leading-none">
+            ‹
+        </span>
 
-            <span>
-                Previous
-            </span>
-        `;
+        <span>
+            Previous
+        </span>
+    `;
 
-    previousButton.addEventListener("click", () => {
-        filterUsers(currentUserPage - 1);
-    });
+    previousButton.addEventListener(
+        "click",
+        () => {
+            filterUsers(
+                currentUserPage - 1,
+            );
+        },
+    );
 
-    controls.appendChild(previousButton);
+    controls.appendChild(
+        previousButton,
+    );
 
-    for (let page = 1; page <= totalPages; page++) {
-        const pageButton = document.createElement("button");
+    for (
+        let page = 1;
+        page <= totalPages;
+        page++
+    ) {
+        const pageButton =
+            document.createElement("button");
 
         pageButton.type = "button";
 
-        pageButton.textContent = page;
+        pageButton.textContent =
+            page;
 
         pageButton.className =
             "inline-flex h-9 min-w-9 items-center justify-center rounded-lg px-2.5 text-xs font-medium transition";
 
-        if (page === currentUserPage) {
+        if (
+            page ===
+            currentUserPage
+        ) {
             pageButton.classList.add(
                 "border",
                 "border-gray-200",
@@ -617,70 +750,107 @@ function renderUserPagination(totalUsers, totalPages) {
                 "shadow-sm",
             );
         } else {
-            pageButton.classList.add("text-gray-700", "hover:bg-gray-100");
+            pageButton.classList.add(
+                "text-gray-700",
+                "hover:bg-gray-100",
+            );
         }
 
-        pageButton.addEventListener("click", () => {
-            filterUsers(page);
-        });
+        pageButton.addEventListener(
+            "click",
+            () => {
+                filterUsers(page);
+            },
+        );
 
-        controls.appendChild(pageButton);
+        controls.appendChild(
+            pageButton,
+        );
     }
 
-    const nextButton = document.createElement("button");
+    const nextButton =
+        document.createElement("button");
 
     nextButton.type = "button";
 
-    nextButton.disabled = currentUserPage >= totalPages;
+    nextButton.disabled =
+        currentUserPage >=
+        totalPages;
 
     nextButton.className =
         "inline-flex h-9 items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 text-xs font-medium text-gray-700 shadow-sm transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50";
 
     nextButton.innerHTML = `
-            <span>
-                Next
-            </span>
+        <span>
+            Next
+        </span>
 
-            <span class="text-base leading-none">
-                ›
-            </span>
-        `;
+        <span class="text-base leading-none">
+            ›
+        </span>
+    `;
 
-    nextButton.addEventListener("click", () => {
-        filterUsers(currentUserPage + 1);
-    });
+    nextButton.addEventListener(
+        "click",
+        () => {
+            filterUsers(
+                currentUserPage + 1,
+            );
+        },
+    );
 
-    controls.appendChild(nextButton);
+    controls.appendChild(
+        nextButton,
+    );
 
-    wrapper.appendChild(information);
+    wrapper.appendChild(
+        information,
+    );
 
-    wrapper.appendChild(controls);
+    wrapper.appendChild(
+        controls,
+    );
 
-    userPagination.appendChild(wrapper);
+    userPagination.appendChild(
+        wrapper,
+    );
 }
 
-userSearch.addEventListener("input", () => {
-    filterUsers(1);
-});
+userSearch.addEventListener(
+    "input",
+    () => {
+        filterUsers(1);
+    },
+);
 
-roleFilter.addEventListener("change", () => {
-    filterUsers(1);
-});
+roleFilter.addEventListener(
+    "change",
+    () => {
+        filterUsers(1);
+    },
+);
 
-statusFilter.addEventListener("change", () => {
-    filterUsers(1);
-});
+statusFilter.addEventListener(
+    "change",
+    () => {
+        filterUsers(1);
+    },
+);
 
 filterUsers(1);
 
 function formatDate(date) {
-    return new Date(date).toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-    });
+    return new Date(date).toLocaleDateString(
+        "en-US",
+        {
+            month: "short",
+            day: "numeric",
+            year: "numeric",
+        },
+    );
 }
 
 function capitalize(value) {
-    return value.charAt(0).toUpperCase() + value.slice(1);
+    return value.charAt(0).toUpperCase() +
+        value.slice(1);
 }
