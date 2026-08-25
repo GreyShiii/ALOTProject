@@ -124,9 +124,12 @@
     </div>
 
     <div class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+
+        {{-- Pending Leave --}}
         <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
             <div class="flex items-start justify-between">
                 <p class="text-sm font-medium text-gray-500">Pending Leave</p>
+
                 <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-amber-50 text-amber-600">
                     <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
                         <rect x="3" y="5" width="18" height="16" rx="2" />
@@ -134,13 +137,22 @@
                     </svg>
                 </div>
             </div>
-            <p class="mt-3 text-3xl font-bold text-gray-900">1</p>
-            <p class="mt-2 text-xs text-gray-500">Awaiting manager review</p>
+
+            <p class="mt-3 text-3xl font-bold text-gray-900">
+                {{ $pendingLeaveCount }}
+            </p>
+
+            <p class="mt-2 text-xs text-gray-500">
+                Awaiting manager review
+            </p>
         </div>
 
+
+        {{-- Pending Overtime --}}
         <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
             <div class="flex items-start justify-between">
                 <p class="text-sm font-medium text-gray-500">Pending Overtime</p>
+
                 <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-amber-50 text-amber-600">
                     <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
                         <circle cx="12" cy="13" r="7" />
@@ -148,26 +160,44 @@
                     </svg>
                 </div>
             </div>
-            <p class="mt-3 text-3xl font-bold text-gray-900">1</p>
-            <p class="mt-2 text-xs text-gray-500">Awaiting manager review</p>
+
+            <p class="mt-3 text-3xl font-bold text-gray-900">
+                {{ $pendingOvertimeCount }}
+            </p>
+
+            <p class="mt-2 text-xs text-gray-500">
+                Awaiting manager review
+            </p>
         </div>
 
+
+        {{-- Approved Leave --}}
         <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
             <div class="flex items-start justify-between">
                 <p class="text-sm font-medium text-gray-500">Approved Leave</p>
+
                 <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-green-50 text-green-600">
                     <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M5 12l4 4L19 6" />
                     </svg>
                 </div>
             </div>
-            <p class="mt-3 text-3xl font-bold text-gray-900">3</p>
-            <p class="mt-2 text-xs text-gray-500">This year</p>
+
+            <p class="mt-3 text-3xl font-bold text-gray-900">
+                {{ $approvedLeaveCount }}
+            </p>
+
+            <p class="mt-2 text-xs text-gray-500">
+                This year
+            </p>
         </div>
 
+
+        {{-- Approved Overtime --}}
         <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
             <div class="flex items-start justify-between">
                 <p class="text-sm font-medium text-gray-500">Approved Overtime</p>
+
                 <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-green-50 text-green-600">
                     <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
                         <circle cx="12" cy="13" r="7" />
@@ -175,9 +205,16 @@
                     </svg>
                 </div>
             </div>
-            <p class="mt-3 text-3xl font-bold text-gray-900">2</p>
-            <p class="mt-2 text-xs text-gray-500">This year</p>
+
+            <p class="mt-3 text-3xl font-bold text-gray-900">
+                {{ $approvedOvertimeCount }}
+            </p>
+
+            <p class="mt-2 text-xs text-gray-500">
+                This year
+            </p>
         </div>
+
     </div>
 
     <div class="grid grid-cols-1 gap-4 md:grid-cols-2 mt-7">
@@ -321,5 +358,6 @@
     </div>
 
     @vite('resources/js/employee/employees.js')
+    @vite('resources/js/employee/dashboard.js')
 
 @endsection
