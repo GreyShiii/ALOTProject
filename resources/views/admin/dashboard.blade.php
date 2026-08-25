@@ -222,6 +222,7 @@
         <div class="flex items-center justify-between">
 
             <div>
+
                 <h2 class="text-lg font-semibold text-gray-900">
                     Recent Requests
                 </h2>
@@ -229,6 +230,7 @@
                 <p class="mt-1 text-sm text-gray-500">
                     Latest leave and overtime requests.
                 </p>
+
             </div>
 
         </div>
@@ -236,7 +238,6 @@
     </div>
 
 
-    {{-- Desktop / Tablet --}}
     <div class="hidden overflow-x-auto md:block">
 
         <table class="min-w-full divide-y divide-gray-200">
@@ -268,16 +269,112 @@
 
             <tbody class="divide-y divide-gray-200 bg-white">
 
-                <tr>
+                @forelse ($recentRequests as $request)
 
-                    <td
-                        colspan="4"
-                        class="px-6 py-10 text-center text-sm text-gray-500"
-                    >
-                        No recent requests.
-                    </td>
+                    <tr class="hover:bg-gray-50">
 
-                </tr>
+                        <td class="px-4 py-4 text-center">
+
+                            <p class="text-sm font-semibold text-gray-900">
+                                {{ $request['employee']->user->first_name }}
+                                {{ $request['employee']->user->last_name }}
+                            </p>
+
+                            <p class="mt-1 text-xs text-gray-500">
+                                {{ $request['employee']->department->name ?? '—' }}
+                            </p>
+
+                        </td>
+
+
+                        <td class="px-4 py-4 text-center">
+
+                            @if ($request['type'] === 'Leave')
+
+                                <span class="inline-flex rounded-full bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-700">
+                                    Leave
+                                </span>
+
+                            @else
+
+                                <span class="inline-flex rounded-full bg-purple-50 px-2.5 py-1 text-xs font-semibold text-purple-700">
+                                    Overtime
+                                </span>
+
+                            @endif
+
+                        </td>
+
+
+                        <td class="px-4 py-4 text-center text-sm text-gray-700">
+
+                            {{ \Carbon\Carbon::parse(
+                                $request['date']
+                            )->format('M j, Y') }}
+
+                        </td>
+
+
+                        <td class="px-4 py-4 text-center">
+
+                            @if (
+                                strtolower(
+                                    $request['status']
+                                ) === 'pending'
+                            )
+
+                                <span class="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-700">
+
+                                    <span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
+
+                                    Pending
+
+                                </span>
+
+                            @elseif (
+                                strtolower(
+                                    $request['status']
+                                ) === 'approved'
+                            )
+
+                                <span class="inline-flex items-center gap-1.5 rounded-full bg-green-50 px-2.5 py-1 text-xs font-semibold text-green-700">
+
+                                    <span class="h-1.5 w-1.5 rounded-full bg-green-500"></span>
+
+                                    Approved
+
+                                </span>
+
+                            @else
+
+                                <span class="inline-flex items-center gap-1.5 rounded-full bg-red-50 px-2.5 py-1 text-xs font-semibold text-red-700">
+
+                                    <span class="h-1.5 w-1.5 rounded-full bg-red-500"></span>
+
+                                    Rejected
+
+                                </span>
+
+                            @endif
+
+                        </td>
+
+                    </tr>
+
+                @empty
+
+                    <tr>
+
+                        <td
+                            colspan="4"
+                            class="px-6 py-10 text-center text-sm text-gray-500"
+                        >
+                            No recent requests.
+                        </td>
+
+                    </tr>
+
+                @endforelse
 
             </tbody>
 
@@ -286,12 +383,86 @@
     </div>
 
 
-    {{-- Mobile --}}
     <div class="divide-y divide-gray-200 md:hidden">
 
-        <div class="px-4 py-10 text-center text-sm text-gray-500">
-            No recent requests.
-        </div>
+        @forelse ($recentRequests as $request)
+
+            <div class="px-4 py-4">
+
+                <div class="flex items-start justify-between gap-3">
+
+                    <div class="min-w-0">
+
+                        <p class="truncate text-sm font-semibold text-gray-900">
+                            {{ $request['employee']->user->first_name }}
+                            {{ $request['employee']->user->last_name }}
+                        </p>
+
+                        <p class="mt-1 text-xs text-gray-500">
+                            {{ $request['type'] }}
+                            ·
+                            {{ $request['employee']->department->name ?? '—' }}
+                        </p>
+
+                    </div>
+
+
+                    @if (
+                        strtolower(
+                            $request['status']
+                        ) === 'pending'
+                    )
+
+                        <span class="shrink-0 rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-700">
+                            Pending
+                        </span>
+
+                    @elseif (
+                        strtolower(
+                            $request['status']
+                        ) === 'approved'
+                    )
+
+                        <span class="shrink-0 rounded-full bg-green-50 px-2.5 py-1 text-xs font-semibold text-green-700">
+                            Approved
+                        </span>
+
+                    @else
+
+                        <span class="shrink-0 rounded-full bg-red-50 px-2.5 py-1 text-xs font-semibold text-red-700">
+                            Rejected
+                        </span>
+
+                    @endif
+
+                </div>
+
+
+                <p class="mt-3 text-sm text-gray-700">
+
+                    {{ \Carbon\Carbon::parse(
+                        $request['date']
+                    )->format('M j, Y') }}
+
+                </p>
+
+
+                <p class="mt-1 text-xs text-gray-500">
+
+                    Submitted
+                    {{ $request['created_at']->format('M j, Y') }}
+
+                </p>
+
+            </div>
+
+        @empty
+
+            <div class="px-4 py-10 text-center text-sm text-gray-500">
+                No recent requests.
+            </div>
+
+        @endforelse
 
     </div>
 
