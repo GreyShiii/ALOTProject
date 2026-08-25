@@ -10,10 +10,6 @@ const cardList = document.getElementById("manager-overtime-card-list");
 
 const emptyMessage = document.getElementById("manager-overtime-empty");
 
-const paginationContainer = document.getElementById(
-    "manager-overtime-pagination",
-);
-
 const modal = document.getElementById("manager-overtime-modal");
 
 const closeModalButton = document.getElementById(
@@ -58,13 +54,13 @@ const reviewStatus = document.getElementById("review-overtime-status");
 
 const reviewReason = document.getElementById("review-overtime-reason");
 
-const OVERTIME_PER_PAGE = 10;
-
 let overtimeRequests = [];
 
 let selectedOvertime = null;
 
-let currentPage = 1;
+// =====================================================
+// LOAD
+// =====================================================
 
 async function loadOvertimeRequests() {
     try {
@@ -84,11 +80,15 @@ async function loadOvertimeRequests() {
 
         overtimeRequests = data.overtimeRequests || [];
 
-        renderOvertimeRequests(1);
+        renderOvertimeRequests();
     } catch (error) {
         console.error("LOAD MANAGER OVERTIME ERROR:", error);
     }
 }
+
+// =====================================================
+// HELPERS
+// =====================================================
 
 function normalizeStatus(status) {
     return String(status || "")
@@ -96,7 +96,41 @@ function normalizeStatus(status) {
         .trim();
 }
 
+function normalizeDate(date) {
+    if (!date) {
+        return "";
+    }
+
+    return String(date).substring(0, 10);
+}
+
 function formatDate(date) {
+    if (!date) {
+        return "N/A";
+    }
+
+    const value = normalizeDate(date);
+
+    const parts = value.split("-");
+
+    if (parts.length !== 3) {
+        return "N/A";
+    }
+
+    const year = Number(parts[0]);
+
+    const month = Number(parts[1]);
+
+    const day = Number(parts[2]);
+
+    return new Date(year, month - 1, day).toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+    });
+}
+
+function formatDateTime(date) {
     if (!date) {
         return "N/A";
     }
@@ -113,7 +147,7 @@ function statusBadge(status) {
 
     if (normalized === "pending") {
         return `
-            <span class="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-700">
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-700">
                 <span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
                 Pending
             </span>
@@ -122,7 +156,7 @@ function statusBadge(status) {
 
     if (normalized === "approved") {
         return `
-            <span class="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-green-50 px-2.5 py-1 text-xs font-semibold text-green-700">
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-green-50 px-2.5 py-1 text-xs font-semibold text-green-700">
                 <span class="h-1.5 w-1.5 rounded-full bg-green-500"></span>
                 Approved
             </span>
@@ -130,12 +164,16 @@ function statusBadge(status) {
     }
 
     return `
-        <span class="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-red-50 px-2.5 py-1 text-xs font-semibold text-red-700">
+        <span class="inline-flex items-center gap-1.5 rounded-full bg-red-50 px-2.5 py-1 text-xs font-semibold text-red-700">
             <span class="h-1.5 w-1.5 rounded-full bg-red-500"></span>
             Rejected
         </span>
     `;
 }
+
+// =====================================================
+// FILTER
+// =====================================================
 
 function getFilteredRequests() {
     const search = searchInput.value.toLowerCase().trim();
@@ -163,16 +201,18 @@ function getFilteredRequests() {
         const matchesStatus =
             status === "" || normalizeStatus(overtime.status) === status;
 
-        const overtimeDate = overtime.date
-            ? String(overtime.date).substring(0, 10)
-            : "";
+        const overtimeDate = normalizeDate(overtime.date);
 
         const matchesDate =
-            selectedDate === "" || selectedDate === overtimeDate;
+            selectedDate === "" || overtimeDate === selectedDate;
 
         return matchesSearch && matchesStatus && matchesDate;
     });
 }
+
+// =====================================================
+// TABLE ROW
+// =====================================================
 
 function createTableRow(overtime) {
     const employee = overtime.employee;
@@ -189,7 +229,9 @@ function createTableRow(overtime) {
 
     row.innerHTML = `
         <td class="px-4 py-4 text-center">
+
             <div>
+
                 <p class="text-sm font-semibold text-gray-900">
                     ${employeeName}
                 </p>
@@ -197,22 +239,26 @@ function createTableRow(overtime) {
                 <p class="mt-1 text-xs text-gray-500">
                     ${user?.email || "—"}
                 </p>
+
             </div>
+
         </td>
+
 
         <td class="whitespace-nowrap px-4 py-4 text-center text-sm text-gray-700">
             ${formatDate(overtime.date)}
         </td>
 
+
         <td class="whitespace-nowrap px-4 py-4 text-center text-sm font-medium text-gray-900">
             ${overtime.hours} hrs
         </td>
 
-        <td class="px-4 py-4 text-center text-sm text-gray-700">
-            <div class="truncate">
-                ${overtime.reason || "—"}
-            </div>
+
+        <td class="max-w-xs px-4 py-4 text-center text-sm text-gray-700">
+            ${overtime.reason || "—"}
         </td>
+
 
         <td class="px-4 py-4 text-center">
             <div class="flex justify-center">
@@ -220,21 +266,26 @@ function createTableRow(overtime) {
             </div>
         </td>
 
+
         <td class="px-4 py-4 text-center">
-            <div class="flex justify-center">
-                <button
-                    type="button"
-                    class="view-manager-overtime-btn rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-100"
-                    data-id="${overtime.id}"
-                >
-                    Review
-                </button>
-            </div>
+
+            <button
+                type="button"
+                class="view-manager-overtime-btn rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-100"
+                data-id="${overtime.id}"
+            >
+                Review
+            </button>
+
         </td>
     `;
 
     return row;
 }
+
+// =====================================================
+// MOBILE CARD
+// =====================================================
 
 function createMobileCard(overtime) {
     const employee = overtime.employee;
@@ -268,6 +319,7 @@ function createMobileCard(overtime) {
 
         </div>
 
+
         <div class="mt-3 grid grid-cols-2 gap-4">
 
             <div>
@@ -281,6 +333,7 @@ function createMobileCard(overtime) {
                 </p>
 
             </div>
+
 
             <div>
 
@@ -296,6 +349,7 @@ function createMobileCard(overtime) {
 
         </div>
 
+
         <button
             type="button"
             class="view-manager-overtime-btn mt-4 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 transition hover:bg-slate-100"
@@ -308,171 +362,35 @@ function createMobileCard(overtime) {
     return card;
 }
 
-function renderOvertimeRequests(page = 1) {
+// =====================================================
+// RENDER
+// =====================================================
+
+function renderOvertimeRequests() {
     const filtered = getFilteredRequests();
-
-    const totalRequests = filtered.length;
-
-    const totalPages = Math.ceil(totalRequests / OVERTIME_PER_PAGE);
-
-    if (totalPages === 0) {
-        currentPage = 1;
-    } else if (page > totalPages) {
-        currentPage = totalPages;
-    } else if (page < 1) {
-        currentPage = 1;
-    } else {
-        currentPage = page;
-    }
-
-    const startIndex = (currentPage - 1) * OVERTIME_PER_PAGE;
-
-    const endIndex = startIndex + OVERTIME_PER_PAGE;
-
-    const pageRequests = filtered.slice(startIndex, endIndex);
 
     tableBody.innerHTML = "";
 
     cardList.innerHTML = "";
 
-    if (pageRequests.length === 0) {
+    if (filtered.length === 0) {
         emptyMessage.classList.remove("hidden");
-    } else {
-        emptyMessage.classList.add("hidden");
-
-        pageRequests.forEach((overtime) => {
-            tableBody.appendChild(createTableRow(overtime));
-
-            cardList.appendChild(createMobileCard(overtime));
-        });
-    }
-
-    renderPagination(totalRequests, totalPages);
-}
-
-function renderPagination(totalRequests, totalPages) {
-    paginationContainer.innerHTML = "";
-
-    if (totalRequests <= OVERTIME_PER_PAGE) {
-        paginationContainer.classList.add("hidden");
 
         return;
     }
 
-    paginationContainer.classList.remove("hidden");
+    emptyMessage.classList.add("hidden");
 
-    const wrapper = document.createElement("div");
+    filtered.forEach((overtime) => {
+        tableBody.appendChild(createTableRow(overtime));
 
-    wrapper.className =
-        "flex min-h-[72px] w-full items-center justify-between px-5 py-3";
-
-    const endRecord = Math.min(currentPage * OVERTIME_PER_PAGE, totalRequests);
-
-    const information = document.createElement("p");
-
-    information.className = "text-xs text-gray-500";
-
-    information.innerHTML = `
-        Showing
-        <span class="font-semibold text-gray-700">
-            ${endRecord}
-        </span>
-        of
-        <span class="font-semibold text-gray-700">
-            ${totalRequests}
-        </span>
-        records
-    `;
-
-    const controls = document.createElement("div");
-
-    controls.className = "flex items-center gap-1";
-
-    const previousButton = document.createElement("button");
-
-    previousButton.type = "button";
-
-    previousButton.disabled = currentPage <= 1;
-
-    previousButton.className =
-        "inline-flex h-9 items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 text-xs font-medium text-gray-500 shadow-sm transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50";
-
-    previousButton.innerHTML = `
-        <span class="text-base leading-none">
-            ‹
-        </span>
-
-        <span>
-            Previous
-        </span>
-    `;
-
-    previousButton.addEventListener("click", () => {
-        renderOvertimeRequests(currentPage - 1);
+        cardList.appendChild(createMobileCard(overtime));
     });
-
-    controls.appendChild(previousButton);
-
-    for (let page = 1; page <= totalPages; page++) {
-        const pageButton = document.createElement("button");
-
-        pageButton.type = "button";
-
-        pageButton.textContent = page;
-
-        pageButton.className =
-            "inline-flex h-9 min-w-9 items-center justify-center rounded-lg px-2.5 text-xs font-medium transition";
-
-        if (page === currentPage) {
-            pageButton.classList.add(
-                "border",
-                "border-gray-200",
-                "bg-gray-100",
-                "text-gray-800",
-                "shadow-sm",
-            );
-        } else {
-            pageButton.classList.add("text-gray-700", "hover:bg-gray-100");
-        }
-
-        pageButton.addEventListener("click", () => {
-            renderOvertimeRequests(page);
-        });
-
-        controls.appendChild(pageButton);
-    }
-
-    const nextButton = document.createElement("button");
-
-    nextButton.type = "button";
-
-    nextButton.disabled = currentPage >= totalPages;
-
-    nextButton.className =
-        "inline-flex h-9 items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 text-xs font-medium text-gray-700 shadow-sm transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50";
-
-    nextButton.innerHTML = `
-        <span>
-            Next
-        </span>
-
-        <span class="text-base leading-none">
-            ›
-        </span>
-    `;
-
-    nextButton.addEventListener("click", () => {
-        renderOvertimeRequests(currentPage + 1);
-    });
-
-    controls.appendChild(nextButton);
-
-    wrapper.appendChild(information);
-
-    wrapper.appendChild(controls);
-
-    paginationContainer.appendChild(wrapper);
 }
+
+// =====================================================
+// RESET REJECTION MODE
+// =====================================================
 
 function resetRejectionMode() {
     rejectSection.classList.add("hidden");
@@ -491,6 +409,10 @@ function resetRejectionMode() {
 
     errorMessage.classList.add("hidden");
 }
+
+// =====================================================
+// OPEN MODAL
+// =====================================================
 
 function openReviewModal(overtime) {
     selectedOvertime = overtime;
@@ -513,7 +435,7 @@ function openReviewModal(overtime) {
 
     reviewHours.textContent = `${overtime.hours} hours`;
 
-    reviewSubmitted.textContent = formatDate(overtime.created_at);
+    reviewSubmitted.textContent = formatDateTime(overtime.created_at);
 
     reviewStatus.innerHTML = statusBadge(overtime.status);
 
@@ -534,6 +456,10 @@ function openReviewModal(overtime) {
     modal.classList.add("flex");
 }
 
+// =====================================================
+// CLOSE MODAL
+// =====================================================
+
 function closeReviewModal() {
     modal.classList.add("hidden");
 
@@ -547,6 +473,10 @@ function closeReviewModal() {
 closeModalButton.addEventListener("click", closeReviewModal);
 
 closeFooterButton.addEventListener("click", closeReviewModal);
+
+// =====================================================
+// REVIEW BUTTON
+// =====================================================
 
 document.addEventListener("click", (event) => {
     const button = event.target.closest(".view-manager-overtime-btn");
@@ -565,6 +495,10 @@ document.addEventListener("click", (event) => {
         openReviewModal(overtime);
     }
 });
+
+// =====================================================
+// APPROVE
+// =====================================================
 
 approveButton.addEventListener("click", async () => {
     if (!selectedOvertime) {
@@ -612,7 +546,7 @@ approveButton.addEventListener("click", async () => {
 
         closeReviewModal();
 
-        renderOvertimeRequests(currentPage);
+        renderOvertimeRequests();
     } catch (error) {
         console.error("APPROVE OVERTIME ERROR:", error);
     } finally {
@@ -621,6 +555,10 @@ approveButton.addEventListener("click", async () => {
         approveButton.textContent = "Approve";
     }
 });
+
+// =====================================================
+// START REJECTION MODE
+// =====================================================
 
 rejectButton.addEventListener("click", () => {
     rejectSection.classList.remove("hidden");
@@ -640,11 +578,23 @@ rejectButton.addEventListener("click", () => {
     rejectionReason.focus();
 });
 
+// =====================================================
+// CANCEL REJECTION
+// =====================================================
+
 cancelRejectButton.addEventListener("click", () => {
     resetRejectionMode();
 });
 
+// =====================================================
+// CONFIRM REJECTION
+// =====================================================
+
 confirmRejectButton.addEventListener("click", submitRejection);
+
+// =====================================================
+// CTRL + ENTER
+// =====================================================
 
 rejectionReason.addEventListener("keydown", (event) => {
     if (event.key === "Enter" && event.ctrlKey) {
@@ -653,6 +603,10 @@ rejectionReason.addEventListener("keydown", (event) => {
         submitRejection();
     }
 });
+
+// =====================================================
+// SUBMIT REJECTION
+// =====================================================
 
 async function submitRejection() {
     if (!selectedOvertime) {
@@ -725,7 +679,7 @@ async function submitRejection() {
 
         closeReviewModal();
 
-        renderOvertimeRequests(currentPage);
+        renderOvertimeRequests();
     } catch (error) {
         console.error("REJECT OVERTIME ERROR:", error);
 
@@ -740,16 +694,18 @@ async function submitRejection() {
     }
 }
 
-searchInput.addEventListener("input", () => {
-    renderOvertimeRequests(1);
-});
+// =====================================================
+// FILTER EVENTS
+// =====================================================
 
-statusFilter.addEventListener("change", () => {
-    renderOvertimeRequests(1);
-});
+searchInput.addEventListener("input", renderOvertimeRequests);
 
-dateFilter.addEventListener("change", () => {
-    renderOvertimeRequests(1);
-});
+statusFilter.addEventListener("change", renderOvertimeRequests);
+
+dateFilter.addEventListener("change", renderOvertimeRequests);
+
+// =====================================================
+// INITIAL LOAD
+// =====================================================
 
 loadOvertimeRequests();

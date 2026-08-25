@@ -9,17 +9,11 @@ use Illuminate\Support\Facades\Auth;
 
 class OvertimeController extends Controller
 {
-    /**
-     * Display manager overtime requests page.
-     */
     public function index()
     {
         return view('manager.overtime.index');
     }
 
-    /**
-     * Return overtime requests belonging to the manager's team.
-     */
     public function data()
     {
         $manager = Auth::user()->employee;
@@ -30,10 +24,25 @@ class OvertimeController extends Controller
             'approver',
         ])
             ->whereHas('employee', function ($query) use ($manager) {
-                $query->where('manager_id', $manager->id);
+                $query->where(
+                    'manager_id',
+                    $manager->id
+                );
             })
             ->latest('date')
             ->get();
+
+        $overtimeRequests->each(
+            function ($overtime) {
+
+                if ($overtime->date) {
+                    $overtime->setAttribute(
+                        'date',
+                        $overtime->date->format('Y-m-d')
+                    );
+                }
+            }
+        );
 
         return response()->json([
             'success' => true,
@@ -41,26 +50,32 @@ class OvertimeController extends Controller
         ]);
     }
 
-    /**
-     * Approve an overtime request.
-     */
-    public function approve(OvertimeRequest $overtimeRequest)
-    {
+    public function approve(
+        OvertimeRequest $overtimeRequest
+    ) {
         $manager = Auth::user()->employee;
 
         $belongsToManager =
             $overtimeRequest->employee &&
-            $overtimeRequest->employee->manager_id === $manager->id;
+            $overtimeRequest->employee->manager_id ===
+            $manager->id;
 
         if (!$belongsToManager) {
+
             return response()->json([
-                'message' => 'You are not allowed to manage this overtime request.',
+                'message' =>
+                    'You are not allowed to manage this overtime request.',
             ], 403);
         }
 
-        if ($overtimeRequest->status !== 'Pending') {
+        if (
+            $overtimeRequest->status !==
+            'Pending'
+        ) {
+
             return response()->json([
-                'message' => 'Only pending overtime requests can be approved.',
+                'message' =>
+                    'Only pending overtime requests can be approved.',
             ], 422);
         }
 
@@ -77,16 +92,22 @@ class OvertimeController extends Controller
             'approver',
         ]);
 
+        if ($overtimeRequest->date) {
+            $overtimeRequest->setAttribute(
+                'date',
+                $overtimeRequest->date->format('Y-m-d')
+            );
+        }
+
         return response()->json([
             'success' => true,
-            'message' => 'Overtime request approved successfully.',
-            'overtimeRequest' => $overtimeRequest,
+            'message' =>
+                'Overtime request approved successfully.',
+            'overtimeRequest' =>
+                $overtimeRequest,
         ]);
     }
 
-    /**
-     * Reject an overtime request.
-     */
     public function reject(
         Request $request,
         OvertimeRequest $overtimeRequest
@@ -95,17 +116,25 @@ class OvertimeController extends Controller
 
         $belongsToManager =
             $overtimeRequest->employee &&
-            $overtimeRequest->employee->manager_id === $manager->id;
+            $overtimeRequest->employee->manager_id ===
+            $manager->id;
 
         if (!$belongsToManager) {
+
             return response()->json([
-                'message' => 'You are not allowed to manage this overtime request.',
+                'message' =>
+                    'You are not allowed to manage this overtime request.',
             ], 403);
         }
 
-        if ($overtimeRequest->status !== 'Pending') {
+        if (
+            $overtimeRequest->status !==
+            'Pending'
+        ) {
+
             return response()->json([
-                'message' => 'Only pending overtime requests can be rejected.',
+                'message' =>
+                    'Only pending overtime requests can be rejected.',
             ], 422);
         }
 
@@ -121,7 +150,8 @@ class OvertimeController extends Controller
             'status' => 'Rejected',
             'approved_by' => Auth::id(),
             'approval_date' => now(),
-            'rejection_reason' => $validated['rejection_reason'],
+            'rejection_reason' =>
+                $validated['rejection_reason'],
         ]);
 
         $overtimeRequest->load([
@@ -130,10 +160,19 @@ class OvertimeController extends Controller
             'approver',
         ]);
 
+        if ($overtimeRequest->date) {
+            $overtimeRequest->setAttribute(
+                'date',
+                $overtimeRequest->date->format('Y-m-d')
+            );
+        }
+
         return response()->json([
             'success' => true,
-            'message' => 'Overtime request rejected successfully.',
-            'overtimeRequest' => $overtimeRequest,
+            'message' =>
+                'Overtime request rejected successfully.',
+            'overtimeRequest' =>
+                $overtimeRequest,
         ]);
     }
 }
