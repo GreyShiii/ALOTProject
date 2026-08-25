@@ -6,10 +6,6 @@
 
 @section('content')
 
-    {{-- =====================================================
-        PAGE HEADER
-    ===================================================== --}}
-
     <div class="mb-6">
 
         <h1 class="text-xl font-bold tracking-tight text-gray-900 sm:text-2xl">
@@ -23,39 +19,25 @@
     </div>
 
 
-    {{-- =====================================================
-        REQUESTS CARD
-    ===================================================== --}}
-
     <div class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
 
-        {{-- HEADER --}}
         <div class="border-b border-gray-200 px-5 py-4">
 
-            <div>
+            <h2 class="text-lg font-semibold text-gray-900">
+                Team Leave Requests
+            </h2>
 
-                <h2 class="text-lg font-semibold text-gray-900">
-                    Team Leave Requests
-                </h2>
-
-                <p class="mt-1 text-sm text-gray-500">
-                    Approve or reject pending requests from your team.
-                </p>
-
-            </div>
+            <p class="mt-1 text-sm text-gray-500">
+                Approve or reject pending requests from your team.
+            </p>
 
         </div>
 
-
-        {{-- =================================================
-            FILTERS
-        ================================================== --}}
 
         <div class="border-b border-gray-200 bg-gray-50 px-5 py-4">
 
             <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
 
-                {{-- SEARCH --}}
                 <div>
 
                     <label
@@ -75,7 +57,6 @@
                 </div>
 
 
-                {{-- STATUS --}}
                 <div>
 
                     <label
@@ -111,7 +92,6 @@
                 </div>
 
 
-                {{-- DATE --}}
                 <div>
 
                     <label
@@ -134,39 +114,45 @@
         </div>
 
 
-        {{-- =================================================
-            DESKTOP TABLE
-        ================================================== --}}
-
         <div class="hidden overflow-x-auto md:block">
 
-            <table class="min-w-full divide-y divide-gray-200">
+            <table class="w-full table-fixed divide-y divide-gray-200">
+
+                <colgroup>
+                    <col class="w-[24%]">
+                    <col class="w-[14%]">
+                    <col class="w-[18%]">
+                    <col class="w-[14%]">
+                    <col class="w-[14%]">
+                    <col class="w-[16%]">
+                </colgroup>
+
 
                 <thead class="bg-gray-50">
 
                     <tr>
 
-                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                        <th class="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-gray-500">
                             Employee
                         </th>
 
-                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                        <th class="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-gray-500">
                             Leave Type
                         </th>
 
-                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                        <th class="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-gray-500">
                             Date
                         </th>
 
-                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                        <th class="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-gray-500">
                             Submitted
                         </th>
 
-                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                        <th class="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-gray-500">
                             Status
                         </th>
 
-                        <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-gray-500">
+                        <th class="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-gray-500">
                             Action
                         </th>
 
@@ -178,30 +164,18 @@
                 <tbody
                     id="manager-leave-table-body"
                     class="divide-y divide-gray-200 bg-white"
-                >
-
-                </tbody>
+                ></tbody>
 
             </table>
 
         </div>
 
 
-        {{-- =================================================
-            MOBILE
-        ================================================== --}}
-
         <div
             id="manager-leave-card-list"
             class="divide-y divide-gray-200 md:hidden"
-        >
+        ></div>
 
-        </div>
-
-
-        {{-- =================================================
-            EMPTY
-        ================================================== --}}
 
         <div
             id="manager-leave-empty"
@@ -218,12 +192,14 @@
 
         </div>
 
+
+        <div
+            id="manager-leave-pagination"
+            class="border-t border-gray-200 bg-white"
+        ></div>
+
     </div>
 
-
-    {{-- =====================================================
-        REVIEW MODAL
-    ===================================================== --}}
 
     <div
         id="manager-leave-modal"
@@ -232,7 +208,6 @@
 
         <div class="w-full max-w-xl rounded-xl bg-white shadow-xl">
 
-            {{-- HEADER --}}
             <div class="flex items-start justify-between border-b border-gray-200 px-6 py-5">
 
                 <div>
@@ -247,6 +222,7 @@
 
                 </div>
 
+
                 <button
                     type="button"
                     id="close-manager-leave-modal"
@@ -258,12 +234,12 @@
             </div>
 
 
-            {{-- BODY --}}
             <div class="space-y-5 px-6 py-5">
 
                 <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
 
                     <div>
+
                         <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">
                             Employee
                         </p>
@@ -274,10 +250,12 @@
                         >
                             —
                         </p>
+
                     </div>
 
 
                     <div>
+
                         <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">
                             Department
                         </p>
@@ -288,10 +266,12 @@
                         >
                             —
                         </p>
+
                     </div>
 
 
                     <div>
+
                         <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">
                             Position
                         </p>
@@ -302,10 +282,12 @@
                         >
                             —
                         </p>
+
                     </div>
 
 
                     <div>
+
                         <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">
                             Leave Type
                         </p>
@@ -316,10 +298,12 @@
                         >
                             —
                         </p>
+
                     </div>
 
 
                     <div>
+
                         <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">
                             Start Date
                         </p>
@@ -330,10 +314,12 @@
                         >
                             —
                         </p>
+
                     </div>
 
 
                     <div>
+
                         <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">
                             End Date
                         </p>
@@ -344,10 +330,12 @@
                         >
                             —
                         </p>
+
                     </div>
 
 
                     <div>
+
                         <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">
                             Submitted
                         </p>
@@ -358,10 +346,12 @@
                         >
                             —
                         </p>
+
                     </div>
 
 
                     <div>
+
                         <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">
                             Status
                         </p>
@@ -372,12 +362,12 @@
                         >
                             —
                         </div>
+
                     </div>
 
                 </div>
 
 
-                {{-- REASON --}}
                 <div>
 
                     <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">
@@ -394,14 +384,12 @@
                 </div>
 
 
-                {{-- ERROR --}}
                 <div
                     id="manager-leave-error"
                     class="hidden rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
                 ></div>
 
 
-                {{-- REJECTION AREA --}}
                 <div
                     id="reject-section"
                     class="hidden"
@@ -426,7 +414,6 @@
             </div>
 
 
-            {{-- FOOTER --}}
             <div
                 id="manager-leave-actions"
                 class="flex flex-col-reverse gap-2 border-t border-gray-200 px-6 py-4 sm:flex-row sm:justify-end"
@@ -440,6 +427,7 @@
                     Close
                 </button>
 
+
                 <button
                     type="button"
                     id="cancel-reject-leave-btn"
@@ -447,6 +435,7 @@
                 >
                     Cancel Reject
                 </button>
+
 
                 <button
                     type="button"
@@ -456,6 +445,7 @@
                     Reject
                 </button>
 
+
                 <button
                     type="button"
                     id="confirm-reject-leave-btn"
@@ -463,6 +453,7 @@
                 >
                     Reject Request
                 </button>
+
 
                 <button
                     type="button"

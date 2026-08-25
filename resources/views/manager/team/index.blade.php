@@ -34,36 +34,45 @@
         </div>
 
 
-        {{-- Desktop --}}
         <div class="hidden overflow-x-auto md:block">
 
-            <table class="min-w-full divide-y divide-gray-200">
+            <table class="w-full table-fixed divide-y divide-gray-200">
+
+                <colgroup>
+                    <col class="w-[18%]">
+                    <col class="w-[16%]">
+                    <col class="w-[16%]">
+                    <col class="w-[23%]">
+                    <col class="w-[15%]">
+                    <col class="w-[12%]">
+                </colgroup>
+
 
                 <thead class="bg-gray-50">
 
                     <tr>
 
-                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                        <th class="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-gray-500">
                             Employee
                         </th>
 
-                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                        <th class="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-gray-500">
                             Position
                         </th>
 
-                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                        <th class="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-gray-500">
                             Department
                         </th>
 
-                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                        <th class="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-gray-500">
                             Email
                         </th>
 
-                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                        <th class="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-gray-500">
                             Hire Date
                         </th>
 
-                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                        <th class="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-gray-500">
                             Status
                         </th>
 
@@ -72,178 +81,38 @@
                 </thead>
 
 
-                <tbody class="divide-y divide-gray-200 bg-white">
-
-                    @forelse ($employees as $employee)
-
-                        <tr class="hover:bg-gray-50">
-
-                            <td class="px-4 py-4">
-
-                                <p class="text-sm font-semibold text-gray-900">
-                                    {{ $employee->user->first_name }}
-                                    {{ $employee->user->last_name }}
-                                </p>
-
-                            </td>
-
-
-                            <td class="px-4 py-4 text-sm text-gray-700">
-                                {{ $employee->position }}
-                            </td>
-
-
-                            <td class="px-4 py-4 text-sm text-gray-700">
-                                {{ $employee->department->name ?? '—' }}
-                            </td>
-
-
-                            <td class="px-4 py-4 text-sm text-gray-700">
-                                {{ $employee->user->email }}
-                            </td>
-
-
-                            <td class="px-4 py-4 text-sm text-gray-700">
-                                {{ $employee->hire_date?->format('M j, Y') ?? 'N/A' }}
-                            </td>
-
-
-                            <td class="px-4 py-4">
-
-                                @if ($employee->user->status === 'active')
-
-                                    <span class="inline-flex rounded-full bg-green-50 px-2.5 py-1 text-xs font-semibold text-green-700">
-                                        Active
-                                    </span>
-
-                                @else
-
-                                    <span class="inline-flex rounded-full bg-gray-100 px-2.5 py-1 text-xs font-semibold text-gray-600">
-                                        Inactive
-                                    </span>
-
-                                @endif
-
-                            </td>
-
-                        </tr>
-
-                    @empty
-
-                        <tr>
-
-                            <td
-                                colspan="6"
-                                class="px-6 py-12 text-center text-sm text-gray-500"
-                            >
-                                You currently have no assigned employees.
-                            </td>
-
-                        </tr>
-
-                    @endforelse
-
-                </tbody>
+                <tbody id="manager-team-table-body" class="divide-y divide-gray-200 bg-white"></tbody>
 
             </table>
 
         </div>
 
 
-        {{-- Mobile --}}
-        <div class="divide-y divide-gray-200 md:hidden">
-
-            @forelse ($employees as $employee)
-
-                <div class="px-4 py-4">
-
-                    <div class="flex items-start justify-between gap-3">
-
-                        <div class="min-w-0">
-
-                            <p class="text-sm font-semibold text-gray-900">
-                                {{ $employee->user->first_name }}
-                                {{ $employee->user->last_name }}
-                            </p>
-
-                            <p class="mt-1 text-xs text-gray-500">
-                                {{ $employee->position }}
-                            </p>
-
-                        </div>
+        <div id="manager-team-card-list" class="divide-y divide-gray-200 md:hidden"></div>
 
 
-                        @if ($employee->user->status === 'active')
+        <div id="manager-team-empty" class="hidden px-6 py-12 text-center">
 
-                            <span class="shrink-0 rounded-full bg-green-50 px-2.5 py-1 text-xs font-semibold text-green-700">
-                                Active
-                            </span>
+            <p class="text-sm font-semibold text-gray-700">
+                No team members found.
+            </p>
 
-                        @else
-
-                            <span class="shrink-0 rounded-full bg-gray-100 px-2.5 py-1 text-xs font-semibold text-gray-600">
-                                Inactive
-                            </span>
-
-                        @endif
-
-                    </div>
-
-
-                    <dl class="mt-3 grid grid-cols-2 gap-3 text-sm">
-
-                        <div>
-
-                            <dt class="text-xs font-semibold uppercase tracking-wide text-gray-400">
-                                Department
-                            </dt>
-
-                            <dd class="text-gray-700">
-                                {{ $employee->department->name ?? '—' }}
-                            </dd>
-
-                        </div>
-
-
-                        <div>
-
-                            <dt class="text-xs font-semibold uppercase tracking-wide text-gray-400">
-                                Email
-                            </dt>
-
-                            <dd class="break-all text-gray-700">
-                                {{ $employee->user->email }}
-                            </dd>
-
-                        </div>
-
-
-                        <div>
-
-                            <dt class="text-xs font-semibold uppercase tracking-wide text-gray-400">
-                                Hire Date
-                            </dt>
-
-                            <dd class="text-gray-700">
-                                {{ $employee->hire_date?->format('M j, Y') ?? 'N/A' }}
-                            </dd>
-
-                        </div>
-
-                    </dl>
-
-                </div>
-
-            @empty
-
-                <div class="px-4 py-12 text-center text-sm text-gray-500">
-                    You currently have no assigned employees.
-                </div>
-
-            @endforelse
+            <p class="mt-1 text-xs text-gray-500">
+                You currently have no assigned employees.
+            </p>
 
         </div>
 
+
+        <div id="manager-team-pagination" class="border-t border-gray-200 bg-white"></div>
+
     </div>
+
+
+    <script>
+        window.managerTeamEmployees = @json($employees->values());
+    </script>
+
+    @vite('resources/js/manager/team.js')
 
 @endsection
