@@ -425,7 +425,7 @@ function createTableRow(
 
 
     row.innerHTML = `
-        <td class="align-middle break-words px-4 py-4">
+        <td class="align-middle break-words px-4 py-4 text-center">
             <p class="text-sm font-semibold text-gray-900">
                 ${employeeName}
             </p>
@@ -435,31 +435,31 @@ function createTableRow(
             </p>
         </td>
 
-        <td class="align-middle break-words px-4 py-4 text-sm text-gray-700">
+        <td class="align-middle break-words px-4 py-4 text-sm text-gray-700 text-center">
             ${department?.name || "—"}
         </td>
 
-        <td class="align-middle break-words px-4 py-4 text-sm font-medium text-gray-900">
+        <td class="align-middle break-words px-4 py-4 text-sm font-medium text-gray-900 text-center">
             ${leave.leave_type || "—"}
         </td>
 
-        <td class="align-middle whitespace-nowrap px-4 py-4 text-sm text-gray-700">
+        <td class="align-middle whitespace-nowrap px-4 py-4 text-sm text-gray-700 text-center">
             ${dateDisplay}
         </td>
 
-        <td class="align-middle whitespace-nowrap px-4 py-4 text-sm text-gray-700">
+        <td class="align-middle whitespace-nowrap px-4 py-4 text-sm text-gray-700 text-center">
             ${days} ${days === 1 ? "day" : "days"}
         </td>
 
-        <td class="align-middle whitespace-nowrap px-4 py-4 text-sm text-gray-500">
+        <td class="align-middle whitespace-nowrap px-4 py-4 text-sm text-gray-500 text-center">
             ${formatDate(leave.created_at)}
         </td>
 
-        <td class="align-middle px-4 py-4">
+        <td class="align-middle px-4 py-4 text-center">
             ${statusBadge(leave.status)}
         </td>
 
-        <td class="align-middle whitespace-nowrap px-4 py-4 text-right">
+        <td class="align-middle whitespace-nowrap px-4 py-4 text-center">
             <button
                 type="button"
                 class="view-leave-btn rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 shadow-sm transition hover:bg-slate-100 hover:text-slate-900"

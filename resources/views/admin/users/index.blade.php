@@ -68,129 +68,164 @@
 
         <div class="hidden overflow-x-auto md:block">
 
-            <table class="min-w-full divide-y divide-gray-200">
+            <div class="hidden overflow-x-auto md:block">
 
-                <thead class="bg-gray-50">
-                    <tr>
-                        <th
-                            class="whitespace-nowrap px-3 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-500">
-                            User
-                        </th>
+                <table class="w-full table-fixed divide-y divide-gray-200">
 
-                        <th
-                            class="whitespace-nowrap px-3 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-500">
-                            Email
-                        </th>
+                    <colgroup>
+                        <col class="w-[18%]">
+                        <col class="w-[20%]">
+                        <col class="w-[12%]">
+                        <col class="w-[15%]">
+                        <col class="w-[12%]">
+                        <col class="w-[23%]">
+                    </colgroup>
 
-                        <th
-                            class="whitespace-nowrap px-3 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-500">
-                            Role
-                        </th>
+                    <thead class="bg-gray-50">
 
-                        <th
-                            class="whitespace-nowrap px-3 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-500">
-                            Created At
-                        </th>
+                        <tr>
 
-                        <th
-                            class="whitespace-nowrap px-3 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-500">
-                            Status
-                        </th>
+                            <th
+                                class="whitespace-nowrap px-3 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-500">
+                                User
+                            </th>
 
-                        <th
-                            class="whitespace-nowrap px-3 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-500">
-                            Actions
-                        </th>
-                    </tr>
-                </thead>
+                            <th
+                                class="whitespace-nowrap px-3 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-500">
+                                Email
+                            </th>
 
-                <tbody id="user-table-body" class="divide-y divide-gray-200 bg-white">
-                    @forelse ($users as $user)
-                        <tr id="user-row-{{ $user->id }}" class="transition hover:bg-gray-50"
-                            data-role="{{ $user->role }}" data-status="{{ $user->status }}">
-                            <td class="px-3 py-4 text-center text-sm font-semibold text-gray-900">
-                                {{ $user->first_name }} {{ $user->last_name }}
-                            </td>
+                            <th
+                                class="whitespace-nowrap px-3 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-500">
+                                Role
+                            </th>
 
-                            <td class="px-3 py-4 text-center text-sm text-gray-700">
-                                {{ $user->email }}
-                            </td>
+                            <th
+                                class="whitespace-nowrap px-3 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-500">
+                                Created At
+                            </th>
 
-                            <td class="px-3 py-4 text-center">
-                                @if ($user->role === 'admin')
-                                    <span data-user-role
-                                        class="inline-flex rounded-full bg-purple-100 px-2.5 py-1 text-xs font-semibold text-purple-700">
-                                        Admin
-                                    </span>
-                                @elseif ($user->role === 'manager')
-                                    <span data-user-role
-                                        class="inline-flex rounded-full bg-blue-100 px-2.5 py-1 text-xs font-semibold text-blue-700">
-                                        Manager
-                                    </span>
-                                @else
-                                    <span data-user-role
-                                        class="inline-flex rounded-full bg-gray-100 px-2.5 py-1 text-xs font-semibold text-gray-700">
-                                        Employee
-                                    </span>
-                                @endif
-                            </td>
+                            <th
+                                class="whitespace-nowrap px-3 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-500">
+                                Status
+                            </th>
 
-                            <td class="whitespace-nowrap px-3 py-4 text-center text-sm text-gray-700">
-                                {{ $user->created_at->format('M j, Y') }}
-                            </td>
+                            <th
+                                class="whitespace-nowrap px-3 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-500">
+                                Actions
+                            </th>
 
-                            <td class="px-3 py-4 text-center">
-                                @if ($user->status === 'active')
-                                    <span data-user-status
-                                        class="inline-flex rounded-full bg-green-100 px-2.5 py-1 text-xs font-semibold text-green-700">
-                                        Active
-                                    </span>
-                                @else
-                                    <span data-user-status
-                                        class="inline-flex rounded-full bg-red-100 px-2.5 py-1 text-xs font-semibold text-red-700">
-                                        Inactive
-                                    </span>
-                                @endif
-                            </td>
+                        </tr>
 
-                            <td class="whitespace-nowrap px-3 py-4 text-center">
-                                <div class="flex items-center justify-center gap-2">
+                    </thead>
 
-                                    <button type="button" data-id="{{ $user->id }}"
-                                        class="view-user-btn rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 shadow-sm transition hover:bg-slate-100 hover:text-slate-900">
-                                        View
-                                    </button>
+                    <tbody id="user-table-body" class="divide-y divide-gray-200 bg-white">
 
-                                    <button type="button" data-id="{{ $user->id }}"
-                                        class="edit-user-btn rounded-md border border-slate-200 bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-200">
-                                        Edit
-                                    </button>
+                        @forelse ($users as $user)
+                            <tr id="user-row-{{ $user->id }}" class="transition hover:bg-gray-50"
+                                data-role="{{ $user->role }}" data-status="{{ $user->status }}">
 
-                                    @if ($user->status === 'active')
-                                        <button type="button" data-id="{{ $user->id }}"
-                                            class="deactivate-user-btn w-[84px] rounded-md bg-amber-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-amber-700">
-                                            Deactivate
-                                        </button>
+                                <td class="px-3 py-4 text-center text-sm font-semibold text-gray-900">
+                                    <div class="truncate">
+                                        {{ $user->first_name }} {{ $user->last_name }}
+                                    </div>
+                                </td>
+
+                                <td class="px-3 py-4 text-center text-sm text-gray-700">
+                                    <div class="truncate">
+                                        {{ $user->email }}
+                                    </div>
+                                </td>
+
+                                <td class="px-3 py-4 text-center">
+
+                                    @if ($user->role === 'admin')
+                                        <span data-user-role
+                                            class="inline-flex rounded-full bg-purple-100 px-2.5 py-1 text-xs font-semibold text-purple-700">
+                                            Admin
+                                        </span>
+                                    @elseif ($user->role === 'manager')
+                                        <span data-user-role
+                                            class="inline-flex rounded-full bg-blue-100 px-2.5 py-1 text-xs font-semibold text-blue-700">
+                                            Manager
+                                        </span>
                                     @else
-                                        <button type="button" data-id="{{ $user->id }}"
-                                            class="activate-user-btn w-[84px] rounded-md bg-green-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-green-700">
-                                            Activate
-                                        </button>
+                                        <span data-user-role
+                                            class="inline-flex rounded-full bg-gray-100 px-2.5 py-1 text-xs font-semibold text-gray-700">
+                                            Employee
+                                        </span>
                                     @endif
 
-                                </div>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr id="no-users">
-                            <td colspan="6" class="px-6 py-12 text-center text-sm text-gray-500">
-                                No users yet.
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
+                                </td>
 
-            </table>
+                                <td class="whitespace-nowrap px-3 py-4 text-center text-sm text-gray-700">
+                                    {{ $user->created_at->format('M j, Y') }}
+                                </td>
+
+                                <td class="px-3 py-4 text-center">
+
+                                    @if ($user->status === 'active')
+                                        <span data-user-status
+                                            class="inline-flex rounded-full bg-green-100 px-2.5 py-1 text-xs font-semibold text-green-700">
+                                            Active
+                                        </span>
+                                    @else
+                                        <span data-user-status
+                                            class="inline-flex rounded-full bg-red-100 px-2.5 py-1 text-xs font-semibold text-red-700">
+                                            Inactive
+                                        </span>
+                                    @endif
+
+                                </td>
+
+                                <td class="whitespace-nowrap px-3 py-4 text-center">
+
+                                    <div class="flex items-center justify-center gap-2">
+
+                                        <button type="button" data-id="{{ $user->id }}"
+                                            class="view-user-btn rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 shadow-sm transition hover:bg-slate-100 hover:text-slate-900">
+                                            View
+                                        </button>
+
+                                        <button type="button" data-id="{{ $user->id }}"
+                                            class="edit-user-btn rounded-md border border-slate-200 bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-200">
+                                            Edit
+                                        </button>
+
+                                        @if ($user->status === 'active')
+                                            <button type="button" data-id="{{ $user->id }}"
+                                                class="deactivate-user-btn w-[84px] rounded-md bg-amber-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-amber-700">
+                                                Deactivate
+                                            </button>
+                                        @else
+                                            <button type="button" data-id="{{ $user->id }}"
+                                                class="activate-user-btn w-[84px] rounded-md bg-green-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-green-700">
+                                                Activate
+                                            </button>
+                                        @endif
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+
+                        @empty
+
+                            <tr id="no-users">
+
+                                <td colspan="6" class="px-6 py-12 text-center text-sm text-gray-500">
+                                    No users yet.
+                                </td>
+
+                            </tr>
+                        @endforelse
+
+                    </tbody>
+
+                </table>
+
+            </div>
 
         </div>
 

@@ -309,40 +309,40 @@ function createAttendanceRow(
 
 
     row.innerHTML = `
-        <td class="px-5 py-3 text-sm text-gray-900">
+        <td class="px-5 py-3 text-sm text-gray-900 text-center">
             <p class="font-medium">
                 ${employeeName}
             </p>
 
-            <p class="mt-1 text-xs text-gray-500">
+            <p class="mt-1 text-xs text-gray-500 text-center">
                 ${user?.email || "—"}
             </p>
         </td>
 
-        <td class="px-5 py-3 text-sm text-gray-700">
+        <td class="px-5 py-3 text-sm text-gray-700 text-center">
             ${department?.name || "—"}
         </td>
 
-        <td class="whitespace-nowrap px-5 py-3 text-sm text-gray-700">
+        <td class="whitespace-nowrap px-5 py-3 text-sm text-gray-700 text-center">
             ${formatDate(attendance.date)}
         </td>
 
-        <td class="whitespace-nowrap px-5 py-3 text-sm text-gray-700">
+        <td class="whitespace-nowrap px-5 py-3 text-sm text-gray-700 text-center">
             ${formatTime(attendance.time_in)}
         </td>
 
-        <td class="whitespace-nowrap px-5 py-3 text-sm text-gray-700">
+        <td class="whitespace-nowrap px-5 py-3 text-sm text-gray-700 text-center">
             ${formatTime(attendance.time_out)}
         </td>
 
-        <td class="whitespace-nowrap px-5 py-3 text-sm text-gray-700">
+        <td class="whitespace-nowrap px-5 py-3 text-sm text-gray-700 text-center">
             ${calculateTotalHours(
                 attendance.time_in,
                 attendance.time_out
             )}
         </td>
 
-        <td class="px-5 py-3">
+        <td class="px-5 py-3 text-center">
             ${statusBadge(attendance)}
         </td>
     `

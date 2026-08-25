@@ -193,33 +193,33 @@ function createTableRow(overtime) {
     row.className = "transition hover:bg-gray-50";
 
     row.innerHTML = `
-        <td class="align-middle break-words px-4 py-4">
+        <td class="align-middle break-words px-4 py-4 text-center">
             <p class="text-sm font-semibold text-gray-900">
                 ${employeeName}
             </p>
 
-            <p class="mt-1 break-all text-xs text-gray-500">
+            <p class="mt-1 break-all text-xs text-gray-500 text-center">
                 ${user?.email || "—"}
             </p>
         </td>
 
-        <td class="align-middle break-words px-4 py-4 text-sm text-gray-700">
+        <td class="align-middle break-words px-4 py-4 text-sm text-gray-700 text-center">
             ${department?.name || "—"}
         </td>
 
-        <td class="align-middle whitespace-nowrap px-4 py-4 text-sm text-gray-700">
+        <td class="align-middle whitespace-nowrap px-4 py-4 text-sm text-gray-700 text-center">
             ${formatDate(overtime.date)}
         </td>
 
-        <td class="align-middle whitespace-nowrap px-4 py-4 text-sm font-medium text-gray-900">
+        <td class="align-middle whitespace-nowrap px-4 py-4 text-sm font-medium text-gray-900 text-center">
             ${overtime.hours} hrs
         </td>
 
-        <td class="align-middle px-4 py-4">
+        <td class="align-middle px-4 py-4 text-center">
             ${statusBadge(overtime.status)}
         </td>
 
-        <td class="align-middle whitespace-nowrap px-4 py-4 text-right">
+        <td class="align-middle whitespace-nowrap px-4 py-4 text-center">
             <button
                 type="button"
                 class="view-admin-overtime-btn rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 shadow-sm transition hover:bg-slate-100 hover:text-slate-900"
